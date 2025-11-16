@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 function loadStore(id){
   const key = `lpg_store_${id}`
   const raw = localStorage.getItem(key)
-  return raw ? JSON.parse(raw) : { inventory: { '45kg': { filled:10, empty:0 } }, transactions: [], khatabook: {} }
+  return raw ? JSON.parse(raw) : { inventory: { '45kg': { filled:10, empty:0 } }, transactions: [], khatabook: {}, perKgRate: 0 }
 }
 
 function saveStore(id, data){
@@ -102,22 +102,73 @@ export function useStore(sessionId){
     return { success: true, message: 'Refilled successfully' }
   }
 
-  const addKhataEntry = (name, kg) => {
+  const addKhataEntry = (name, kg, perKgRate) => {
     const q = Number(kg || 0)
+    const rate = Number(perKgRate || 0)
     if(!name || !name.toString().trim()) return { success: false, message: 'Name required' }
     if(!q || q <= 0) return { success: false, message: 'Invalid kg' }
+    if(!rate || rate <= 0) return { success: false, message: 'Per-kg rate not set' }
 
+    const amount = q * rate
     setStore(s=>{
       const next = JSON.parse(JSON.stringify(s))
       if(!next.khatabook) next.khatabook = {}
       const key = name.toString().trim()
-      next.khatabook[key] = (next.khatabook[key] || 0) + q
+      
+      // Migrate old format (number) to new format (object)
+      if(typeof next.khatabook[key] === 'number'){
+        next.khatabook[key] = { kg: next.khatabook[key], amount: 0 }
+      }
+      
+      if(!next.khatabook[key]) next.khatabook[key] = { kg: 0, amount: 0 }
+      next.khatabook[key].kg = (next.khatabook[key].kg || 0) + q
+      next.khatabook[key].amount = (next.khatabook[key].amount || 0) + amount
       if(!next.transactions) next.transactions = []
-      next.transactions.unshift({ date: todaysKey, type:'khata', name: key, kg: q, note: 'credit' })
+      next.transactions.unshift({ date: todaysKey, type:'khata', name: key, kg: q, amount, rate, note: 'credit' })
       return next
     })
     return { success: true, message: 'Recorded in Khata' }
   }
 
-  return { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry }
+  const settleKhata = (name, paidAmount) => {
+    const paid = Number(paidAmount || 0)
+    if(!name || !name.toString().trim()) return { success: false, message: 'Name required' }
+    if(!paid || paid <= 0) return { success: false, message: 'Invalid amount' }
+
+    setStore(s=>{
+      const next = JSON.parse(JSON.stringify(s))
+      if(!next.khatabook) next.khatabook = {}
+      const key = name.toString().trim()
+      if(!next.khatabook[key]) return s
+      
+      // Migrate old format (number) to new format (object)
+      if(typeof next.khatabook[key] === 'number'){
+        next.khatabook[key] = { kg: next.khatabook[key], amount: 0 }
+      }
+      
+      const currentAmount = next.khatabook[key].amount || 0
+      const currentKg = next.khatabook[key].kg || 0
+      const newAmount = Math.max(0, currentAmount - paid)
+      
+      // Calculate how much kg was paid for
+      // If rate is stored in perKgRate or calculate from existing data
+      const ratePerKg = currentKg > 0 && currentAmount > 0 ? currentAmount / currentKg : 0
+      const paidKg = ratePerKg > 0 ? paid / ratePerKg : 0
+      const newKg = Math.max(0, currentKg - paidKg)
+      
+      next.khatabook[key].amount = newAmount
+      next.khatabook[key].kg = newKg
+      
+      if(!next.transactions) next.transactions = []
+      next.transactions.unshift({ date: todaysKey, type:'settlement', name: key, paid, paidKg, note: 'payment' })
+      
+      if(newAmount === 0 && newKg === 0){
+        delete next.khatabook[key]
+      }
+      return next
+    })
+    return { success: true, message: 'Payment recorded' }
+  }
+
+  return { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata }
 }

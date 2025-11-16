@@ -11,7 +11,7 @@ const NAV = [
 ]
 
 export default function Dashboard({ session, renameShop }){
-  const { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry } = useStore(session.id)
+  const { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata } = useStore(session.id)
   
   const [perKgRate, setPerKgRate] = useState(0)
   const [view, setView] = useState('overview')
@@ -26,6 +26,8 @@ export default function Dashboard({ session, renameShop }){
   const [khataKg, setKhataKg] = useState('')
   const [addingTo, setAddingTo] = useState(null)
   const [addKgValue, setAddKgValue] = useState('')
+  const [settlingName, setSettlingName] = useState(null)
+  const [settleAmount, setSettleAmount] = useState('')
 
   const currencyFmt = new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   const formatPKR = v => `PKR ${currencyFmt.format(Number(v) || 0)}`
@@ -124,6 +126,12 @@ export default function Dashboard({ session, renameShop }){
             </div>
           </div>
         </header>
+
+        {toast && (
+          <div className={`fixed right-6 top-6 z-50 p-4 rounded-xl shadow-2xl text-white font-semibold ${toast.type==='error' ? 'bg-red-500' : 'bg-green-500'}`}>
+            {toast.message}
+          </div>
+        )}
 
         {showEdit && (
           <div className="modal-overlay" onClick={()=>setShowEdit(false)}>
@@ -282,7 +290,7 @@ export default function Dashboard({ session, renameShop }){
                 <input value={khataName} onChange={e=>setKhataName(e.target.value)} placeholder="Name" className="p-3 border-2 rounded-lg w-48" />
                 <input value={khataKg} onChange={e=>setKhataKg(e.target.value)} placeholder="Kg" type="number" className="p-3 border-2 rounded-lg w-32" />
                 <button className="px-4 py-2 bg-blue-600 text-white rounded-lg" onClick={()=>{
-                  const res = addKhataEntry(khataName, khataKg)
+                  const res = addKhataEntry(khataName, khataKg, perKgRate)
                   if(res && res.success){ setToast({message: res.message, type:'success'}); setKhataName(''); setKhataKg('') }
                   else setToast({message: res.message || 'Error', type:'error'})
                 }}>Add</button>
@@ -290,25 +298,41 @@ export default function Dashboard({ session, renameShop }){
 
               <div className="space-y-3">
                 {Object.entries(store.khatabook || {}).length === 0 && <div className="text-slate-400">No khata entries yet</div>}
-                {Object.entries(store.khatabook || {}).map(([name,kg], idx)=> (
-                  <div key={idx} className="flex items-center justify-between p-3 border rounded-lg">
+                {Object.entries(store.khatabook || {}).map(([name,data], idx)=> (
+                  <div key={idx} className="flex items-center justify-between p-4 border-2 rounded-xl bg-gradient-to-r from-slate-50 to-white hover:shadow-lg transition-all">
                     <div>
-                      <div className="font-semibold">{name}</div>
-                      <div className="text-sm text-slate-500">Total: {kg} kg</div>
+                      <div className="font-bold text-lg text-slate-800">{name}</div>
+                      <div className="flex gap-4 mt-1">
+                        <span className="text-sm text-slate-600">Total Kg: <span className="font-semibold">{data.kg || 0} kg</span></span>
+                        <span className="text-sm text-red-600">Total Udhar: <span className="font-bold">{formatPKR(data.amount || 0)}</span></span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {addingTo === name ? (
                         <>
-                          <input type="number" value={addKgValue} onChange={e=>setAddKgValue(e.target.value)} className="p-2 border rounded w-28" />
-                          <button className="px-3 py-2 bg-green-500 text-white rounded" onClick={()=>{
-                            const res = addKhataEntry(name, addKgValue)
+                          <input type="number" value={addKgValue} onChange={e=>setAddKgValue(e.target.value)} placeholder="Kg" className="p-2 border-2 rounded-lg w-28" />
+                          <button className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" onClick={()=>{
+                            const res = addKhataEntry(name, addKgValue, perKgRate)
                             if(res && res.success){ setToast({message: res.message, type:'success'}); setAddingTo(null); setAddKgValue('') }
                             else setToast({message: res.message || 'Error', type:'error'})
-                          }}>+ Add</button>
-                          <button className="px-3 py-2 border rounded" onClick={()=>{ setAddingTo(null); setAddKgValue('') }}>Cancel</button>
+                          }}>+ Add Kg</button>
+                          <button className="px-3 py-2 border-2 rounded-lg hover:bg-slate-50" onClick={()=>{ setAddingTo(null); setAddKgValue('') }}>Cancel</button>
+                        </>
+                      ) : settlingName === name ? (
+                        <>
+                          <input type="number" value={settleAmount} onChange={e=>setSettleAmount(e.target.value)} placeholder="PKR" className="p-2 border-2 rounded-lg w-32" />
+                          <button className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" onClick={()=>{
+                            const res = settleKhata(name, settleAmount)
+                            if(res && res.success){ setToast({message: res.message, type:'success'}); setSettlingName(null); setSettleAmount('') }
+                            else setToast({message: res.message || 'Error', type:'error'})
+                          }}>💰 Pay</button>
+                          <button className="px-3 py-2 border-2 rounded-lg hover:bg-slate-50" onClick={()=>{ setSettlingName(null); setSettleAmount('') }}>Cancel</button>
                         </>
                       ) : (
-                        <button className="px-3 py-2 bg-blue-500 text-white rounded" onClick={()=>{ setAddingTo(name); setAddKgValue('') }}>Add Kg</button>
+                        <>
+                          <button className="px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600" onClick={()=>{ setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
+                          <button className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" onClick={()=>{ setSettlingName(name); setSettleAmount('') }}>💳 Settle</button>
+                        </>
                       )}
                     </div>
                   </div>
