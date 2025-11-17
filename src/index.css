@@ -18,6 +18,4 @@ body{@apply bg-slate-50 text-slate-900}
   .sidebar{flex-direction:row}
 }
 
-@media (max-width:600px){
-  .app{padding:12px}
-}
+
