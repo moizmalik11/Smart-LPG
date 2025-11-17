@@ -28,6 +28,7 @@ export default function Dashboard({ session, renameShop }){
   const [addKgValue, setAddKgValue] = useState('')
   const [settlingName, setSettlingName] = useState(null)
   const [settleAmount, setSettleAmount] = useState('')
+  const [showHistory, setShowHistory] = useState(false)
 
   const currencyFmt = new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   const formatPKR = v => `PKR ${currencyFmt.format(Number(v) || 0)}`
@@ -284,7 +285,15 @@ export default function Dashboard({ session, renameShop }){
 
           {view === 'shipments' && (
             <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
-              <h3 className="text-2xl font-bold text-slate-800 mb-5">📒 Khata Book (Udhar)</h3>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-2xl font-bold text-slate-800">📒 Khata Book (Udhar)</h3>
+                <button 
+                  className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-all shadow-md" 
+                  onClick={()=>setShowHistory(true)}
+                >
+                  📜 History
+                </button>
+              </div>
 
               <div className="mb-5 flex gap-3">
                 <input value={khataName} onChange={e=>setKhataName(e.target.value)} placeholder="Name" className="p-3 border-2 rounded-lg w-48" />
@@ -337,6 +346,70 @@ export default function Dashboard({ session, renameShop }){
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {showHistory && (
+            <div className="modal-overlay" onClick={()=>setShowHistory(false)}>
+              <div className="modal bg-white p-6 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-auto" onClick={e=>e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold text-slate-800">📜 Last Month Payment History</h3>
+                  <button 
+                    className="px-3 py-1 bg-slate-500 text-white rounded-lg hover:bg-slate-600" 
+                    onClick={()=>setShowHistory(false)}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="overflow-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gradient-to-r from-slate-100 to-slate-50">
+                        <th className="py-3 px-4 text-sm font-bold text-slate-700 uppercase tracking-wide">Date</th>
+                        <th className="py-3 px-4 text-sm font-bold text-slate-700 uppercase tracking-wide">Name</th>
+                        <th className="py-3 px-4 text-sm font-bold text-slate-700 uppercase tracking-wide">Paid Amount</th>
+                        <th className="py-3 px-4 text-sm font-bold text-slate-700 uppercase tracking-wide">Remaining</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const lastMonth = new Date()
+                        lastMonth.setDate(lastMonth.getDate() - 30)
+                        const lastMonthStr = lastMonth.toISOString().slice(0,10)
+                        const historyTxns = store.transactions
+                          .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
+                          .sort((a,b) => b.date.localeCompare(a.date))
+                        return historyTxns.map((t,i)=> {
+                          const currentData = store.khatabook && store.khatabook[t.name] ? store.khatabook[t.name] : { amount: 0 }
+                          const remaining = currentData.amount || 0
+                          return (
+                            <tr key={i} className="border-t border-slate-200 hover:bg-blue-50 transition-all">
+                              <td className="py-3 px-4 text-sm text-slate-700 font-medium">{t.date}</td>
+                              <td className="py-3 px-4 text-sm font-semibold text-slate-800">{t.name}</td>
+                              <td className="py-3 px-4 text-sm font-bold text-green-600">{formatPKR(t.paid)}</td>
+                              <td className="py-3 px-4 text-sm">
+                                {remaining === 0 ? (
+                                  <span className="text-green-600 font-bold">Clear</span>
+                                ) : (
+                                  <span className="text-red-600 font-bold">{formatPKR(remaining)}</span>
+                                )}
+                              </td>
+                            </tr>
+                          )
+                        })
+                      })()}
+                      {(() => {
+                        const lastMonth = new Date()
+                        lastMonth.setDate(lastMonth.getDate() - 30)
+                        const lastMonthStr = lastMonth.toISOString().slice(0,10)
+                        return store.transactions.filter(t => t.type === 'settlement' && t.date >= lastMonthStr).length === 0
+                      })() && (
+                        <tr><td className="py-8 text-center text-slate-400" colSpan={4}>📝 No payments in last month</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}

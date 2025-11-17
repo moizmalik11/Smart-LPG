@@ -147,6 +147,10 @@ export function useStore(sessionId){
       }
       
       const currentAmount = next.khatabook[key].amount || 0
+      if(paid > currentAmount){
+        return s // Don't update if overpayment
+      }
+      
       const currentKg = next.khatabook[key].kg || 0
       const newAmount = Math.max(0, currentAmount - paid)
       
@@ -167,6 +171,13 @@ export function useStore(sessionId){
       }
       return next
     })
+    
+    // Check if payment was processed (if not, it means overpayment)
+    const currentAmount = store.khatabook && store.khatabook[name] ? (store.khatabook[name].amount || 0) : 0
+    if(paid > currentAmount){
+      return { success: false, message: 'ye amount remaining se zyada hai' }
+    }
+    
     return { success: true, message: 'Payment recorded' }
   }
 
