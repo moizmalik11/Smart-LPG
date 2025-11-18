@@ -30,6 +30,8 @@ export default function Dashboard({ session, renameShop }){
   const [settleAmount, setSettleAmount] = useState('')
   const [showHistory, setShowHistory] = useState(false)
   const [inventoryEdits, setInventoryEdits] = useState({})
+  const [showInventoryModal, setShowInventoryModal] = useState(false)
+  const [inventoryModalData, setInventoryModalData] = useState({ type: '', total: 0, filled: 0, empty: 0 })
   const [localSession, setLocalSession] = useState(session)
   const [personalEditing, setPersonalEditing] = useState(false)
 
@@ -695,73 +697,162 @@ export default function Dashboard({ session, renameShop }){
               <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
                 <h3 className="text-2xl font-bold text-slate-800 mb-5">📦 Inventory Management</h3>
                 <div className="space-y-6">
-                  {Object.entries(store.inventory).map(([type, counts]) => (
-                    <div key={type} className="border border-slate-200 rounded-lg p-4">
-                      <h4 className="text-lg font-bold text-slate-700 mb-4">{type} Cylinders</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2">Filled Cylinders</label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={inventoryEdits[type]?.filled ?? counts.filled}
-                            onChange={(e) => setInventoryEdits({
-                              ...inventoryEdits,
-                              [type]: { ...inventoryEdits[type], filled: parseInt(e.target.value) || 0 }
-                            })}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                          />
+                  {Object.entries(store.inventory).map(([type, counts]) => {
+                    const total = (counts.filled || 0) + (counts.empty || 0)
+                    const isEditing = inventoryEdits[type]?.editing
+                    const draftTotal = inventoryEdits[type]?.total ?? total
+                    const filledPercent = total > 0 ? ((counts.filled || 0) / total) * 100 : 0
+                    return (
+                      <div key={type} className="bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <span className="text-2xl">🛢️</span> {type} Cylinders
+                          </h4>
+                          {!isEditing && (
+                            <button
+                              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md"
+                              onClick={() => setInventoryEdits({ ...inventoryEdits, [type]: { ...(inventoryEdits[type] || {}), editing: true, total } })}
+                            >
+                              ✏️ Edit Total
+                            </button>
+                          )}
                         </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2">Empty Cylinders</label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={inventoryEdits[type]?.empty ?? counts.empty}
-                            onChange={(e) => setInventoryEdits({
-                              ...inventoryEdits,
-                              [type]: { ...inventoryEdits[type], empty: parseInt(e.target.value) || 0 }
-                            })}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                          />
-                        </div>
+
+                        {!isEditing ? (
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="text-lg font-semibold text-slate-700">Total Cylinders: <span className="text-slate-900">{total}</span></div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-green-700 font-medium">Filled: {counts.filled || 0}</span>
+                                <span className="text-amber-700 font-medium">Empty: {counts.empty || 0}</span>
+                              </div>
+                              <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden shadow-inner">
+                                <div 
+                                  className="bg-gradient-to-r from-green-500 to-green-600 h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${filledPercent}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div className="text-sm text-blue-800 mb-3">Enter new total cylinders. You'll be asked to specify how many are filled and empty.</div>
+                            <div className="flex items-center gap-4">
+                              <div className="flex-1">
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Total Cylinders</label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={draftTotal}
+                                  onChange={(e) => setInventoryEdits({ ...inventoryEdits, [type]: { ...(inventoryEdits[type] || {}), editing: true, total: parseInt(e.target.value) || 0 } })}
+                                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg font-semibold"
+                                  placeholder="e.g., 30"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <button
+                                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg font-semibold"
+                                  onClick={() => {
+                                    const newTotal = Number(inventoryEdits[type]?.total ?? 0)
+                                    if (isNaN(newTotal) || newTotal < 0) {
+                                      setToast({ message: 'Invalid total', type: 'error' })
+                                      return
+                                    }
+                                    setInventoryModalData({ type, total: newTotal, filled: 0, empty: newTotal })
+                                    setShowInventoryModal(true)
+                                  }}
+                                >
+                                  💾 Save
+                                </button>
+                                <button
+                                  className="px-6 py-3 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-all font-semibold"
+                                  onClick={() => {
+                                    const copy = { ...inventoryEdits }
+                                    delete copy[type]
+                                    setInventoryEdits(copy)
+                                  }}
+                                >
+                                  ✖ Cancel
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
-                <div className="mt-6 flex justify-end space-x-4">
+              </div>
+            </div>
+          )}
+
+          {showInventoryModal && (
+            <div className="modal-overlay" onClick={() => setShowInventoryModal(false)}>
+              <div className="modal bg-white p-6 rounded-2xl shadow-2xl" onClick={e => e.stopPropagation()}>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">Set Cylinder Distribution</h3>
+                <p className="text-sm text-slate-600 mb-5">Total {inventoryModalData.type} cylinders: {inventoryModalData.total}</p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Filled Cylinders</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max={inventoryModalData.total}
+                      value={inventoryModalData.filled}
+                      onChange={(e) => {
+                        const filled = Math.min(Number(e.target.value) || 0, inventoryModalData.total)
+                        const empty = inventoryModalData.total - filled
+                        setInventoryModalData({ ...inventoryModalData, filled, empty })
+                      }}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Empty Cylinders</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max={inventoryModalData.total}
+                      value={inventoryModalData.empty}
+                      onChange={(e) => {
+                        const empty = Math.min(Number(e.target.value) || 0, inventoryModalData.total)
+                        const filled = inventoryModalData.total - empty
+                        setInventoryModalData({ ...inventoryModalData, filled, empty })
+                      }}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  <div className="text-sm text-slate-500">
+                    Filled + Empty = {inventoryModalData.filled + inventoryModalData.empty} (must equal {inventoryModalData.total})
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end gap-3">
                   <button
-                    onClick={() => {
-                      setInventoryEdits({});
-                    }}
-                    className="px-6 py-3 bg-slate-500 text-white font-bold rounded-lg hover:bg-slate-600 transition-all"
+                    className="px-5 py-2 border-2 border-slate-300 rounded-xl font-medium hover:bg-slate-50 transition-all"
+                    onClick={() => setShowInventoryModal(false)}
                   >
-                    ❌ Cancel
+                    Cancel
                   </button>
                   <button
+                    className="px-5 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-green-700 transition-all shadow-lg"
                     onClick={() => {
-                      const updates = {};
-                      Object.entries(inventoryEdits).forEach(([type, counts]) => {
-                        if (counts.filled !== undefined || counts.empty !== undefined) {
-                          updates[type] = {
-                            filled: counts.filled ?? store.inventory[type]?.filled ?? 0,
-                            empty: counts.empty ?? store.inventory[type]?.empty ?? 0
-                          };
-                        }
-                      });
-                      if (Object.keys(updates).length > 0) {
-                        const result = updateInventory(updates);
-                        if (result.success) {
-                          setToast({ message: result.message, type: 'success' });
-                          setInventoryEdits({});
-                        } else {
-                          setToast({ message: result.message, type: 'error' });
-                        }
+                      if (inventoryModalData.filled + inventoryModalData.empty !== inventoryModalData.total) {
+                        setToast({ message: 'Filled + Empty must equal total', type: 'error' })
+                        return
+                      }
+                      const res = updateInventory(inventoryModalData.type, inventoryModalData.filled, inventoryModalData.empty)
+                      if (res && res.success) {
+                        setToast({ message: res.message, type: 'success' })
+                        setShowInventoryModal(false)
+                        const copy = { ...inventoryEdits }
+                        delete copy[inventoryModalData.type]
+                        setInventoryEdits(copy)
                       } else {
-                        setToast({ message: 'No changes to save', type: 'info' });
+                        setToast({ message: (res && res.message) || 'Failed to update', type: 'error' })
                       }
                     }}
-                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg"
                   >
                     💾 Save Inventory
                   </button>

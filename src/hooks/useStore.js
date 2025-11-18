@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 function loadStore(id){
   const key = `lpg_store_${id}`
   const raw = localStorage.getItem(key)
-  return raw ? JSON.parse(raw) : { inventory: { '45kg': { filled:10, empty:0 } }, transactions: [], khatabook: {}, perKgRate: 0 }
+  return raw ? JSON.parse(raw) : { inventory: { '45kg': { filled:0, empty:0 } }, transactions: [], khatabook: {}, perKgRate: 0 }
 }
 
 function saveStore(id, data){
