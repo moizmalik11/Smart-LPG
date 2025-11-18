@@ -30,6 +30,8 @@ export default function Dashboard({ session, renameShop }){
   const [settleAmount, setSettleAmount] = useState('')
   const [showHistory, setShowHistory] = useState(false)
   const [inventoryEdits, setInventoryEdits] = useState({})
+  const [localSession, setLocalSession] = useState(session)
+  const [personalEditing, setPersonalEditing] = useState(false)
 
   const currencyFmt = new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   const formatPKR = v => `PKR ${currencyFmt.format(Number(v) || 0)}`
@@ -37,6 +39,10 @@ export default function Dashboard({ session, renameShop }){
   useEffect(()=>{
     setNewShopName(session.name)
   },[session.name])
+
+  useEffect(()=>{
+    setLocalSession(session)
+  },[session])
 
   useEffect(()=>{
     if(!toast) return
@@ -91,7 +97,7 @@ export default function Dashboard({ session, renameShop }){
               >
                 ✏️ Edit
               </button>
-            </div>
+            </div> 
 
             <div className="flex items-center gap-3 bg-white px-4 py-3 rounded-xl border border-slate-200 shadow-sm">
               <div className="text-sm font-semibold text-slate-700">Per-kg Rate</div>
@@ -588,50 +594,102 @@ export default function Dashboard({ session, renameShop }){
           {view === 'settings' && (
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
-                <h3 className="text-2xl font-bold text-slate-800 mb-5">⚙️ Personal Details</h3>
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="text-2xl font-bold text-slate-800">⚙️ Personal Details</h3>
+                  <div>
+                    {!personalEditing ? (
+                      <button
+                        className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                        onClick={() => setPersonalEditing(true)}
+                      >
+                        ✏️ Edit
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                          onClick={() => {
+                            // persist changes
+                            if(!localSession || !localSession.name){
+                              setToast({ message: 'Shop name is required', type: 'error' })
+                              return
+                            }
+                            if(localSession.name !== session.name){
+                              renameShop(localSession.name)
+                            }
+                            const toSave = { ...session, name: localSession.name, ownerName: localSession.ownerName, phone: localSession.phone, address: localSession.address }
+                            localStorage.setItem('lpg_session', JSON.stringify(toSave))
+                            setPersonalEditing(false)
+                            setToast({ message: 'Personal details saved successfully!', type: 'success' })
+                          }}
+                        >
+                          💾 Save
+                        </button>
+                        <button
+                          className="px-3 py-1 bg-slate-500 text-white rounded-lg hover:bg-slate-600"
+                          onClick={() => {
+                            setPersonalEditing(false)
+                            setLocalSession(session)
+                          }}
+                        >
+                          ✖ Cancel
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {(!localSession || !localSession.name || !localSession.ownerName || !localSession.phone) && !personalEditing ? (
+                  <div className="p-4 mb-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-700">Please add shop name, owner name and phone number. Click <strong>Edit</strong> to add details.</div>
+                ) : null}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Shop Name</label>
+                    <input
+                      type="text"
+                      value={localSession?.name || ''}
+                      onChange={(e) => setLocalSession({...localSession, name: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Enter shop name"
+                      disabled={!personalEditing}
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Owner Name</label>
                     <input
                       type="text"
-                      value={session.ownerName || ''}
-                      onChange={(e) => setSession({...session, ownerName: e.target.value})}
+                      value={localSession?.ownerName || ''}
+                      onChange={(e) => setLocalSession({...localSession, ownerName: e.target.value})}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="Enter owner name"
+                      disabled={!personalEditing}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
                     <input
                       type="tel"
-                      value={session.phone || ''}
-                      onChange={(e) => setSession({...session, phone: e.target.value})}
+                      value={localSession?.phone || ''}
+                      onChange={(e) => setLocalSession({...localSession, phone: e.target.value})}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="Enter phone number"
+                      disabled={!personalEditing}
                     />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Address</label>
                     <input
                       type="text"
-                      value={session.address || ''}
-                      onChange={(e) => setSession({...session, address: e.target.value})}
+                      value={localSession?.address || ''}
+                      onChange={(e) => setLocalSession({...localSession, address: e.target.value})}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="Enter address"
+                      disabled={!personalEditing}
                     />
                   </div>
                 </div>
-                <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={() => {
-                      localStorage.setItem('lpg_session', JSON.stringify(session));
-                      setToast({ message: 'Personal details saved successfully!', type: 'success' });
-                    }}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg"
-                  >
-                    💾 Save Details
-                  </button>
-                </div>
+                
               </div>
 
               <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
