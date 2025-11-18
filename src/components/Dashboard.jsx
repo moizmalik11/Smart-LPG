@@ -11,7 +11,7 @@ const NAV = [
 ]
 
 export default function Dashboard({ session, renameShop }){
-  const { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata } = useStore(session.id)
+  const { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory } = useStore(session.id)
   
   const [perKgRate, setPerKgRate] = useState(0)
   const [view, setView] = useState('overview')
@@ -29,6 +29,7 @@ export default function Dashboard({ session, renameShop }){
   const [settlingName, setSettlingName] = useState(null)
   const [settleAmount, setSettleAmount] = useState('')
   const [showHistory, setShowHistory] = useState(false)
+  const [inventoryEdits, setInventoryEdits] = useState({})
 
   const currencyFmt = new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   const formatPKR = v => `PKR ${currencyFmt.format(Number(v) || 0)}`
@@ -582,6 +583,133 @@ export default function Dashboard({ session, renameShop }){
                 </div>
               </div>
             </>
+          )}
+
+          {view === 'settings' && (
+            <div className="space-y-6">
+              <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
+                <h3 className="text-2xl font-bold text-slate-800 mb-5">⚙️ Personal Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Owner Name</label>
+                    <input
+                      type="text"
+                      value={session.ownerName || ''}
+                      onChange={(e) => setSession({...session, ownerName: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Enter owner name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={session.phone || ''}
+                      onChange={(e) => setSession({...session, phone: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Enter phone number"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Address</label>
+                    <input
+                      type="text"
+                      value={session.address || ''}
+                      onChange={(e) => setSession({...session, address: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Enter address"
+                    />
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={() => {
+                      localStorage.setItem('lpg_session', JSON.stringify(session));
+                      setToast({ message: 'Personal details saved successfully!', type: 'success' });
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg"
+                  >
+                    💾 Save Details
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
+                <h3 className="text-2xl font-bold text-slate-800 mb-5">📦 Inventory Management</h3>
+                <div className="space-y-6">
+                  {Object.entries(store.inventory).map(([type, counts]) => (
+                    <div key={type} className="border border-slate-200 rounded-lg p-4">
+                      <h4 className="text-lg font-bold text-slate-700 mb-4">{type} Cylinders</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Filled Cylinders</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={inventoryEdits[type]?.filled ?? counts.filled}
+                            onChange={(e) => setInventoryEdits({
+                              ...inventoryEdits,
+                              [type]: { ...inventoryEdits[type], filled: parseInt(e.target.value) || 0 }
+                            })}
+                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Empty Cylinders</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={inventoryEdits[type]?.empty ?? counts.empty}
+                            onChange={(e) => setInventoryEdits({
+                              ...inventoryEdits,
+                              [type]: { ...inventoryEdits[type], empty: parseInt(e.target.value) || 0 }
+                            })}
+                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 flex justify-end space-x-4">
+                  <button
+                    onClick={() => {
+                      setInventoryEdits({});
+                    }}
+                    className="px-6 py-3 bg-slate-500 text-white font-bold rounded-lg hover:bg-slate-600 transition-all"
+                  >
+                    ❌ Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      const updates = {};
+                      Object.entries(inventoryEdits).forEach(([type, counts]) => {
+                        if (counts.filled !== undefined || counts.empty !== undefined) {
+                          updates[type] = {
+                            filled: counts.filled ?? store.inventory[type]?.filled ?? 0,
+                            empty: counts.empty ?? store.inventory[type]?.empty ?? 0
+                          };
+                        }
+                      });
+                      if (Object.keys(updates).length > 0) {
+                        const result = updateInventory(updates);
+                        if (result.success) {
+                          setToast({ message: result.message, type: 'success' });
+                          setInventoryEdits({});
+                        } else {
+                          setToast({ message: result.message, type: 'error' });
+                        }
+                      } else {
+                        setToast({ message: 'No changes to save', type: 'info' });
+                      }
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg"
+                  >
+                    💾 Save Inventory
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </section>
       </main>

@@ -181,5 +181,21 @@ export function useStore(sessionId){
     return { success: true, message: 'Payment recorded' }
   }
 
-  return { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata }
+  const updateInventory = (type, filled, empty) => {
+    const f = Number(filled || 0)
+    const e = Number(empty || 0)
+    if(f < 0 || e < 0) return { success: false, message: 'Invalid counts' }
+    
+    setStore(s=>{
+      const next = JSON.parse(JSON.stringify(s))
+      if(!next.inventory) next.inventory = {}
+      next.inventory[type] = { filled: f, empty: e }
+      if(!next.transactions) next.transactions = []
+      next.transactions.unshift({ date: todaysKey, type:'inventory_update', cylinderType: type, filled: f, empty: e, note: 'manual update' })
+      return next
+    })
+    return { success: true, message: 'Inventory updated' }
+  }
+
+  return { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory }
 }
