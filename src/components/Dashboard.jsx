@@ -88,18 +88,17 @@ export default function Dashboard({ session, renameShop }){
       <main className="flex-1 flex flex-col gap-5">
         <header className="bg-gradient-to-r from-white to-slate-50 p-4 rounded-2xl shadow-lg border border-slate-100">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div>
-                <div className="text-2xl font-bold text-slate-800">{session.name}</div>
-                <div className="text-sm text-slate-500 mt-1">Shop ID: <code className="text-xs bg-slate-100 px-2 py-1 rounded">{session.id}</code></div>
-              </div>
-              <button 
-                className="px-4 py-2 bg-white border-2 border-blue-500 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition-all shadow-sm" 
-                onClick={()=>setShowEdit(true)}
-              >
-                ✏️ Edit
-              </button>
-            </div> 
+            <div className="flex items-center gap-3">
+              <img
+                src="/src/icons/gas-cylinder-icon.webp"
+                alt=""
+                style={{ width: '40px', height: '40px' }}
+              />
+              <h1 className="text-xl font-semibold tracking-wide">
+                Smart<span className="text-red-500"> Gas</span>
+              </h1>
+            </div>
+          
 
             <div className="flex items-center gap-3 bg-white px-4 py-3 rounded-xl border border-slate-200 shadow-sm">
               <div className="text-sm font-semibold text-slate-700">Per-kg Rate</div>
