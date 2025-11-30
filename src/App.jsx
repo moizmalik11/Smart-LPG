@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Dashboard from './components/Dashboard'
+import Login from './components/Login'
 
 function initialSession(){
   const s = localStorage.getItem('lpg_session')
@@ -9,8 +10,17 @@ function initialSession(){
   return def
 }
 
+function checkAuthStatus(){
+  return localStorage.getItem('lpg_logged_in') === 'true'
+}
+
 export default function App(){
   const [session, setSession] = useState(() => initialSession())
+  const [isAuthenticated, setIsAuthenticated] = useState(() => checkAuthStatus())
+
+  useEffect(() => {
+    setIsAuthenticated(checkAuthStatus())
+  }, [])
 
   // rename shop with migration: copy old store to new id if needed
   function renameShop(newName){
@@ -36,9 +46,22 @@ export default function App(){
     localStorage.setItem('lpg_session', JSON.stringify(ns))
   }
 
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('lpg_logged_in')
+    setIsAuthenticated(false)
+  }
+
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={handleLoginSuccess} />
+  }
+
   return (
     <div className="app">
-      <Dashboard session={session} renameShop={renameShop} />
+      <Dashboard session={session} renameShop={renameShop} onLogout={handleLogout} />
     </div>
   )
 }
