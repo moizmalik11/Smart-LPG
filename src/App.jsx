@@ -1,39 +1,41 @@
 import React, { useState, useEffect } from 'react'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Dashboard from './components/Dashboard'
 import Login from './components/Login'
 
-function initialSession(){
+function initialSession() {
   const s = localStorage.getItem('lpg_session')
-  if(s) return JSON.parse(s)
+  if (s) return JSON.parse(s)
   const def = { name: 'Masha Allah LPG', id: 'masha-allah-lpg' }
   localStorage.setItem('lpg_session', JSON.stringify(def))
   return def
 }
 
-function checkAuthStatus(){
+function checkAuthStatus() {
   return localStorage.getItem('lpg_logged_in') === 'true'
 }
 
-export default function App(){
+export default function App() {
   const [session, setSession] = useState(() => initialSession())
   const [isAuthenticated, setIsAuthenticated] = useState(() => checkAuthStatus())
+  const navigate = useNavigate()
 
   useEffect(() => {
     setIsAuthenticated(checkAuthStatus())
   }, [])
 
   // rename shop with migration: copy old store to new id if needed
-  function renameShop(newName){
-    if(!newName) return
+  function renameShop(newName) {
+    if (!newName) return
     const newId = newName.toLowerCase().replace(/\s+/g, '-')
     const oldId = session.id
     const oldKey = `lpg_store_${oldId}`
     const newKey = `lpg_store_${newId}`
 
-    if(newId !== oldId){
-      if(!localStorage.getItem(newKey)){
+    if (newId !== oldId) {
+      if (!localStorage.getItem(newKey)) {
         const data = localStorage.getItem(oldKey)
-        if(data) localStorage.setItem(newKey, data)
+        if (data) localStorage.setItem(newKey, data)
         else {
           const initial = { inventory: { '45kg': { filled: 10, empty: 0 } }, transactions: [] }
           localStorage.setItem(newKey, JSON.stringify(initial))
@@ -48,20 +50,40 @@ export default function App(){
 
   const handleLoginSuccess = () => {
     setIsAuthenticated(true)
+    navigate('/dashboard')
   }
 
   const handleLogout = () => {
     localStorage.removeItem('lpg_logged_in')
     setIsAuthenticated(false)
-  }
-
-  if (!isAuthenticated) {
-    return <Login onLoginSuccess={handleLoginSuccess} />
+    navigate('/login')
   }
 
   return (
-    <div className="app">
-      <Dashboard session={session} renameShop={renameShop} onLogout={handleLogout} />
-    </div>
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          !isAuthenticated ? (
+            <Login onLoginSuccess={handleLoginSuccess} />
+          ) : (
+            <Navigate to="/dashboard" replace />
+          )
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          isAuthenticated ? (
+            <div className="app">
+              <Dashboard session={session} renameShop={renameShop} onLogout={handleLogout} />
+            </div>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+    </Routes>
   )
 }
