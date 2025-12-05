@@ -43,7 +43,9 @@ body {
 }
 
 /* Scrollbar styling for webkit browsers */
-
+::-webkit-scrollbar {
+  width: 6px;
+}
 
 ::-webkit-scrollbar-track {
   background: rgb(241 245 249);
@@ -53,3 +55,6 @@ body {
   background: rgb(203 213 225);
   border-radius: 3px;
 }
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 1
