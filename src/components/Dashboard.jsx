@@ -61,7 +61,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 h-full bg-gradient-to-br from-white to-slate-50 shadow-xl border-r border-slate-100 flex flex-col w-72 z-50 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${
+      <aside className={`fixed left-0 top-0 h-screen bg-gradient-to-br from-white to-slate-50 shadow-xl border-r border-slate-100 flex flex-col w-72 z-50 transform transition-transform duration-300 lg:translate-x-0 ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex items-center justify-between p-5 pb-4 border-b border-slate-200">
@@ -112,7 +112,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col w-full">
+      <main className="flex-1 flex flex-col w-full lg:ml-72">
         <header className="bg-white shadow-sm border-b border-slate-200 px-4 py-3 lg:px-6 lg:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
