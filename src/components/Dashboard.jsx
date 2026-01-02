@@ -54,38 +54,60 @@ export default function Dashboard({ session, renameShop, onLogout }){
   },[toast])
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl -top-48 -left-48 animate-pulse"></div>
+        <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl -bottom-48 -right-48 animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute w-[400px] h-[400px] bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" style={{animationDelay: '2s'}}></div>
+        {/* Floating particles */}
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white/10 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${5 + Math.random() * 10}s`
+              }}
+            ></div>
+          ))}
+        </div>
+      </div>
+
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 h-screen bg-gradient-to-br from-white to-slate-50 shadow-xl border-r border-slate-100 flex flex-col w-72 z-50 transform transition-transform duration-300 lg:translate-x-0 ${
+      <aside className={`fixed left-0 top-0 h-screen bg-white/10 backdrop-blur-2xl border-r border-white/20 shadow-2xl flex flex-col w-72 z-50 transform transition-transform duration-300 lg:translate-x-0 ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex items-center justify-between p-5 pb-4 border-b border-slate-200">
+        <div className="flex items-center justify-between p-5 pb-4 border-b border-white/20">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/50 animate-pulse" style={{animationDuration: '3s'}}>
               {session.name.charAt(0)}
             </div>
             <div>
-              <div className="font-bold text-lg text-slate-800">{session.name}</div>
-              <div className="text-sm text-blue-600 font-medium">Smart LPG</div>
+              <div className="font-bold text-lg text-white drop-shadow-lg">{session.name}</div>
+              <div className="text-sm text-purple-300 font-medium">Smart LPG</div>
             </div>
           </div>
           <button 
-            className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         <nav className="flex-1 p-5 pt-6 overflow-y-auto">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             {NAV.map(n => (
               <div 
                 key={n.id} 
@@ -95,8 +117,8 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 }} 
                 className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                   view===n.id 
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200' 
-                    : 'hover:bg-slate-100 text-slate-700'
+                    ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white shadow-lg shadow-purple-500/50' 
+                    : 'hover:bg-white/10 text-white/80 hover:text-white'
                 }`}
               >
                 <div className="w-8 text-center text-xl">{n.icon}</div>
@@ -106,45 +128,45 @@ export default function Dashboard({ session, renameShop, onLogout }){
           </div>
         </nav>
 
-        <div className="p-5 pt-4 text-xs text-slate-400 text-center border-t border-slate-200">
+        <div className="p-5 pt-4 text-xs text-purple-300/70 text-center border-t border-white/20">
           Smart LPG v1.0
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col w-full lg:ml-72">
-        <header className="bg-white shadow-sm border-b border-slate-200 px-4 py-3 lg:px-6 lg:py-4">
+      <main className="flex-1 flex flex-col w-full lg:ml-72 relative z-10">
+        <header className="bg-white/10 backdrop-blur-xl shadow-lg border-b border-white/20 px-4 py-3 lg:px-6 lg:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Mobile Menu Button */}
               <button 
-                className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100 transition-colors"
+                className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
-                <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
               
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center shadow-lg shadow-purple-500/50 animate-pulse" style={{animationDuration: '3s'}}>
                   <span className="text-white font-bold text-lg lg:text-xl">🏪</span>
                 </div>
                 <div>
-                  <h1 className="text-lg lg:text-xl font-semibold text-slate-800">
-                    Smart<span className="text-blue-600"> LPG</span>
+                  <h1 className="text-lg lg:text-xl font-semibold text-white drop-shadow-lg">
+                    Smart<span className="text-purple-300"> LPG</span>
                   </h1>
-                  <div className="text-xs text-slate-500 lg:hidden">Management System</div>
+                  <div className="text-xs text-purple-200/70 lg:hidden">Management System</div>
                 </div>
               </div>
             </div>
           
 
             <div className="flex items-center gap-3">
-              <div className="hidden lg:flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-lg border border-slate-200">
-                <div className="text-sm font-semibold text-slate-700">Rate/kg</div>
+              <div className="hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/20 shadow-lg">
+                <div className="text-sm font-semibold text-white">Rate/kg</div>
                 <input 
-                  className="w-28 p-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 disabled:bg-slate-100 disabled:text-slate-500" 
+                  className="w-28 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm font-semibold text-white disabled:bg-white/5 disabled:text-white/50 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" 
                   type="number" 
                   value={perKgDraft} 
                   onChange={e=>setPerKgDraft(e.target.value)} 
@@ -153,7 +175,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 />
                 {!perKgEditing ? (
                   <button 
-                    className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-all" 
+                    className="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium transition-all shadow-lg hover:shadow-purple-500/50" 
                     onClick={()=>{ setPerKgDraft(perKgRate); setPerKgEditing(true); }}
                   >
                     Edit
@@ -161,13 +183,13 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 ) : (
                 <div className="flex gap-1">
                   <button 
-                    className="px-2 py-2 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all" 
+                    className="px-2 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm font-medium text-white hover:bg-white/20 transition-all" 
                     onClick={()=>{ setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                   >
                     ✕
                   </button>
                   <button 
-                    className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-all" 
+                    className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg text-sm font-medium transition-all shadow-lg" 
                     onClick={()=>{ setPerKgRate(Number(perKgDraft||0)); setPerKgEditing(false); }}
                   >
                     💾 Save
@@ -179,7 +201,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
               {/* Logout Button */}
               <button 
                 onClick={onLogout}
-                className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+                className="px-3 py-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-lg hover:shadow-red-500/50"
                 title="Logout"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,12 +214,12 @@ export default function Dashboard({ session, renameShop, onLogout }){
         </header>
 
         {/* Mobile Per-kg Rate */}
-        <div className="lg:hidden bg-white border-b border-slate-200 px-4 py-3">
+        <div className="lg:hidden bg-white/10 backdrop-blur-xl border-b border-white/20 px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-slate-700">Per-kg Rate</div>
+            <div className="text-sm font-semibold text-white">Per-kg Rate</div>
             <div className="flex items-center gap-2">
               <input 
-                className="w-20 p-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 disabled:bg-slate-100" 
+                className="w-20 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm font-semibold text-white disabled:bg-white/5 disabled:text-white/50 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400" 
                 type="number" 
                 value={perKgDraft} 
                 onChange={e=>setPerKgDraft(e.target.value)} 
@@ -206,7 +228,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
               />
               {!perKgEditing ? (
                 <button 
-                  className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-all" 
+                  className="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium transition-all shadow-lg" 
                   onClick={()=>{ setPerKgDraft(perKgRate); setPerKgEditing(true); }}
                 >
                   Edit
@@ -214,13 +236,13 @@ export default function Dashboard({ session, renameShop, onLogout }){
               ) : (
                 <div className="flex gap-1">
                   <button 
-                    className="px-2 py-2 border border-slate-300 rounded-lg text-sm" 
+                    className="px-2 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm text-white hover:bg-white/20 transition-all" 
                     onClick={()=>{ setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                   >
                     ✕
                   </button>
                   <button 
-                    className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm font-medium" 
+                    className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg text-sm font-medium shadow-lg" 
                     onClick={()=>{ setPerKgRate(Number(perKgDraft||0)); setPerKgEditing(false); }}
                   >
                     💾
@@ -232,19 +254,23 @@ export default function Dashboard({ session, renameShop, onLogout }){
         </div>
 
         {toast && (
-          <div className={`fixed right-4 top-4 lg:right-6 lg:top-6 z-50 p-4 rounded-xl shadow-2xl text-white font-semibold max-w-sm ${toast.type==='error' ? 'bg-red-500' : 'bg-green-500'}`}>
+          <div className={`fixed right-4 top-4 lg:right-6 lg:top-6 z-50 p-4 rounded-xl shadow-2xl backdrop-blur-xl text-white font-semibold max-w-sm border border-white/20 ${
+            toast.type==='error' 
+              ? 'bg-red-500/90' 
+              : 'bg-gradient-to-r from-green-500/90 to-emerald-500/90'
+          }`}>
             {toast.message}
           </div>
         )}
 
         {showEdit && (
           <div className="modal-overlay" onClick={()=>setShowEdit(false)}>
-            <div className="modal bg-white p-6 rounded-2xl shadow-2xl" onClick={e=>e.stopPropagation()}>
-              <h3 className="text-2xl font-bold text-slate-800 mb-2">Edit Shop Name</h3>
-              <p className="text-sm text-slate-500 mb-4">Changing the name will create/point to a shop id slug.</p>
+            <div className="modal bg-white/10 backdrop-blur-2xl border border-white/20 p-6 rounded-2xl shadow-2xl" onClick={e=>e.stopPropagation()}>
+              <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">Edit Shop Name</h3>
+              <p className="text-sm text-purple-200/80 mb-4">Changing the name will create/point to a shop id slug.</p>
               <div className="mb-5">
                 <input 
-                  className="w-full p-3 border-2 border-slate-200 rounded-xl font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                  className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl font-medium text-white placeholder-white/50 focus:border-purple-400 focus:ring-2 focus:ring-purple-400 focus:outline-none transition-all" 
                   value={newShopName} 
                   onChange={e=>setNewShopName(e.target.value)} 
                   placeholder="Enter shop name"
@@ -252,13 +278,13 @@ export default function Dashboard({ session, renameShop, onLogout }){
               </div>
               <div className="flex justify-end gap-3">
                 <button 
-                  className="px-5 py-2 border-2 border-slate-300 rounded-xl font-medium hover:bg-slate-50 transition-all" 
+                  className="px-5 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl font-medium text-white hover:bg-white/20 transition-all" 
                   onClick={()=>setShowEdit(false)}
                 >
                   Cancel
                 </button>
                 <button 
-                  className="px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg" 
+                  className="px-5 py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white rounded-xl font-medium transition-all shadow-lg shadow-purple-500/50" 
                   onClick={()=>{ renameShop(newShopName); setShowEdit(false); }}
                 >
                   💾 Save Changes
@@ -271,50 +297,50 @@ export default function Dashboard({ session, renameShop, onLogout }){
         <section className="flex-1 p-4 lg:p-6 overflow-auto">
           {view === 'overview' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl shadow-lg border border-green-100 hover:shadow-xl transition-all">
+              <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-green-400/30 hover:shadow-xl hover:shadow-green-500/20 transition-all">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-sm font-semibold text-green-600 uppercase tracking-wide">Filled Cylinders</div>
+                  <div className="text-sm font-semibold text-green-300 uppercase tracking-wide">Filled Cylinders</div>
                   <div className="text-3xl">🟢</div>
                 </div>
-                <div className="text-4xl font-bold text-green-700">{totalFilled}</div>
-                <div className="text-xs text-green-600 mt-2">Ready for sale</div>
+                <div className="text-4xl font-bold text-white drop-shadow-lg">{totalFilled}</div>
+                <div className="text-xs text-green-200 mt-2">Ready for sale</div>
               </div>
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-2xl shadow-lg border border-amber-100 hover:shadow-xl transition-all">
+              <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-amber-400/30 hover:shadow-xl hover:shadow-amber-500/20 transition-all">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-sm font-semibold text-amber-600 uppercase tracking-wide">Empty Cylinders</div>
+                  <div className="text-sm font-semibold text-amber-300 uppercase tracking-wide">Empty Cylinders</div>
                   <div className="text-3xl">⚪</div>
                 </div>
-                <div className="text-4xl font-bold text-amber-700">{totalEmpty}</div>
-                <div className="text-xs text-amber-600 mt-2">Awaiting refill</div>
+                <div className="text-4xl font-bold text-white drop-shadow-lg">{totalEmpty}</div>
+                <div className="text-xs text-amber-200 mt-2">Awaiting refill</div>
               </div>
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl shadow-lg border border-blue-100 hover:shadow-xl transition-all">
+              <div className="bg-gradient-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-blue-400/30 hover:shadow-xl hover:shadow-blue-500/20 transition-all">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Today's Sales</div>
+                  <div className="text-sm font-semibold text-blue-300 uppercase tracking-wide">Today's Sales</div>
                   <div className="text-3xl">💰</div>
                 </div>
-                <div className="text-3xl font-bold text-blue-700">{formatPKR(todaysSalesValue)}</div>
-                <div className="text-xs text-blue-600 mt-2">{todaysTransactions.length} transactions</div>
+                <div className="text-3xl font-bold text-white drop-shadow-lg">{formatPKR(todaysSalesValue)}</div>
+                <div className="text-xs text-blue-200 mt-2">{todaysTransactions.length} transactions</div>
               </div>
             </div>
           )}
 
           {view === 'inventory' && (
-            <div className="bg-white p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl border border-slate-100">
-              <h3 className="text-2xl font-bold text-slate-800 mb-5">📦 Inventory Management</h3>
+            <div className="bg-white/10 backdrop-blur-2xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl border border-white/20">
+              <h3 className="text-2xl font-bold text-white mb-5 drop-shadow-lg">📦 Inventory Management</h3>
               <div className="space-y-4">
                 {Object.entries(store.inventory).map(([type,st])=> (
-                  <div key={type} className="bg-gradient-to-r from-slate-50 to-white p-5 border-2 border-slate-200 rounded-xl hover:shadow-lg transition-all">
+                  <div key={type} className="bg-white/10 backdrop-blur-sm p-5 border border-white/20 rounded-xl hover:shadow-lg hover:bg-white/15 transition-all">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-xl font-bold text-slate-800 mb-2">{type} Cylinders</div>
+                        <div className="text-xl font-bold text-white mb-2 drop-shadow-md">{type} Cylinders</div>
                         <div className="flex gap-4 text-sm">
-                          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-lg font-semibold">✓ Filled: {st.filled}</span>
-                          <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-lg font-semibold">○ Empty: {st.empty}</span>
+                          <span className="px-3 py-1 bg-green-500/30 backdrop-blur-sm border border-green-400/50 text-green-200 rounded-lg font-semibold">✓ Filled: {st.filled}</span>
+                          <span className="px-3 py-1 bg-amber-500/30 backdrop-blur-sm border border-amber-400/50 text-amber-200 rounded-lg font-semibold">○ Empty: {st.empty}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <button 
-                          className="px-4 py-2 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-all shadow-md" 
+                          className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl font-medium transition-all shadow-lg" 
                           onClick={()=>{
                             const res = recordSale(type,1,perKgRate,'')
                             if(!res || !res.success){
@@ -327,7 +353,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                           💸 Sell -1
                         </button>
                         <button 
-                          className="px-4 py-2 bg-amber-500 text-white rounded-xl font-medium hover:bg-amber-600 transition-all shadow-md" 
+                          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-medium transition-all shadow-lg" 
                           onClick={()=>{
                             setManagingEmpty(type)
                             setEmptyQty('')
@@ -338,22 +364,22 @@ export default function Dashboard({ session, renameShop, onLogout }){
                       </div>
                     </div>
                     {managingEmpty === type && (
-                      <div className="mt-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
-                        <div className="text-sm font-semibold text-amber-800 mb-3">Refill Empty Cylinders</div>
+                      <div className="mt-4 p-4 bg-amber-500/20 backdrop-blur-sm border border-amber-400/30 rounded-xl">
+                        <div className="text-sm font-semibold text-amber-200 mb-3">Refill Empty Cylinders</div>
                         <div className="flex items-center gap-3">
                           <input 
                             type="number" 
-                            className="w-32 p-2 border-2 border-amber-300 rounded-lg font-semibold focus:border-amber-500 focus:ring-2 focus:ring-amber-200" 
+                            className="w-32 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold text-white placeholder-white/50 focus:border-amber-400 focus:ring-2 focus:ring-amber-400 focus:outline-none" 
                             placeholder="Quantity"
                             value={emptyQty}
                             onChange={(e)=>setEmptyQty(e.target.value)}
                             min="0"
                             max={st.empty}
                           />
-                          <span className="text-sm text-amber-700">Available: {st.empty}</span>
+                          <span className="text-sm text-amber-200">Available: {st.empty}</span>
                           <div className="flex gap-2 ml-auto">
                             <button 
-                              className="px-4 py-2 border-2 border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-all" 
+                              className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-medium text-white hover:bg-white/20 transition-all" 
                               onClick={()=>{
                                 setManagingEmpty(null)
                                 setEmptyQty('')
@@ -362,7 +388,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                               Cancel
                             </button>
                             <button 
-                              className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-all shadow-md" 
+                              className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all shadow-lg" 
                               onClick={()=>{
                                 const result = manageEmpty(type, emptyQty)
                                 if(result.success){
@@ -387,11 +413,11 @@ export default function Dashboard({ session, renameShop, onLogout }){
           )}
 
           {view === 'shipments' && (
-            <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
+            <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-2xl font-bold text-slate-800">📒 Khata Book (Udhar)</h3>
+                <h3 className="text-2xl font-bold text-white drop-shadow-lg">📒 Khata Book (Udhar)</h3>
                 <button 
-                  className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-all shadow-md" 
+                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all shadow-lg" 
                   onClick={()=>setShowHistory(true)}
                 >
                   📜 History
@@ -399,9 +425,9 @@ export default function Dashboard({ session, renameShop, onLogout }){
               </div>
 
               <div className="mb-5 flex gap-3">
-                <input value={khataName} onChange={e=>setKhataName(e.target.value)} placeholder="Name" className="p-3 border-2 rounded-lg w-48" />
-                <input value={khataKg} onChange={e=>setKhataKg(e.target.value)} placeholder="Kg" type="number" className="p-3 border-2 rounded-lg w-32" />
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg" onClick={()=>{
+                <input value={khataName} onChange={e=>setKhataName(e.target.value)} placeholder="Name" className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-48 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
+                <input value={khataKg} onChange={e=>setKhataKg(e.target.value)} placeholder="Kg" type="number" className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-32 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
+                <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg" onClick={()=>{
                   const res = addKhataEntry(khataName, khataKg, perKgRate)
                   if(res && res.success){ setToast({message: res.message, type:'success'}); setKhataName(''); setKhataKg('') }
                   else setToast({message: res.message || 'Error', type:'error'})
@@ -409,41 +435,41 @@ export default function Dashboard({ session, renameShop, onLogout }){
               </div>
 
               <div className="space-y-3">
-                {Object.entries(store.khatabook || {}).length === 0 && <div className="text-slate-400">No khata entries yet</div>}
+                {Object.entries(store.khatabook || {}).length === 0 && <div className="text-purple-200">No khata entries yet</div>}
                 {Object.entries(store.khatabook || {}).map(([name,data], idx)=> (
-                  <div key={idx} className="flex items-center justify-between p-4 border-2 rounded-xl bg-gradient-to-r from-slate-50 to-white hover:shadow-lg transition-all">
+                  <div key={idx} className="flex items-center justify-between p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/15 hover:shadow-lg transition-all">
                     <div>
-                      <div className="font-bold text-lg text-slate-800">{name}</div>
+                      <div className="font-bold text-lg text-white drop-shadow-md">{name}</div>
                       <div className="flex gap-4 mt-1">
-                        <span className="text-sm text-slate-600">Total Kg: <span className="font-semibold">{data.kg || 0} kg</span></span>
-                        <span className="text-sm text-red-600">Total Udhar: <span className="font-bold">{formatPKR(data.amount || 0)}</span></span>
+                        <span className="text-sm text-purple-200">Total Kg: <span className="font-semibold text-white">{data.kg || 0} kg</span></span>
+                        <span className="text-sm text-red-300">Total Udhar: <span className="font-bold text-red-200">{formatPKR(data.amount || 0)}</span></span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {addingTo === name ? (
                         <>
-                          <input type="number" value={addKgValue} onChange={e=>setAddKgValue(e.target.value)} placeholder="Kg" className="p-2 border-2 rounded-lg w-28" />
-                          <button className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" onClick={()=>{
+                          <input type="number" value={addKgValue} onChange={e=>setAddKgValue(e.target.value)} placeholder="Kg" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-28 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                          <button className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg" onClick={()=>{
                             const res = addKhataEntry(name, addKgValue, perKgRate)
                             if(res && res.success){ setToast({message: res.message, type:'success'}); setAddingTo(null); setAddKgValue('') }
                             else setToast({message: res.message || 'Error', type:'error'})
                           }}>+ Add Kg</button>
-                          <button className="px-3 py-2 border-2 rounded-lg hover:bg-slate-50" onClick={()=>{ setAddingTo(null); setAddKgValue('') }}>Cancel</button>
+                          <button className="px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20" onClick={()=>{ setAddingTo(null); setAddKgValue('') }}>Cancel</button>
                         </>
                       ) : settlingName === name ? (
                         <>
-                          <input type="number" value={settleAmount} onChange={e=>setSettleAmount(e.target.value)} placeholder="PKR" className="p-2 border-2 rounded-lg w-32" />
-                          <button className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" onClick={()=>{
+                          <input type="number" value={settleAmount} onChange={e=>setSettleAmount(e.target.value)} placeholder="PKR" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-32 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                          <button className="px-3 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg" onClick={()=>{
                             const res = settleKhata(name, settleAmount)
                             if(res && res.success){ setToast({message: res.message, type:'success'}); setSettlingName(null); setSettleAmount('') }
                             else setToast({message: res.message || 'Error', type:'error'})
                           }}>💰 Pay</button>
-                          <button className="px-3 py-2 border-2 rounded-lg hover:bg-slate-50" onClick={()=>{ setSettlingName(null); setSettleAmount('') }}>Cancel</button>
+                          <button className="px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20" onClick={()=>{ setSettlingName(null); setSettleAmount('') }}>Cancel</button>
                         </>
                       ) : (
                         <>
-                          <button className="px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600" onClick={()=>{ setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
-                          <button className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" onClick={()=>{ setSettlingName(name); setSettleAmount('') }}>💳 Settle</button>
+                          <button className="px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg shadow-lg" onClick={()=>{ setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
+                          <button className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg" onClick={()=>{ setSettlingName(name); setSettleAmount('') }}>💳 Settle</button>
                         </>
                       )}
                     </div>
@@ -455,11 +481,11 @@ export default function Dashboard({ session, renameShop, onLogout }){
 
           {showHistory && (
             <div className="modal-overlay" onClick={()=>setShowHistory(false)}>
-              <div className="modal bg-white p-6 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-auto" onClick={e=>e.stopPropagation()}>
+              <div className="modal bg-white/10 backdrop-blur-2xl border border-white/20 p-6 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-auto" onClick={e=>e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-2xl font-bold text-slate-800">📜 Last Month Payment History</h3>
+                  <h3 className="text-2xl font-bold text-white drop-shadow-lg">📜 Last Month Payment History</h3>
                   <button 
-                    className="px-3 py-1 bg-slate-500 text-white rounded-lg hover:bg-slate-600" 
+                    className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg shadow-lg" 
                     onClick={()=>setShowHistory(false)}
                   >
                     ✕
@@ -468,11 +494,11 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 <div className="overflow-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-gradient-to-r from-slate-100 to-slate-50">
-                        <th className="py-3 px-4 text-sm font-bold text-slate-700 uppercase tracking-wide">Date</th>
-                        <th className="py-3 px-4 text-sm font-bold text-slate-700 uppercase tracking-wide">Name</th>
-                        <th className="py-3 px-4 text-sm font-bold text-slate-700 uppercase tracking-wide">Paid Amount</th>
-                        <th className="py-3 px-4 text-sm font-bold text-slate-700 uppercase tracking-wide">Remaining</th>
+                      <tr className="bg-white/10 backdrop-blur-sm">
+                        <th className="py-3 px-4 text-sm font-bold text-purple-200 uppercase tracking-wide">Date</th>
+                        <th className="py-3 px-4 text-sm font-bold text-purple-200 uppercase tracking-wide">Name</th>
+                        <th className="py-3 px-4 text-sm font-bold text-purple-200 uppercase tracking-wide">Paid Amount</th>
+                        <th className="py-3 px-4 text-sm font-bold text-purple-200 uppercase tracking-wide">Remaining</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -487,15 +513,15 @@ export default function Dashboard({ session, renameShop, onLogout }){
                           const currentData = store.khatabook && store.khatabook[t.name] ? store.khatabook[t.name] : { amount: 0 }
                           const remaining = currentData.amount || 0
                           return (
-                            <tr key={i} className="border-t border-slate-200 hover:bg-blue-50 transition-all">
-                              <td className="py-3 px-4 text-sm text-slate-700 font-medium">{t.date}</td>
-                              <td className="py-3 px-4 text-sm font-semibold text-slate-800">{t.name}</td>
-                              <td className="py-3 px-4 text-sm font-bold text-green-600">{formatPKR(t.paid)}</td>
+                            <tr key={i} className="border-t border-white/20 hover:bg-white/10 transition-all">
+                              <td className="py-3 px-4 text-sm text-purple-200 font-medium">{t.date}</td>
+                              <td className="py-3 px-4 text-sm font-semibold text-white">{t.name}</td>
+                              <td className="py-3 px-4 text-sm font-bold text-green-300">{formatPKR(t.paid)}</td>
                               <td className="py-3 px-4 text-sm">
                                 {remaining === 0 ? (
-                                  <span className="text-green-600 font-bold">Clear</span>
+                                  <span className="text-green-300 font-bold">Clear</span>
                                 ) : (
-                                  <span className="text-red-600 font-bold">{formatPKR(remaining)}</span>
+                                  <span className="text-red-300 font-bold">{formatPKR(remaining)}</span>
                                 )}
                               </td>
                             </tr>
@@ -508,7 +534,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                         const lastMonthStr = lastMonth.toISOString().slice(0,10)
                         return store.transactions.filter(t => t.type === 'settlement' && t.date >= lastMonthStr).length === 0
                       })() && (
-                        <tr><td className="py-8 text-center text-slate-400" colSpan={4}>📝 No payments in last month</td></tr>
+                        <tr><td className="py-8 text-center text-purple-200" colSpan={4}>📝 No payments in last month</td></tr>
                       )}
                     </tbody>
                   </table>
