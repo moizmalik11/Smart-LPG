@@ -546,25 +546,25 @@ export default function Dashboard({ session, renameShop, onLogout }){
           {view === 'reports' && (
             <div className="space-y-4 lg:space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl shadow-lg border border-blue-100">
-                  <div className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Today's Sales</div>
-                  <div className="text-3xl font-bold text-blue-700">{formatPKR(todaysSalesValue)}</div>
-                  <div className="text-xs text-blue-600 mt-1">{todaysTransactions.length} transactions</div>
+                <div className="bg-gradient-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-blue-400/30">
+                  <div className="text-sm font-semibold text-blue-300 uppercase tracking-wide mb-2">Today's Sales</div>
+                  <div className="text-3xl font-bold text-white drop-shadow-lg">{formatPKR(todaysSalesValue)}</div>
+                  <div className="text-xs text-blue-200 mt-1">{todaysTransactions.length} transactions</div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-6 rounded-2xl shadow-lg border border-purple-100">
-                  <div className="text-sm font-semibold text-purple-600 uppercase tracking-wide mb-2">Weekly Sales</div>
-                  <div className="text-3xl font-bold text-purple-700">{formatPKR(weeklySales)}</div>
-                  <div className="text-xs text-purple-600 mt-1">Last 7 days</div>
+                <div className="bg-gradient-to-br from-purple-500/20 to-violet-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-purple-400/30">
+                  <div className="text-sm font-semibold text-purple-300 uppercase tracking-wide mb-2">Weekly Sales</div>
+                  <div className="text-3xl font-bold text-white drop-shadow-lg">{formatPKR(weeklySales)}</div>
+                  <div className="text-xs text-purple-200 mt-1">Last 7 days</div>
                 </div>
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-2xl shadow-lg border border-emerald-100">
-                  <div className="text-sm font-semibold text-emerald-600 uppercase tracking-wide mb-2">Total Transactions</div>
-                  <div className="text-3xl font-bold text-emerald-700">{store.transactions.length}</div>
-                  <div className="text-xs text-emerald-600 mt-1">All time</div>
+                <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-emerald-400/30">
+                  <div className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-2">Total Transactions</div>
+                  <div className="text-3xl font-bold text-white drop-shadow-lg">{store.transactions.length}</div>
+                  <div className="text-xs text-emerald-200 mt-1">All time</div>
                 </div>
               </div>
 
-              <div className="bg-white p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl border border-slate-100">
-                <h3 className="text-lg lg:text-2xl font-bold text-slate-800 mb-4 lg:mb-5">📊 Weekly Sales Chart</h3>
+              <div className="bg-white/10 backdrop-blur-2xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl border border-white/20">
+                <h3 className="text-lg lg:text-2xl font-bold text-white mb-4 lg:mb-5 drop-shadow-lg">📊 Weekly Sales Chart</h3>
                 <div className="space-y-3">
                   {(() => {
                     const weekDates = []
@@ -586,18 +586,18 @@ export default function Dashboard({ session, renameShop, onLogout }){
                       const dayName = new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })
                       return (
                         <div key={i} className="flex items-center gap-3">
-                          <div className="w-16 text-sm font-semibold text-slate-700">{dayName}</div>
-                          <div className="flex-1 bg-slate-100 rounded-lg h-10 relative overflow-hidden">
+                          <div className="w-16 text-sm font-semibold text-white">{dayName}</div>
+                          <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-lg h-10 relative overflow-hidden border border-white/20">
                             <div 
-                              className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-lg transition-all duration-500 flex items-center px-3"
+                              className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-full rounded-lg transition-all duration-500 flex items-center px-3"
                               style={{ width: `${barWidth}%`, minWidth: day.sales > 0 ? '60px' : '0' }}
                             >
                               {day.sales > 0 && (
-                                <span className="text-white font-bold text-sm">{formatPKR(day.sales)}</span>
+                                <span className="text-white font-bold text-sm drop-shadow-md">{formatPKR(day.sales)}</span>
                               )}
                             </div>
                           </div>
-                          <div className="w-24 text-right text-xs text-slate-500">{day.date}</div>
+                          <div className="w-24 text-right text-xs text-purple-200">{day.date}</div>
                         </div>
                       )
                     })
@@ -606,8 +606,8 @@ export default function Dashboard({ session, renameShop, onLogout }){
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
-                <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
-                  <h3 className="text-xl font-bold text-slate-800 mb-4">🎯 Inventory Status</h3>
+                <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
+                  <h3 className="text-xl font-bold text-white mb-4 drop-shadow-lg">🎯 Inventory Status</h3>
                   <div className="space-y-3">
                     {Object.entries(store.inventory).map(([type,st])=> {
                       const total = st.filled + st.empty
@@ -615,18 +615,18 @@ export default function Dashboard({ session, renameShop, onLogout }){
                       return (
                         <div key={type}>
                           <div className="flex justify-between mb-2">
-                            <span className="font-semibold text-slate-700">{type}</span>
-                            <span className="text-sm text-slate-600">{st.filled}/{total}</span>
+                            <span className="font-semibold text-white">{type}</span>
+                            <span className="text-sm text-purple-200">{st.filled}/{total}</span>
                           </div>
-                          <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
+                          <div className="w-full bg-white/10 backdrop-blur-sm rounded-full h-4 overflow-hidden border border-white/20">
                             <div 
                               className="bg-gradient-to-r from-green-500 to-emerald-600 h-full rounded-full transition-all duration-500"
                               style={{ width: `${filledPercent}%` }}
                             />
                           </div>
                           <div className="flex justify-between mt-1 text-xs">
-                            <span className="text-green-600">Filled: {st.filled}</span>
-                            <span className="text-amber-600">Empty: {st.empty}</span>
+                            <span className="text-green-300">Filled: {st.filled}</span>
+                            <span className="text-amber-300">Empty: {st.empty}</span>
                           </div>
                         </div>
                       )
@@ -634,27 +634,27 @@ export default function Dashboard({ session, renameShop, onLogout }){
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
-                  <h3 className="text-xl font-bold text-slate-800 mb-4">📈 Transaction Types</h3>
+                <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
+                  <h3 className="text-xl font-bold text-white mb-4 drop-shadow-lg">📈 Transaction Types</h3>
                   <div className="space-y-4">
                     {['sale', 'shipment', 'refill'].map(type => {
                       const count = store.transactions.filter(t=>t.type===type).length
                       const total = store.transactions.length || 1
                       const percent = (count / total) * 100
                       const colors = {
-                        sale: { bg: 'from-blue-500 to-blue-600', text: 'text-blue-700', light: 'bg-blue-50' },
-                        shipment: { bg: 'from-green-500 to-green-600', text: 'text-green-700', light: 'bg-green-50' },
-                        refill: { bg: 'from-amber-500 to-amber-600', text: 'text-amber-700', light: 'bg-amber-50' }
+                        sale: { bg: 'from-blue-500 to-indigo-500', text: 'text-blue-200', light: 'bg-blue-500/30' },
+                        shipment: { bg: 'from-green-500 to-emerald-500', text: 'text-green-200', light: 'bg-green-500/30' },
+                        refill: { bg: 'from-amber-500 to-orange-500', text: 'text-amber-200', light: 'bg-amber-500/30' }
                       }
                       return (
                         <div key={type}>
                           <div className="flex items-center justify-between mb-2">
-                            <span className={`px-3 py-1 rounded-lg text-sm font-bold uppercase ${colors[type].light} ${colors[type].text}`}>
+                            <span className={`px-3 py-1 rounded-lg text-sm font-bold uppercase backdrop-blur-sm border border-white/20 ${colors[type].light} ${colors[type].text}`}>
                               {type}
                             </span>
-                            <span className="text-sm font-bold text-slate-700">{count} ({percent.toFixed(0)}%)</span>
+                            <span className="text-sm font-bold text-white">{count} ({percent.toFixed(0)}%)</span>
                           </div>
-                          <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                          <div className="w-full bg-white/10 backdrop-blur-sm rounded-full h-3 overflow-hidden border border-white/20">
                             <div 
                               className={`bg-gradient-to-r ${colors[type].bg} h-full rounded-full transition-all duration-500`}
                               style={{ width: `${percent}%` }}
@@ -671,40 +671,40 @@ export default function Dashboard({ session, renameShop, onLogout }){
 
           {view === 'sales' && (
             <>
-              <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg border border-purple-100 hover:shadow-xl transition-all mb-4 lg:mb-5">
+              <div className="bg-gradient-to-br from-purple-500/20 to-violet-500/20 backdrop-blur-xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg border border-purple-400/30 hover:shadow-xl hover:shadow-purple-500/20 transition-all mb-4 lg:mb-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-xs lg:text-sm font-semibold text-purple-600 uppercase tracking-wide mb-2">Weekly Sales (Last 7 Days)</div>
-                    <div className="text-2xl lg:text-4xl font-bold text-purple-700">{formatPKR(weeklySales)}</div>
+                    <div className="text-xs lg:text-sm font-semibold text-purple-300 uppercase tracking-wide mb-2">Weekly Sales (Last 7 Days)</div>
+                    <div className="text-2xl lg:text-4xl font-bold text-white drop-shadow-lg">{formatPKR(weeklySales)}</div>
                   </div>
                   <div className="text-3xl lg:text-5xl">📊</div>
                 </div>
               </div>
-              <div className="bg-white p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl border border-slate-100">
-                <h3 className="text-2xl font-bold text-slate-800 mb-5">💰 Sales Records</h3>
+              <div className="bg-white/10 backdrop-blur-2xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl border border-white/20">
+                <h3 className="text-2xl font-bold text-white mb-5 drop-shadow-lg">💰 Sales Records</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[600px]">
                     <thead>
-                      <tr className="bg-gradient-to-r from-slate-100 to-slate-50">
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-slate-700 uppercase tracking-wide">Date</th>
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-slate-700 uppercase tracking-wide">Qty</th>
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-slate-700 uppercase tracking-wide">Amount</th>
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-slate-700 uppercase tracking-wide">Rate (/kg)</th>
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-slate-700 uppercase tracking-wide">Note</th>
+                      <tr className="bg-white/10 backdrop-blur-sm">
+                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Date</th>
+                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Qty</th>
+                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Amount</th>
+                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Rate (/kg)</th>
+                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Note</th>
                       </tr>
                     </thead>
                     <tbody>
                       {store.transactions.filter(t=>t.type==='sale').map((s,i)=>(
-                        <tr key={i} className="border-t border-slate-200 hover:bg-blue-50 transition-all">
-                          <td className="py-3 px-4 text-sm text-slate-700 font-medium">{s.date}</td>
-                          <td className="py-3 px-4 text-sm font-semibold">{s.qty}</td>
-                          <td className="py-3 px-4 text-sm font-bold text-green-600">{formatPKR(s.amount)}</td>
-                          <td className="py-3 px-4 text-sm text-slate-600">{formatPKR(s.ratePerKg)}</td>
-                          <td className="py-3 px-4 text-sm text-slate-500">{s.note}</td>
+                        <tr key={i} className="border-t border-white/20 hover:bg-white/10 transition-all">
+                          <td className="py-3 px-4 text-sm text-purple-200 font-medium">{s.date}</td>
+                          <td className="py-3 px-4 text-sm font-semibold text-white">{s.qty}</td>
+                          <td className="py-3 px-4 text-sm font-bold text-green-300">{formatPKR(s.amount)}</td>
+                          <td className="py-3 px-4 text-sm text-purple-200">{formatPKR(s.ratePerKg)}</td>
+                          <td className="py-3 px-4 text-sm text-purple-200">{s.note}</td>
                         </tr>
                       ))}
                       {store.transactions.filter(t=>t.type==='sale').length === 0 && (
-                        <tr><td className="py-8 text-center text-slate-400" colSpan={5}>📝 No sales yet</td></tr>
+                        <tr><td className="py-8 text-center text-purple-200" colSpan={5}>📝 No sales yet</td></tr>
                       )}
                     </tbody>
                   </table>
@@ -715,13 +715,13 @@ export default function Dashboard({ session, renameShop, onLogout }){
 
           {view === 'settings' && (
             <div className="space-y-4 lg:space-y-6">
-              <div className="bg-white p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl border border-slate-100">
+              <div className="bg-white/10 backdrop-blur-2xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl border border-white/20">
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-2xl font-bold text-slate-800">⚙️ Personal Details</h3>
+                  <h3 className="text-2xl font-bold text-white drop-shadow-lg">⚙️ Personal Details</h3>
                   <div>
                     {!personalEditing ? (
                       <button
-                        className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                        className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg"
                         onClick={() => setPersonalEditing(true)}
                       >
                         ✏️ Edit
@@ -729,7 +729,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                     ) : (
                       <div className="flex items-center gap-2">
                         <button
-                          className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                          className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg"
                           onClick={() => {
                             // persist changes
                             if(!localSession || !localSession.name){
@@ -748,7 +748,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                           💾 Save
                         </button>
                         <button
-                          className="px-3 py-1 bg-slate-500 text-white rounded-lg hover:bg-slate-600"
+                          className="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white rounded-lg"
                           onClick={() => {
                             setPersonalEditing(false)
                             setLocalSession(session)
@@ -762,50 +762,50 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 </div>
 
                 {(!localSession || !localSession.name || !localSession.ownerName || !localSession.phone) && !personalEditing ? (
-                  <div className="p-4 mb-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-700">Please add shop name, owner name and phone number. Click <strong>Edit</strong> to add details.</div>
+                  <div className="p-4 mb-4 rounded-lg bg-amber-500/20 backdrop-blur-sm border border-amber-400/30 text-amber-200">Please add shop name, owner name and phone number. Click <strong>Edit</strong> to add details.</div>
                 ) : null}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Shop Name</label>
+                    <label className="block text-sm font-semibold text-purple-200 mb-2">Shop Name</label>
                     <input
                       type="text"
                       value={localSession?.name || ''}
                       onChange={(e) => setLocalSession({...localSession, name: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all disabled:bg-white/5 disabled:text-white/50"
                       placeholder="Enter shop name"
                       disabled={!personalEditing}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Owner Name</label>
+                    <label className="block text-sm font-semibold text-purple-200 mb-2">Owner Name</label>
                     <input
                       type="text"
                       value={localSession?.ownerName || ''}
                       onChange={(e) => setLocalSession({...localSession, ownerName: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all disabled:bg-white/5 disabled:text-white/50"
                       placeholder="Enter owner name"
                       disabled={!personalEditing}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+                    <label className="block text-sm font-semibold text-purple-200 mb-2">Phone Number</label>
                     <input
                       type="tel"
                       value={localSession?.phone || ''}
                       onChange={(e) => setLocalSession({...localSession, phone: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all disabled:bg-white/5 disabled:text-white/50"
                       placeholder="Enter phone number"
                       disabled={!personalEditing}
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Address</label>
+                    <label className="block text-sm font-semibold text-purple-200 mb-2">Address</label>
                     <input
                       type="text"
                       value={localSession?.address || ''}
                       onChange={(e) => setLocalSession({...localSession, address: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all disabled:bg-white/5 disabled:text-white/50"
                       placeholder="Enter address"
                       disabled={!personalEditing}
                     />
@@ -814,8 +814,8 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 
               </div>
 
-              <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
-                <h3 className="text-2xl font-bold text-slate-800 mb-5">📦 Inventory Management</h3>
+              <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
+                <h3 className="text-2xl font-bold text-white mb-5 drop-shadow-lg">📦 Inventory Management</h3>
                 <div className="space-y-6">
                   {Object.entries(store.inventory).map(([type, counts]) => {
                     const total = (counts.filled || 0) + (counts.empty || 0)
@@ -823,14 +823,14 @@ export default function Dashboard({ session, renameShop, onLogout }){
                     const draftTotal = inventoryEdits[type]?.total ?? total
                     const filledPercent = total > 0 ? ((counts.filled || 0) / total) * 100 : 0
                     return (
-                      <div key={type} className="bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
+                      <div key={type} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 shadow-lg hover:bg-white/15 hover:shadow-xl transition-all">
                         <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                          <h4 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow-md">
                             <span className="text-2xl">🛢️</span> {type} Cylinders
                           </h4>
                           {!isEditing && (
                             <button
-                              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md"
+                              className="px-4 py-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white rounded-lg transition-all shadow-lg"
                               onClick={() => setInventoryEdits({ ...inventoryEdits, [type]: { ...(inventoryEdits[type] || {}), editing: true, total } })}
                             >
                               ✏️ Edit Total
@@ -841,39 +841,39 @@ export default function Dashboard({ session, renameShop, onLogout }){
                         {!isEditing ? (
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                              <div className="text-lg font-semibold text-slate-700">Total Cylinders: <span className="text-slate-900">{total}</span></div>
+                              <div className="text-lg font-semibold text-purple-200">Total Cylinders: <span className="text-white">{total}</span></div>
                             </div>
                             <div className="space-y-2">
                               <div className="flex justify-between text-sm">
-                                <span className="text-green-700 font-medium">Filled: {counts.filled || 0}</span>
-                                <span className="text-amber-700 font-medium">Empty: {counts.empty || 0}</span>
+                                <span className="text-green-300 font-medium">Filled: {counts.filled || 0}</span>
+                                <span className="text-amber-300 font-medium">Empty: {counts.empty || 0}</span>
                               </div>
-                              <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden shadow-inner">
+                              <div className="w-full bg-white/10 backdrop-blur-sm rounded-full h-4 overflow-hidden border border-white/20">
                                 <div 
-                                  className="bg-gradient-to-r from-green-500 to-green-600 h-full rounded-full transition-all duration-500"
+                                  className="bg-gradient-to-r from-green-500 to-emerald-600 h-full rounded-full transition-all duration-500"
                                   style={{ width: `${filledPercent}%` }}
                                 />
                               </div>
                             </div>
                           </div>
                         ) : (
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <div className="text-sm text-blue-800 mb-3">Enter new total cylinders. You'll be asked to specify how many are filled and empty.</div>
+                          <div className="bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg p-4">
+                            <div className="text-sm text-blue-200 mb-3">Enter new total cylinders. You'll be asked to specify how many are filled and empty.</div>
                             <div className="flex items-center gap-4">
                               <div className="flex-1">
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Total Cylinders</label>
+                                <label className="block text-sm font-semibold text-white mb-2">Total Cylinders</label>
                                 <input
                                   type="number"
                                   min="0"
                                   value={draftTotal}
                                   onChange={(e) => setInventoryEdits({ ...inventoryEdits, [type]: { ...(inventoryEdits[type] || {}), editing: true, total: parseInt(e.target.value) || 0 } })}
-                                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg font-semibold"
+                                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all text-lg font-semibold"
                                   placeholder="e.g., 30"
                                 />
                               </div>
                               <div className="flex flex-col gap-2">
                                 <button
-                                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg font-semibold"
+                                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg transition-all shadow-lg font-semibold"
                                   onClick={() => {
                                     const newTotal = Number(inventoryEdits[type]?.total ?? 0)
                                     if (isNaN(newTotal) || newTotal < 0) {
@@ -887,7 +887,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                                   💾 Save
                                 </button>
                                 <button
-                                  className="px-6 py-3 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-all font-semibold"
+                                  className="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white rounded-lg transition-all font-semibold"
                                   onClick={() => {
                                     const copy = { ...inventoryEdits }
                                     delete copy[type]
@@ -909,13 +909,13 @@ export default function Dashboard({ session, renameShop, onLogout }){
           )}
 
           {showInventoryModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setShowInventoryModal(false)}>
-              <div className="bg-white p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
-                <h3 className="text-2xl font-bold text-slate-800 mb-4">Set Cylinder Distribution</h3>
-                <p className="text-sm text-slate-600 mb-5">Total {inventoryModalData.type} cylinders: {inventoryModalData.total}</p>
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowInventoryModal(false)}>
+              <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+                <h3 className="text-2xl font-bold text-white mb-4 drop-shadow-lg">Set Cylinder Distribution</h3>
+                <p className="text-sm text-purple-200 mb-5">Total {inventoryModalData.type} cylinders: {inventoryModalData.total}</p>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Filled Cylinders</label>
+                    <label className="block text-sm font-semibold text-purple-200 mb-2">Filled Cylinders</label>
                     <input
                       type="number"
                       min="0"
@@ -926,11 +926,11 @@ export default function Dashboard({ session, renameShop, onLogout }){
                         const empty = inventoryModalData.total - filled
                         setInventoryModalData({ ...inventoryModalData, filled, empty })
                       }}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-green-400 focus:border-transparent focus:outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Empty Cylinders</label>
+                    <label className="block text-sm font-semibold text-purple-200 mb-2">Empty Cylinders</label>
                     <input
                       type="number"
                       min="0"
@@ -941,22 +941,22 @@ export default function Dashboard({ session, renameShop, onLogout }){
                         const filled = inventoryModalData.total - empty
                         setInventoryModalData({ ...inventoryModalData, filled, empty })
                       }}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-amber-400 focus:border-transparent focus:outline-none transition-all"
                     />
                   </div>
-                  <div className="text-sm text-slate-500">
+                  <div className="text-sm text-purple-200">
                     Filled + Empty = {inventoryModalData.filled + inventoryModalData.empty} (must equal {inventoryModalData.total})
                   </div>
                 </div>
                 <div className="mt-4 lg:mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end">
                   <button
-                    className="px-4 lg:px-5 py-2 border-2 border-slate-300 rounded-lg lg:rounded-xl font-medium hover:bg-slate-50 transition-all"
+                    className="px-4 lg:px-5 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg lg:rounded-xl font-medium text-white hover:bg-white/20 transition-all"
                     onClick={() => setShowInventoryModal(false)}
                   >
                     Cancel
                   </button>
                   <button
-                    className="px-4 lg:px-5 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg lg:rounded-xl font-medium hover:from-green-600 hover:to-green-700 transition-all shadow-lg"
+                    className="px-4 lg:px-5 py-2 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-white rounded-lg lg:rounded-xl font-medium transition-all shadow-lg"
                     onClick={() => {
                       if (inventoryModalData.filled + inventoryModalData.empty !== inventoryModalData.total) {
                         setToast({ message: 'Filled + Empty must equal total', type: 'error' })
