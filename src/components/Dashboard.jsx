@@ -329,18 +329,18 @@ export default function Dashboard({ session, renameShop, onLogout }){
               <h3 className="text-2xl font-bold text-white mb-5 drop-shadow-lg">📦 Inventory Management</h3>
               <div className="space-y-4">
                 {Object.entries(store.inventory).map(([type,st])=> (
-                  <div key={type} className="bg-white/10 backdrop-blur-sm p-5 border border-white/20 rounded-xl hover:shadow-lg hover:bg-white/15 transition-all">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-xl font-bold text-white mb-2 drop-shadow-md">{type} Cylinders</div>
-                        <div className="flex gap-4 text-sm">
-                          <span className="px-3 py-1 bg-green-500/30 backdrop-blur-sm border border-green-400/50 text-green-200 rounded-lg font-semibold">✓ Filled: {st.filled}</span>
-                          <span className="px-3 py-1 bg-amber-500/30 backdrop-blur-sm border border-amber-400/50 text-amber-200 rounded-lg font-semibold">○ Empty: {st.empty}</span>
+                  <div key={type} className="bg-white/10 backdrop-blur-sm p-4 lg:p-5 border border-white/20 rounded-xl hover:shadow-lg hover:bg-white/15 transition-all">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="text-lg lg:text-xl font-bold text-white mb-2 drop-shadow-md">{type} Cylinders</div>
+                        <div className="flex flex-wrap gap-2 lg:gap-4 text-sm">
+                          <span className="px-3 py-1 bg-green-500/30 backdrop-blur-sm border border-green-400/50 text-green-200 rounded-lg font-semibold whitespace-nowrap">✓ Filled: {st.filled}</span>
+                          <span className="px-3 py-1 bg-amber-500/30 backdrop-blur-sm border border-amber-400/50 text-amber-200 rounded-lg font-semibold whitespace-nowrap">○ Empty: {st.empty}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <button 
-                          className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl font-medium transition-all shadow-lg" 
+                          className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl font-medium transition-all shadow-lg text-sm lg:text-base whitespace-nowrap" 
                           onClick={()=>{
                             const res = recordSale(type,1,perKgRate,'')
                             if(!res || !res.success){
@@ -353,7 +353,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                           💸 Sell -1
                         </button>
                         <button 
-                          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-medium transition-all shadow-lg" 
+                          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-medium transition-all shadow-lg text-sm lg:text-base whitespace-nowrap" 
                           onClick={()=>{
                             setManagingEmpty(type)
                             setEmptyQty('')
@@ -366,20 +366,22 @@ export default function Dashboard({ session, renameShop, onLogout }){
                     {managingEmpty === type && (
                       <div className="mt-4 p-4 bg-amber-500/20 backdrop-blur-sm border border-amber-400/30 rounded-xl">
                         <div className="text-sm font-semibold text-amber-200 mb-3">Refill Empty Cylinders</div>
-                        <div className="flex items-center gap-3">
-                          <input 
-                            type="number" 
-                            className="w-32 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold text-white placeholder-white/50 focus:border-amber-400 focus:ring-2 focus:ring-amber-400 focus:outline-none" 
-                            placeholder="Quantity"
-                            value={emptyQty}
-                            onChange={(e)=>setEmptyQty(e.target.value)}
-                            min="0"
-                            max={st.empty}
-                          />
-                          <span className="text-sm text-amber-200">Available: {st.empty}</span>
-                          <div className="flex gap-2 ml-auto">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <input 
+                              type="number" 
+                              className="w-24 sm:w-32 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold text-white placeholder-white/50 focus:border-amber-400 focus:ring-2 focus:ring-amber-400 focus:outline-none" 
+                              placeholder="Qty"
+                              value={emptyQty}
+                              onChange={(e)=>setEmptyQty(e.target.value)}
+                              min="0"
+                              max={st.empty}
+                            />
+                            <span className="text-xs sm:text-sm text-amber-200 whitespace-nowrap">Available: {st.empty}</span>
+                          </div>
+                          <div className="flex gap-2 sm:ml-auto">
                             <button 
-                              className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-medium text-white hover:bg-white/20 transition-all" 
+                              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-medium text-white hover:bg-white/20 transition-all text-sm" 
                               onClick={()=>{
                                 setManagingEmpty(null)
                                 setEmptyQty('')
@@ -388,7 +390,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                               Cancel
                             </button>
                             <button 
-                              className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all shadow-lg" 
+                              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all shadow-lg text-sm" 
                               onClick={()=>{
                                 const result = manageEmpty(type, emptyQty)
                                 if(result.success){
@@ -424,10 +426,10 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 </button>
               </div>
 
-              <div className="mb-5 flex gap-3">
-                <input value={khataName} onChange={e=>setKhataName(e.target.value)} placeholder="Name" className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-48 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
-                <input value={khataKg} onChange={e=>setKhataKg(e.target.value)} placeholder="Kg" type="number" className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-32 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
-                <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg" onClick={()=>{
+              <div className="mb-5 flex flex-col sm:flex-row gap-3">
+                <input value={khataName} onChange={e=>setKhataName(e.target.value)} placeholder="Name" className="flex-1 sm:w-48 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
+                <input value={khataKg} onChange={e=>setKhataKg(e.target.value)} placeholder="Kg" type="number" className="flex-1 sm:w-32 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
+                <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg whitespace-nowrap" onClick={()=>{
                   const res = addKhataEntry(khataName, khataKg, perKgRate)
                   if(res && res.success){ setToast({message: res.message, type:'success'}); setKhataName(''); setKhataKg('') }
                   else setToast({message: res.message || 'Error', type:'error'})
@@ -437,39 +439,39 @@ export default function Dashboard({ session, renameShop, onLogout }){
               <div className="space-y-3">
                 {Object.entries(store.khatabook || {}).length === 0 && <div className="text-purple-200">No khata entries yet</div>}
                 {Object.entries(store.khatabook || {}).map(([name,data], idx)=> (
-                  <div key={idx} className="flex items-center justify-between p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/15 hover:shadow-lg transition-all">
-                    <div>
-                      <div className="font-bold text-lg text-white drop-shadow-md">{name}</div>
-                      <div className="flex gap-4 mt-1">
-                        <span className="text-sm text-purple-200">Total Kg: <span className="font-semibold text-white">{data.kg || 0} kg</span></span>
-                        <span className="text-sm text-red-300">Total Udhar: <span className="font-bold text-red-200">{formatPKR(data.amount || 0)}</span></span>
+                  <div key={idx} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/15 hover:shadow-lg transition-all">
+                    <div className="flex-1">
+                      <div className="font-bold text-base lg:text-lg text-white drop-shadow-md">{name}</div>
+                      <div className="flex flex-wrap gap-2 lg:gap-4 mt-1">
+                        <span className="text-xs lg:text-sm text-purple-200 whitespace-nowrap">Total Kg: <span className="font-semibold text-white">{data.kg || 0} kg</span></span>
+                        <span className="text-xs lg:text-sm text-red-300 whitespace-nowrap">Total Udhar: <span className="font-bold text-red-200">{formatPKR(data.amount || 0)}</span></span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                       {addingTo === name ? (
                         <>
-                          <input type="number" value={addKgValue} onChange={e=>setAddKgValue(e.target.value)} placeholder="Kg" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-28 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400" />
-                          <button className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg" onClick={()=>{
+                          <input type="number" value={addKgValue} onChange={e=>setAddKgValue(e.target.value)} placeholder="Kg" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-full sm:w-28 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" />
+                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap" onClick={()=>{
                             const res = addKhataEntry(name, addKgValue, perKgRate)
                             if(res && res.success){ setToast({message: res.message, type:'success'}); setAddingTo(null); setAddKgValue('') }
                             else setToast({message: res.message || 'Error', type:'error'})
                           }}>+ Add Kg</button>
-                          <button className="px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20" onClick={()=>{ setAddingTo(null); setAddKgValue('') }}>Cancel</button>
+                          <button className="flex-1 sm:flex-none px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 text-sm" onClick={()=>{ setAddingTo(null); setAddKgValue('') }}>Cancel</button>
                         </>
                       ) : settlingName === name ? (
                         <>
-                          <input type="number" value={settleAmount} onChange={e=>setSettleAmount(e.target.value)} placeholder="PKR" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-32 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400" />
-                          <button className="px-3 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg" onClick={()=>{
+                          <input type="number" value={settleAmount} onChange={e=>setSettleAmount(e.target.value)} placeholder="PKR" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-full sm:w-32 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" />
+                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap" onClick={()=>{
                             const res = settleKhata(name, settleAmount)
                             if(res && res.success){ setToast({message: res.message, type:'success'}); setSettlingName(null); setSettleAmount('') }
                             else setToast({message: res.message || 'Error', type:'error'})
                           }}>💰 Pay</button>
-                          <button className="px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20" onClick={()=>{ setSettlingName(null); setSettleAmount('') }}>Cancel</button>
+                          <button className="flex-1 sm:flex-none px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 text-sm" onClick={()=>{ setSettlingName(null); setSettleAmount('') }}>Cancel</button>
                         </>
                       ) : (
                         <>
-                          <button className="px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg shadow-lg" onClick={()=>{ setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
-                          <button className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg" onClick={()=>{ setSettlingName(name); setSettleAmount('') }}>💳 Settle</button>
+                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap" onClick={()=>{ setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
+                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap" onClick={()=>{ setSettlingName(name); setSettleAmount('') }}>💳 Settle</button>
                         </>
                       )}
                     </div>
