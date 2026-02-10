@@ -83,21 +83,24 @@ export default function Dashboard({ session, renameShop, onLogout }){
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 h-screen bg-white/10 backdrop-blur-2xl border-r border-white/20 shadow-2xl flex flex-col w-72 z-50 transform transition-transform duration-300 lg:translate-x-0 ${
+      <aside className={`fixed left-0 top-0 h-screen bg-white/10 backdrop-blur-3xl border-r border-white/30 shadow-2xl flex flex-col w-72 z-50 transform transition-all duration-300 ease-out lg:translate-x-0 ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex items-center justify-between p-5 pb-4 border-b border-white/20">
+        <div className="flex items-center justify-between p-6 pb-5 border-b border-white/30 bg-gradient-to-br from-white/10 to-transparent">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/50 animate-pulse" style={{animationDuration: '3s'}}>
-              {session.name.charAt(0)}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 rounded-2xl blur opacity-75 animate-pulse"></div>
+              <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center text-white font-bold text-2xl shadow-2xl shadow-purple-500/60 animate-float-slow">
+                {session.name.charAt(0)}
+              </div>
             </div>
             <div>
-              <div className="font-bold text-lg text-white drop-shadow-lg">{session.name}</div>
-              <div className="text-sm text-purple-300 font-medium">Smart LPG</div>
+              <div className="font-bold text-xl text-white drop-shadow-2xl">{session.name}</div>
+              <div className="text-sm text-purple-300 font-semibold tracking-wide">Smart LPG</div>
             </div>
           </div>
           <button 
-            className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+            className="lg:hidden p-2 rounded-xl hover:bg-white/10 transition-all duration-200 hover:scale-110"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +110,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
         </div>
 
         <nav className="flex-1 p-5 pt-6 overflow-y-auto">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             {NAV.map(n => (
               <div 
                 key={n.id} 
@@ -115,32 +118,38 @@ export default function Dashboard({ session, renameShop, onLogout }){
                   setView(n.id)
                   setIsMobileMenuOpen(false)
                 }} 
-                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+                className={`group relative flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
                   view===n.id 
-                    ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white shadow-lg shadow-purple-500/50' 
-                    : 'hover:bg-white/10 text-white/80 hover:text-white'
+                    ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white shadow-2xl shadow-purple-500/60 scale-105' 
+                    : 'hover:bg-white/15 text-white/80 hover:text-white hover:scale-105 hover:shadow-xl'
                 }`}
               >
-                <div className="w-8 text-center text-xl">{n.icon}</div>
-                <div className="font-medium">{n.label}</div>
+                {view === n.id && (
+                  <div className="absolute inset-0 bg-white/10 rounded-2xl animate-pulse"></div>
+                )}
+                <div className="relative w-10 text-center text-2xl transform group-hover:scale-110 transition-transform duration-300">{n.icon}</div>
+                <div className="relative font-semibold text-base tracking-wide">{n.label}</div>
+                {view === n.id && (
+                  <div className="absolute right-4 w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                )}
               </div>
             ))}
           </div>
         </nav>
 
-        <div className="p-5 pt-4 text-xs text-purple-300/70 text-center border-t border-white/20">
+        <div className="p-5 pt-4 text-xs text-purple-300/80 text-center border-t border-white/30 font-semibold bg-gradient-to-t from-white/5 to-transparent">
           Smart LPG v1.0
         </div>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col w-full lg:ml-72 relative z-10">
-        <header className="bg-white/10 backdrop-blur-xl shadow-lg border-b border-white/20 px-4 py-3 lg:px-6 lg:py-4">
+        <header className="bg-white/10 backdrop-blur-3xl shadow-2xl border-b border-white/30 px-4 py-3 lg:px-6 lg:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Mobile Menu Button */}
               <button 
-                className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-white/15 transition-all duration-200 hover:scale-110"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,24 +158,27 @@ export default function Dashboard({ session, renameShop, onLogout }){
               </button>
               
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center shadow-lg shadow-purple-500/50 animate-pulse" style={{animationDuration: '3s'}}>
-                  <span className="text-white font-bold text-lg lg:text-xl">🏪</span>
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 rounded-xl blur opacity-75 animate-pulse"></div>
+                  <div className="relative w-8 h-8 lg:w-12 lg:h-12 rounded-xl bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center shadow-2xl shadow-purple-500/60">
+                    <span className="text-white font-bold text-lg lg:text-2xl">🏪</span>
+                  </div>
                 </div>
                 <div>
-                  <h1 className="text-lg lg:text-xl font-semibold text-white drop-shadow-lg">
+                  <h1 className="text-lg lg:text-2xl font-bold text-white drop-shadow-2xl">
                     Smart<span className="text-purple-300"> LPG</span>
                   </h1>
-                  <div className="text-xs text-purple-200/70 lg:hidden">Management System</div>
+                  <div className="text-xs text-purple-200/80 lg:hidden font-medium">Management System</div>
                 </div>
               </div>
             </div>
           
 
             <div className="flex items-center gap-3">
-              <div className="hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/20 shadow-lg">
-                <div className="text-sm font-semibold text-white">Rate/kg</div>
+              <div className="hidden lg:flex items-center gap-3 bg-gradient-to-br from-white/15 to-white/10 backdrop-blur-xl px-5 py-3 rounded-2xl border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <div className="text-sm font-bold text-white tracking-wide">Rate/kg</div>
                 <input 
-                  className="w-28 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm font-semibold text-white disabled:bg-white/5 disabled:text-white/50 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" 
+                  className="w-28 p-2 bg-white/15 backdrop-blur-xl border border-white/30 rounded-xl text-sm font-semibold text-white disabled:bg-white/5 disabled:text-white/50 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all" 
                   type="number" 
                   value={perKgDraft} 
                   onChange={e=>setPerKgDraft(e.target.value)} 
@@ -175,21 +187,21 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 />
                 {!perKgEditing ? (
                   <button 
-                    className="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium transition-all shadow-lg hover:shadow-purple-500/50" 
+                    className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-purple-500/60 hover:scale-110" 
                     onClick={()=>{ setPerKgDraft(perKgRate); setPerKgEditing(true); }}
                   >
                     Edit
                   </button>
                 ) : (
-                <div className="flex gap-1">
+                <div className="flex gap-2">
                   <button 
-                    className="px-2 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm font-medium text-white hover:bg-white/20 transition-all" 
+                    className="px-3 py-2 bg-white/15 backdrop-blur-xl border border-white/30 rounded-xl text-sm font-semibold text-white hover:bg-white/25 transition-all duration-300 hover:scale-110" 
                     onClick={()=>{ setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                   >
                     ✕
                   </button>
                   <button 
-                    className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg text-sm font-medium transition-all shadow-lg" 
+                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/60 hover:scale-110" 
                     onClick={()=>{ setPerKgRate(Number(perKgDraft||0)); setPerKgEditing(false); }}
                   >
                     💾 Save
@@ -199,27 +211,30 @@ export default function Dashboard({ session, renameShop, onLogout }){
               </div>
               
               {/* Logout Button */}
-              <button 
-                onClick={onLogout}
-                className="px-3 py-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-lg hover:shadow-red-500/50"
-                title="Logout"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span className="hidden sm:inline">Logout</span>
-              </button>
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl opacity-75 group-hover:opacity-100 blur transition duration-300"></div>
+                <button 
+                  onClick={onLogout}
+                  className="relative px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 shadow-xl hover:shadow-red-500/60 hover:scale-110"
+                  title="Logout"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         </header>
 
         {/* Mobile Per-kg Rate */}
-        <div className="lg:hidden bg-white/10 backdrop-blur-xl border-b border-white/20 px-4 py-3">
+        <div className="lg:hidden bg-gradient-to-r from-white/15 to-white/10 backdrop-blur-3xl border-b border-white/30 px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-white">Per-kg Rate</div>
-            <div className="flex items-center gap-2">
+            <div className="text-sm font-bold text-white tracking-wide">Per-kg Rate</div>
+            <div className="flex items-center gap-3">
               <input 
-                className="w-20 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm font-semibold text-white disabled:bg-white/5 disabled:text-white/50 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400" 
+                className="w-20 p-2 bg-white/15 backdrop-blur-xl border border-white/30 rounded-xl text-sm font-semibold text-white disabled:bg-white/5 disabled:text-white/50 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all" 
                 type="number" 
                 value={perKgDraft} 
                 onChange={e=>setPerKgDraft(e.target.value)} 
@@ -228,21 +243,21 @@ export default function Dashboard({ session, renameShop, onLogout }){
               />
               {!perKgEditing ? (
                 <button 
-                  className="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium transition-all shadow-lg" 
+                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-lg hover:scale-110" 
                   onClick={()=>{ setPerKgDraft(perKgRate); setPerKgEditing(true); }}
                 >
                   Edit
                 </button>
               ) : (
-                <div className="flex gap-1">
+                <div className="flex gap-2">
                   <button 
-                    className="px-2 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm text-white hover:bg-white/20 transition-all" 
+                    className="px-3 py-2 bg-white/15 backdrop-blur-xl border border-white/30 rounded-xl text-sm text-white hover:bg-white/25 transition-all duration-300 hover:scale-110" 
                     onClick={()=>{ setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                   >
                     ✕
                   </button>
                   <button 
-                    className="px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg text-sm font-medium shadow-lg" 
+                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl text-sm font-semibold shadow-lg hover:scale-110 transition-all duration-300" 
                     onClick={()=>{ setPerKgRate(Number(perKgDraft||0)); setPerKgEditing(false); }}
                   >
                     💾
