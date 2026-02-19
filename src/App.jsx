@@ -83,7 +83,6 @@ export default function App() {
           )
         }
       />
-      <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
     </Routes>
   )
 }
