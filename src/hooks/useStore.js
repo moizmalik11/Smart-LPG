@@ -6,15 +6,6 @@ function loadStore(id){
   return raw ? JSON.parse(raw) : { inventory: { '45kg': { filled:0, empty:0 } }, transactions: [], khatabook: {}, perKgRate: 0 }
 }
 
-function saveStore(id, data){
-  const key = `lpg_store_${id}`
-  localStorage.setItem(key, JSON.stringify(data))
-}
-
-function todayDateKey(){
-  const d = new Date()
-  return d.toISOString().slice(0,10)
-}
 
 function getWeekDates(){
   const today = new Date()
@@ -181,11 +172,6 @@ export function useStore(sessionId){
     return { success: true, message: 'Payment recorded' }
   }
 
-  const updateInventory = (type, filled, empty) => {
-    const f = Number(filled || 0)
-    const e = Number(empty || 0)
-    if(f < 0 || e < 0) return { success: false, message: 'Invalid counts' }
-    
     setStore(s=>{
       const next = JSON.parse(JSON.stringify(s))
       if(!next.inventory) next.inventory = {}
