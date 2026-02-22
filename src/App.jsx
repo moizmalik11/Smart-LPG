@@ -8,6 +8,16 @@ import Login from './components/Login'
 function checkAuthStatus() {
   return localStorage.getItem('lpg_logged_in') === 'true'
 }
+
+export default function App() {
+  const [session, setSession] = useState(() => initialSession())
+  const [isAuthenticated, setIsAuthenticated] = useState(() => checkAuthStatus())
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    setIsAuthenticated(checkAuthStatus())
+  }, [])
+
   // rename shop with migration: copy old store to new id if needed
   function renameShop(newName) {
     if (!newName) return
