@@ -3,27 +3,11 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Dashboard from './components/Dashboard'
 import Login from './components/Login'
 
-function initialSession() {
-  const s = localStorage.getItem('lpg_session')
-  if (s) return JSON.parse(s)
-  const def = { name: 'Masha Allah LPG', id: 'masha-allah-lpg' }
-  localStorage.setItem('lpg_session', JSON.stringify(def))
-  return def
-}
+
 
 function checkAuthStatus() {
   return localStorage.getItem('lpg_logged_in') === 'true'
 }
-
-export default function App() {
-  const [session, setSession] = useState(() => initialSession())
-  const [isAuthenticated, setIsAuthenticated] = useState(() => checkAuthStatus())
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    setIsAuthenticated(checkAuthStatus())
-  }, [])
-
   // rename shop with migration: copy old store to new id if needed
   function renameShop(newName) {
     if (!newName) return
