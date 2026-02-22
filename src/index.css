@@ -12,6 +12,34 @@
   scrollbar-color: rgba(168, 85, 247, 0.6) rgba(255, 255, 255, 0.05);
 }
 
+body {
+  background-color: rgb(248 250 252);
+  color: rgb(15 23 42);
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  width: 100%;
+}
+
+/* Modal improvements for mobile */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 10, 30, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+  animation: fade-in 0.3s ease-out;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
