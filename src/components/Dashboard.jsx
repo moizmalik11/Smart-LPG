@@ -228,19 +228,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
           </div>
         </header>
 
-        {/* Mobile Per-kg Rate */}
-        <div className="lg:hidden bg-gradient-to-r from-white/15 to-white/10 backdrop-blur-3xl border-b border-white/30 px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-bold text-white tracking-wide">Per-kg Rate</div>
-            <div className="flex items-center gap-3">
-              <input 
-                className="w-20 p-2 bg-white/15 backdrop-blur-xl border border-white/30 rounded-xl text-sm font-semibold text-white disabled:bg-white/5 disabled:text-white/50 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all" 
-                type="number" 
-                value={perKgDraft} 
-                onChange={e=>setPerKgDraft(e.target.value)} 
-                disabled={!perKgEditing} 
-                placeholder="0"
-              />
+      
               {!perKgEditing ? (
                 <button 
                   className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-lg hover:scale-110" 
@@ -248,12 +236,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 >
                   Edit
                 </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button 
-                    className="px-3 py-2 bg-white/15 backdrop-blur-xl border border-white/30 rounded-xl text-sm text-white hover:bg-white/25 transition-all duration-300 hover:scale-110" 
-                    onClick={()=>{ setPerKgEditing(false); setPerKgDraft(perKgRate); }}
-                  >
+              ) : 
                     ✕
                   </button>
                   <button 
