@@ -65,6 +65,19 @@ export default function App() {
           )
         }
       />
-
-      )
+      <Route
+        path="/dashboard"
+        element={
+          isAuthenticated ? (
+            <div className="app">
+              <Dashboard session={session} renameShop={renameShop} onLogout={handleLogout} />
+            </div>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+    </Routes>
+  )
 }
