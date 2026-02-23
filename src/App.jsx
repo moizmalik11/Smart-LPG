@@ -3,7 +3,10 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Dashboard from './components/Dashboard'
 import Login from './components/Login'
 
-
+function initialSession() {
+  const saved = localStorage.getItem('lpg_session')
+  return saved ? JSON.parse(saved) : { name: 'My Shop', id: 'my-shop' }
+}
 
 function checkAuthStatus() {
   return localStorage.getItem('lpg_logged_in') === 'true'
