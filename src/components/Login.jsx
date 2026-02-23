@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, LogIn, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Login({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
@@ -32,162 +36,92 @@ export default function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-full blur-3xl -top-48 -left-48 animate-blob"></div>
-        <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-blue-500/30 to-cyan-500/30 rounded-full blur-3xl -bottom-48 -right-48 animate-blob animation-delay-2000"></div>
-        <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-blob animation-delay-4000"></div>
-        <div className="absolute w-[400px] h-[400px] bg-gradient-to-r from-pink-500/25 to-rose-500/25 rounded-full blur-3xl top-1/4 right-1/4 animate-blob animation-delay-6000"></div>
-        {/* Floating particles */}
-        <div className="absolute inset-0">
-          {[...Array(30)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute bg-white/20 rounded-full animate-float"
-              style={{
-                width: `${Math.random() * 4 + 1}px`,
-                height: `${Math.random() * 4 + 1}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${5 + Math.random() * 10}s`
-              }}
-            ></div>
-          ))}
-        </div>
-      </div>
-
-      {/* Login Card */}
-      <div className="relative w-full max-w-md animate-slide-up">
-        {/* Glow effect behind card */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-blue-500/30 rounded-3xl blur-2xl opacity-75 animate-gradient"></div>
-        
-        <div className="relative bg-white/10 backdrop-blur-3xl border border-white/30 rounded-3xl shadow-2xl p-6 hover:shadow-purple-500/30 transition-all duration-500 hover:scale-[1.01] before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:via-white/5 before:to-transparent before:pointer-events-none">
-          {/* Logo/Header */}
-          <div className="text-center mb-6 relative z-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 rounded-2xl mb-3 shadow-2xl shadow-purple-500/60 animate-float-slow relative before:absolute before:-inset-1 before:bg-gradient-to-br before:from-purple-500 before:via-pink-500 before:to-blue-500 before:rounded-2xl before:blur-md before:opacity-50 before:animate-pulse">
-              <Lock className="w-8 h-8 text-white drop-shadow-2xl relative z-10" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
+          <CardHeader className="space-y-3 text-center">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl">
+              <Shield className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-2 drop-shadow-2xl tracking-tight">Welcome Back</h1>
-            <p className="text-purple-200/90 text-sm font-medium">Sign in to access your dashboard</p>
-          </div>
+            <CardTitle className="text-3xl font-bold text-white">Welcome Back</CardTitle>
+            <CardDescription className="text-slate-300">
+              Sign in to access your Smart LPG dashboard
+            </CardDescription>
+          </CardHeader>
 
-          {/* Login Form */}
-          <div className="space-y-4">
+          <CardContent className="space-y-4">
             {error && (
-              <div className="bg-gradient-to-r from-red-500/30 to-pink-500/30 backdrop-blur-xl border border-red-400/60 text-red-100 px-5 py-4 rounded-2xl text-sm shadow-2xl animate-shake relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent"></div>
-                <span className="flex items-center gap-3 relative z-10">
-                  <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  <span className="font-semibold">{error}</span>
-                </span>
+              <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                <span className="text-sm font-medium">{error}</span>
               </div>
             )}
 
-            {/* Username Input */}
-            <div className="relative z-10 group">
-              <label className="block text-xs font-bold text-white/95 mb-2 tracking-wide">
-                Username
-              </label>
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-slate-200">Username</Label>
               <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-focus-within:opacity-100 blur transition duration-300"></div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="w-4 h-4 text-purple-300 group-focus-within:text-purple-200 transition-all duration-300 group-focus-within:scale-110" />
-                  </div>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-xl border border-white/30 rounded-xl text-white placeholder-purple-200/60 focus:outline-none focus:border-purple-400/50 focus:bg-white/15 transition-all shadow-xl hover:shadow-2xl hover:bg-white/15"
-                    placeholder="Enter your username"
-                  />
-                </div>
+                <User className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <Input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
+                  placeholder="Enter username"
+                />
               </div>
             </div>
 
-            {/* Password Input */}
-            <div className="relative z-10 group">
-              <label className="block text-xs font-bold text-white/95 mb-2 tracking-wide">
-                Password
-              </label>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-slate-200">Password</Label>
               <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-focus-within:opacity-100 blur transition duration-300"></div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="w-4 h-4 text-purple-300 group-focus-within:text-purple-200 transition-all duration-300 group-focus-within:scale-110" />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="w-full pl-10 pr-12 py-3 bg-white/10 backdrop-blur-xl border border-white/30 rounded-xl text-white placeholder-purple-200/60 focus:outline-none focus:border-purple-400/50 focus:bg-white/15 transition-all shadow-xl hover:shadow-2xl hover:bg-white/15"
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-purple-300 hover:text-purple-100 transition-all duration-300 hover:scale-110"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="pl-10 pr-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
+                  placeholder="Enter password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between text-xs relative z-10">
-              <label className="flex items-center text-white/90 cursor-pointer group">
-                <input type="checkbox" className="w-3 h-3 rounded border-white/40 bg-white/10 text-purple-500 focus:ring-2 focus:ring-purple-400 focus:ring-offset-0 cursor-pointer transition-all" />
-                <span className="ml-2 group-hover:text-white transition-all font-medium">Remember me</span>
-              </label>
-              <a href="#" className="text-purple-300 hover:text-purple-100 transition-all font-semibold hover:underline underline-offset-2">
-                Forgot password?
-              </a>
-            </div>
+            <Button
+              onClick={handleLogin}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold"
+              size="lg"
+            >
+              <LogIn className="mr-2 h-5 w-5" />
+              Sign In
+            </Button>
+          </CardContent>
 
-            {/* Login Button */}
-            <div className="relative z-10 group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:blur-lg"></div>
-              <button
-                onClick={handleLogin}
-                className="relative w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-bold py-3 rounded-2xl shadow-2xl shadow-purple-500/50 transition-all transform hover:scale-[1.02] hover:shadow-purple-500/70 active:scale-95 backdrop-blur-sm border border-white/30"
-              >
-                <span className="flex items-center justify-center gap-2">
-                  <span className="text-base tracking-wide">Sign In</span>
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </span>
-              </button>
-            </div>
-
-            {/* Demo Credentials */}
-            <div className="relative z-10 text-center text-xs text-purple-200/80 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl p-3 rounded-2xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <svg className="w-4 h-4 text-purple-300" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                <span className="font-bold text-white/95 text-sm tracking-wide">Demo Credentials</span>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-white/80">Username:</span>
-                  <span className="text-purple-300 font-bold bg-white/10 px-2 py-0.5 rounded-lg">admin</span>
+          <CardFooter className="flex flex-col space-y-3">
+            <div className="w-full p-3 bg-slate-700/30 rounded-lg border border-slate-600">
+              <p className="text-xs text-slate-400 text-center mb-2 font-semibold">Demo Credentials</p>
+              <div className="flex justify-center gap-4 text-xs">
+                <div className="flex items-center gap-1">
+                  <User className="w-3 h-3 text-purple-400" />
+                  <span className="text-slate-300">admin</span>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-white/80">Password:</span>
-                  <span className="text-pink-300 font-bold bg-white/10 px-2 py-0.5 rounded-lg">admin</span>
+                <div className="flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-pink-400" />
+                  <span className="text-slate-300">admin</span>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );
