@@ -81,6 +81,8 @@ export default function Sidebar({ session, activeView, onViewChange, isOpen, onC
           </div>
         </nav>
 
+        
+
         {/* Footer */}
         <div className="p-4 border-t border-slate-700">
           <div className="text-center">
