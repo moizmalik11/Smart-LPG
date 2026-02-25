@@ -3,14 +3,7 @@ import { Home, Package, DollarSign, BookOpen, FileText, Settings, X } from 'luci
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const NAV_ITEMS = [
-  { id: 'overview', label: 'Overview', icon: Home },
-  { id: 'inventory', label: 'Inventory', icon: Package },
-  { id: 'sales', label: 'Sales', icon: DollarSign },
-  { id: 'shipments', label: 'Khata Book', icon: BookOpen },
-  { id: 'reports', label: 'Reports', icon: FileText },
-  { id: 'settings', label: 'Settings', icon: Settings }
-];
+
 
 export default function Sidebar({ session, activeView, onViewChange, isOpen, onClose }) {
   const Icon = ({ icon: IconComponent }) => <IconComponent className="h-5 w-5" />;
