@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useStore } from '../hooks/useStore'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
-import { DollarSign, Package, CheckCircle, X, Save, TrendingUp, Target, BarChart3, Edit, Edit2, Settings as SettingsIcon, FileText } from 'lucide-react'
+import { DollarSign, Package, CheckCircle, X, Save, TrendingUp, Target, BarChart3, Edit, Edit2, Settings as SettingsIcon, FileText, Circle, ShoppingCart, RefreshCw, BookOpen, History } from 'lucide-react'
 
 export default function Dashboard({ session, renameShop, onLogout }){
   const { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory } = useStore(session.id)
@@ -182,7 +182,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 <div className="relative">
                   <div className="flex items-center justify-between mb-4">
                     <div className="text-sm font-bold text-green-200 uppercase tracking-wider">Filled Cylinders</div>
-                    <div className="text-4xl transform group-hover:scale-110 transition-transform duration-300">🟢</div>
+                    <div className="transform group-hover:scale-110 transition-transform duration-300"><CheckCircle className="w-10 h-10 text-green-400" /></div>
                   </div>
                   <div className="text-5xl font-extrabold text-white drop-shadow-2xl mb-2">{totalFilled}</div>
                   <div className="text-sm text-green-100 font-medium">Ready for sale</div>
@@ -193,7 +193,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 <div className="relative">
                   <div className="flex items-center justify-between mb-4">
                     <div className="text-sm font-bold text-amber-200 uppercase tracking-wider">Empty Cylinders</div>
-                    <div className="text-4xl transform group-hover:scale-110 transition-transform duration-300">⚪</div>
+                    <div className="transform group-hover:scale-110 transition-transform duration-300"><Circle className="w-10 h-10 text-amber-300" /></div>
                   </div>
                   <div className="text-5xl font-extrabold text-white drop-shadow-2xl mb-2">{totalEmpty}</div>
                   <div className="text-sm text-amber-100 font-medium">Awaiting refill</div>
@@ -242,7 +242,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                             }
                           }}
                         >
-                          💸 Sell -1
+                          <ShoppingCart className="w-4 h-4" /> Sell -1
                         </button>
                         <button 
                           className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-medium transition-all shadow-lg text-sm lg:text-base whitespace-nowrap" 
@@ -251,7 +251,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                             setEmptyQty('')
                           }}
                         >
-                          🔄 Manage Empty
+                          <RefreshCw className="w-4 h-4" /> Manage Empty
                         </button>
                       </div>
                     </div>
@@ -309,12 +309,12 @@ export default function Dashboard({ session, renameShop, onLogout }){
           {view === 'shipments' && (
             <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-2xl font-bold text-white drop-shadow-lg">📒 Khata Book (Udhar)</h3>
+                <h3 className="text-2xl font-bold text-white drop-shadow-lg flex items-center gap-2"><BookOpen className="w-6 h-6" /> Khata Book (Udhar)</h3>
                 <button 
                   className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all shadow-lg" 
                   onClick={()=>setShowHistory(true)}
                 >
-                  📜 History
+                  <History className="w-4 h-4 mr-1 inline" /> History
                 </button>
               </div>
 
@@ -648,7 +648,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                             setLocalSession(session)
                           }}
                         >
-                          ✖ Cancel
+                          <X className="w-4 h-4 mr-1 inline" /> Cancel
                         </button>
                       </div>
                     )}
@@ -778,7 +778,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                                     setShowInventoryModal(true)
                                   }}
                                 >
-                                  💾 Save
+                                  <Save className="w-4 h-4 mr-1 inline" /> Save
                                 </button>
                                 <button
                                   className="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white rounded-lg transition-all font-semibold"
@@ -788,7 +788,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                                     setInventoryEdits(copy)
                                   }}
                                 >
-                                  ✖ Cancel
+                                  <X className="w-4 h-4 mr-1 inline" /> Cancel
                                 </button>
                               </div>
                             </div>
@@ -868,7 +868,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
                       }
                     }}
                   >
-                    💾 Save Inventory
+                    <Save className="w-4 h-4 mr-1 inline" /> Save Inventory
                   </button>
                 </div>
               </div>
