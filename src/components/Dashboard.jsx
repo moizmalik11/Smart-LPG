@@ -318,7 +318,15 @@ export default function Dashboard({ session, renameShop, onLogout }){
                 </button>
               </div>
 
-             
+              <div className="mb-5 flex flex-col sm:flex-row gap-3">
+                <input value={khataName} onChange={e=>setKhataName(e.target.value)} placeholder="Name" className="flex-1 sm:w-48 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
+                <input value={khataKg} onChange={e=>setKhataKg(e.target.value)} placeholder="Kg" type="number" className="flex-1 sm:w-32 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
+                <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg whitespace-nowrap" onClick={()=>{
+                  const res = addKhataEntry(khataName, khataKg, perKgRate)
+                  if(res && res.success){ setToast({message: res.message, type:'success'}); setKhataName(''); setKhataKg('') }
+                  else setToast({message: res.message || 'Error', type:'error'})
+                }}>Add</button>
+              </div>
 
               <div className="space-y-3">
                 {Object.entries(store.khatabook || {}).length === 0 && <div className="text-purple-200">No khata entries yet</div>}
@@ -345,7 +353,13 @@ export default function Dashboard({ session, renameShop, onLogout }){
                       ) : settlingName === name ? (
                         <>
                           <input type="number" value={settleAmount} onChange={e=>setSettleAmount(e.target.value)} placeholder="PKR" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-full sm:w-32 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" />
-
+                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap flex items-center justify-center gap-2" onClick={()=>{
+                            const res = settleKhata(name, settleAmount)
+                            if(res && res.success){ setToast({message: res.message, type:'success'}); setSettlingName(null); setSettleAmount('') }
+                            else setToast({message: res.message || 'Error', type:'error'})
+                          }}><DollarSign className="w-4 h-4" /> Pay</button>
+                          <button className="flex-1 sm:flex-none px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 text-sm" onClick={()=>{ setSettlingName(null); setSettleAmount('') }}>Cancel</button>
+                        </>
                       ) : (
                         <>
                           <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap" onClick={()=>{ setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
