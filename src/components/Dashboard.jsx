@@ -48,7 +48,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
   },[toast])
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="flex min-h-screen" style={{ background: 'linear-gradient(135deg, #050510 0%, #0d0520 40%, #080318 70%, #050510 100%)' }}>
       {/* Sidebar */}
       <Sidebar 
         session={session}
@@ -59,7 +59,7 @@ export default function Dashboard({ session, renameShop, onLogout }){
       />
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col w-full lg:ml-72">
+      <main className="flex-1 flex flex-col w-full lg:ml-[268px]">
         {/* Navbar */}
         <Navbar 
           session={session}
@@ -68,70 +68,67 @@ export default function Dashboard({ session, renameShop, onLogout }){
           onSettingsClick={() => setView('settings')}
         />
 
-        {/* Mobile Per-kg Rate */}
-        <div className="lg:hidden bg-gradient-to-r from-white/15 to-white/10 backdrop-blur-3xl border-b border-white/30 px-4 py-4">
+        {/* Mobile Per-kg Rate strip */}
+        <div className="lg:hidden px-4 py-3"
+          style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex items-center justify-between">
-            <div className="text-sm font-bold text-white tracking-wide">Per-kg Rate</div>
-            <div className="flex items-center gap-3">
-              <input 
-                className="w-20 p-2 bg-white/15 backdrop-blur-xl border border-white/30 rounded-xl text-sm font-semibold text-white disabled:bg-white/5 disabled:text-white/50 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all" 
-                type="number" 
-                value={perKgDraft} 
-                onChange={e=>setPerKgDraft(e.target.value)} 
-                disabled={!perKgEditing} 
+            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(167,139,250,0.8)' }}>Per-kg Rate</span>
+            <div className="flex items-center gap-2">
+              <input
+                className="w-20 px-2 py-1.5 text-sm font-bold text-white rounded-lg focus:outline-none transition-all"
+                style={{
+                  background: perKgEditing ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.06)',
+                  border: perKgEditing ? '1px solid rgba(139,92,246,0.5)' : '1px solid rgba(255,255,255,0.1)'
+                }}
+                type="number"
+                value={perKgDraft}
+                onChange={e=>setPerKgDraft(e.target.value)}
+                disabled={!perKgEditing}
                 placeholder="0"
               />
               {!perKgEditing ? (
-                <button 
-                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-lg hover:scale-110" 
+                <button
+                  className="px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition-all hover:scale-105"
+                  style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)' }}
                   onClick={()=>{ setPerKgDraft(perKgRate); setPerKgEditing(true); }}
-                >
-                  Edit
-                </button>
+                >Edit</button>
               ) : (
-                <div className="flex gap-2">
-                  <button 
-                    className="px-3 py-2 bg-white/15 backdrop-blur-xl border border-white/30 rounded-xl text-sm text-white hover:bg-white/25 transition-all duration-300 hover:scale-110 flex items-center gap-1" 
+                <>
+                  <button
+                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-105"
+                    style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(148,163,184,0.8)' }}
                     onClick={()=>{ setPerKgEditing(false); setPerKgDraft(perKgRate); }}
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                  <button 
-                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl text-sm font-semibold shadow-lg hover:scale-110 transition-all duration-300 flex items-center gap-2" 
+                  ><X className="w-3.5 h-3.5" /></button>
+                  <button
+                    className="px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition-all hover:scale-105 flex items-center gap-1"
+                    style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}
                     onClick={()=>{ setPerKgRate(Number(perKgDraft||0)); setPerKgEditing(false); }}
-                  >
-                    <Save className="w-4 h-4" /> Save
-                  </button>
-                </div>
+                  ><Save className="w-3.5 h-3.5" /> Save</button>
+                </>
               )}
             </div>
           </div>
         </div>
 
         {toast && (
-          <div className="fixed right-4 top-4 lg:right-6 lg:top-6 z-50 animate-slide-up">
-            <div className={`relative overflow-hidden p-5 rounded-2xl shadow-2xl backdrop-blur-3xl text-white font-semibold max-w-sm border-2 ${
-              toast.type==='error' 
-                ? 'bg-gradient-to-r from-red-500/95 to-pink-500/95 border-red-400/60' 
-                : 'bg-gradient-to-r from-green-500/95 to-emerald-500/95 border-green-400/60'
-            }`}>
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-              <div className="relative flex items-center gap-3">
-                <div className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                  toast.type==='error' ? 'bg-white/20' : 'bg-white/20'
-                }`}>
-                  {toast.type === 'error' ? (
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </div>
-                <span className="text-base">{toast.message}</span>
+          <div className="fixed right-4 top-4 lg:right-6 lg:top-20 z-50 animate-slide-up">
+            <div
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-white max-w-xs"
+              style={{
+                background: toast.type === 'error'
+                  ? 'linear-gradient(135deg, rgba(220,38,38,0.95), rgba(190,24,93,0.95))'
+                  : 'linear-gradient(135deg, rgba(5,150,105,0.95), rgba(16,185,129,0.95))',
+                backdropFilter: 'blur(20px)',
+                border: toast.type === 'error' ? '1px solid rgba(248,113,113,0.4)' : '1px solid rgba(52,211,153,0.4)',
+                boxShadow: toast.type === 'error' ? '0 16px 40px rgba(220,38,38,0.35)' : '0 16px 40px rgba(5,150,105,0.35)',
+              }}
+            >
+              <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.2)' }}>
+                {toast.type === 'error'
+                  ? <X className="w-3.5 h-3.5" />
+                  : <CheckCircle className="w-3.5 h-3.5" />}
               </div>
+              {toast.message}
             </div>
           </div>
         )}
@@ -176,38 +173,97 @@ export default function Dashboard({ session, renameShop, onLogout }){
 
         <section className="flex-1 p-4 lg:p-6 overflow-auto">
           {view === 'overview' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-              <div className="group relative bg-gradient-to-br from-green-500/25 to-emerald-500/25 backdrop-blur-2xl p-7 rounded-3xl shadow-2xl border-2 border-green-400/40 hover:shadow-green-500/30 transition-all duration-300 hover:scale-105 hover:-translate-y-1 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-sm font-bold text-green-200 uppercase tracking-wider">Filled Cylinders</div>
-                    <div className="transform group-hover:scale-110 transition-transform duration-300"><CheckCircle className="w-10 h-10 text-green-400" /></div>
-                  </div>
-                  <div className="text-5xl font-extrabold text-white drop-shadow-2xl mb-2">{totalFilled}</div>
-                  <div className="text-sm text-green-100 font-medium">Ready for sale</div>
+            <div className="space-y-5">
+              {/* Per-kg rate - desktop */}
+              <div className="hidden lg:flex items-center justify-between px-5 py-4 rounded-2xl"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: 'rgba(167,139,250,0.7)' }}>Per-kg Rate</div>
+                  {!perKgEditing
+                    ? <div className="text-2xl font-bold text-white">PKR {perKgRate.toLocaleString()}</div>
+                    : <input
+                        className="w-32 px-3 py-1.5 text-lg font-bold text-white rounded-lg focus:outline-none"
+                        style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.4)' }}
+                        type="number" value={perKgDraft}
+                        onChange={e=>setPerKgDraft(e.target.value)} autoFocus
+                      />
+                  }
+                </div>
+                <div className="flex gap-2">
+                  {!perKgEditing ? (
+                    <button
+                      className="px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all hover:scale-105"
+                      style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
+                      onClick={()=>{ setPerKgDraft(perKgRate); setPerKgEditing(true); }}
+                    >Edit Rate</button>
+                  ) : (
+                    <>
+                      <button
+                        className="px-3 py-2 text-sm text-white rounded-xl transition-all hover:scale-105 flex items-center gap-1"
+                        style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
+                        onClick={()=>{ setPerKgEditing(false); setPerKgDraft(perKgRate); }}
+                      ><X className="w-4 h-4" /> Cancel</button>
+                      <button
+                        className="px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all hover:scale-105 flex items-center gap-1.5"
+                        style={{ background: 'linear-gradient(135deg, #059669, #10b981)', boxShadow: '0 4px 16px rgba(5,150,105,0.3)' }}
+                        onClick={()=>{ setPerKgRate(Number(perKgDraft||0)); setPerKgEditing(false); }}
+                      ><Save className="w-4 h-4" /> Save</button>
+                    </>
+                  )}
                 </div>
               </div>
-              <div className="group relative bg-gradient-to-br from-amber-500/25 to-orange-500/25 backdrop-blur-2xl p-7 rounded-3xl shadow-2xl border-2 border-amber-400/40 hover:shadow-amber-500/30 transition-all duration-300 hover:scale-105 hover:-translate-y-1 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-sm font-bold text-amber-200 uppercase tracking-wider">Empty Cylinders</div>
-                    <div className="transform group-hover:scale-110 transition-transform duration-300"><Circle className="w-10 h-10 text-amber-300" /></div>
+
+              {/* Stat cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Filled cylinders */}
+                <div className="stat-card group animate-fade-in-up"
+                  style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.12), rgba(16,185,129,0.06))', border: '1px solid rgba(52,211,153,0.2)', boxShadow: '0 8px 32px rgba(52,211,153,0.1)' }}>
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
+                      style={{ background: 'rgba(52,211,153,0.15)', boxShadow: '0 0 20px rgba(52,211,153,0.25)' }}>
+                      <CheckCircle className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
+                      style={{ background: 'rgba(52,211,153,0.12)', color: 'rgba(52,211,153,0.8)', border: '1px solid rgba(52,211,153,0.2)' }}>
+                      Filled
+                    </span>
                   </div>
-                  <div className="text-5xl font-extrabold text-white drop-shadow-2xl mb-2">{totalEmpty}</div>
-                  <div className="text-sm text-amber-100 font-medium">Awaiting refill</div>
+                  <div className="text-5xl font-extrabold text-white mb-2" style={{ fontFamily: 'Outfit,sans-serif' }}>{totalFilled}</div>
+                  <div className="text-sm font-medium" style={{ color: 'rgba(52,211,153,0.7)' }}>Ready for sale</div>
                 </div>
-              </div>
-              <div className="group relative bg-gradient-to-br from-blue-500/25 to-indigo-500/25 backdrop-blur-2xl p-7 rounded-3xl shadow-2xl border-2 border-blue-400/40 hover:shadow-blue-500/30 transition-all duration-300 hover:scale-105 hover:-translate-y-1 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-sm font-bold text-blue-200 uppercase tracking-wider">Today's Sales</div>
-                    <div className="transform group-hover:scale-110 transition-transform duration-300"><DollarSign className="w-10 h-10 text-white" /></div>
+
+                {/* Empty cylinders */}
+                <div className="stat-card group animate-fade-in-up animation-delay-200"
+                  style={{ background: 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))', border: '1px solid rgba(251,191,36,0.2)', boxShadow: '0 8px 32px rgba(251,191,36,0.1)' }}>
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
+                      style={{ background: 'rgba(251,191,36,0.15)', boxShadow: '0 0 20px rgba(251,191,36,0.25)' }}>
+                      <Circle className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
+                      style={{ background: 'rgba(251,191,36,0.12)', color: 'rgba(251,191,36,0.8)', border: '1px solid rgba(251,191,36,0.2)' }}>
+                      Empty
+                    </span>
                   </div>
-                  <div className="text-4xl font-extrabold text-white drop-shadow-2xl mb-2">{formatPKR(todaysSalesValue)}</div>
-                  <div className="text-sm text-blue-100 font-medium">{todaysTransactions.length} transactions</div>
+                  <div className="text-5xl font-extrabold text-white mb-2" style={{ fontFamily: 'Outfit,sans-serif' }}>{totalEmpty}</div>
+                  <div className="text-sm font-medium" style={{ color: 'rgba(251,191,36,0.7)' }}>Awaiting refill</div>
+                </div>
+
+                {/* Today's sales */}
+                <div className="stat-card group animate-fade-in-up animation-delay-400 sm:col-span-2 lg:col-span-1"
+                  style={{ background: 'linear-gradient(135deg, rgba(96,165,250,0.12), rgba(59,130,246,0.06))', border: '1px solid rgba(96,165,250,0.2)', boxShadow: '0 8px 32px rgba(96,165,250,0.1)' }}>
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
+                      style={{ background: 'rgba(96,165,250,0.15)', boxShadow: '0 0 20px rgba(96,165,250,0.25)' }}>
+                      <DollarSign className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
+                      style={{ background: 'rgba(96,165,250,0.12)', color: 'rgba(96,165,250,0.8)', border: '1px solid rgba(96,165,250,0.2)' }}>
+                      Today
+                    </span>
+                  </div>
+                  <div className="text-3xl font-extrabold text-white mb-2" style={{ fontFamily: 'Outfit,sans-serif' }}>{formatPKR(todaysSalesValue)}</div>
+                  <div className="text-sm font-medium" style={{ color: 'rgba(96,165,250,0.7)' }}>{todaysTransactions.length} transactions</div>
                 </div>
               </div>
             </div>
