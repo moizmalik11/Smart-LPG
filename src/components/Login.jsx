@@ -8,7 +8,27 @@ export default function Login({ onLoginSuccess }) {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-
+  const handleLogin = () => {
+    if (!username || !password) {
+      setError('Please enter your credentials');
+      return;
+    }
+    setIsLoading(true);
+    setTimeout(() => {
+      if (username === 'admin' && password === 'admin') {
+        try {
+          localStorage.setItem('lpg_logged_in', 'true');
+        } catch (e) {
+          console.error('localStorage error:', e);
+        }
+        setError('');
+        if (onLoginSuccess) onLoginSuccess();
+      } else {
+        setError('Invalid username or password');
+        setIsLoading(false);
+      }
+    }, 600);
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') handleLogin();
@@ -193,27 +213,39 @@ export default function Login({ onLoginSuccess }) {
                     Signing in...
                   </>
                 ) : (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    Sign In
+                  </>
+                )}
+              </span>
+            </button>
 
-                  {/* Demo credentials */ }
-                  < div className="mt-6 p-4 rounded-xl text-center"
-                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}>
-                <p className="text-xs font-semibold mb-2.5 uppercase tracking-widest"
-                  style={{ color: 'rgba(167,139,250,0.7)' }}>Demo Credentials</p>
-                <div className="flex items-center justify-center gap-5">
-                  <div className="flex items-center gap-1.5">
-                    <User className="w-3 h-3" style={{ color: 'rgba(167,139,250,0.8)' }} />
-                    <code className="text-xs font-bold text-purple-300">admin</code>
-                  </div>
-                  <div className="w-px h-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                  <div className="flex items-center gap-1.5">
-                    <Lock className="w-3 h-3" style={{ color: 'rgba(236,72,153,0.8)' }} />
-                    <code className="text-xs font-bold text-pink-300">admin</code>
-                  </div>
+            {/* Demo credentials */}
+            <div className="mt-6 p-4 rounded-xl text-center"
+              style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}>
+              <p className="text-xs font-semibold mb-2.5 uppercase tracking-widest"
+                style={{ color: 'rgba(167,139,250,0.7)' }}>Demo Credentials</p>
+              <div className="flex items-center justify-center gap-5">
+                <div className="flex items-center gap-1.5">
+                  <User className="w-3 h-3" style={{ color: 'rgba(167,139,250,0.8)' }} />
+                  <code className="text-xs font-bold text-purple-300">admin</code>
+                </div>
+                <div className="w-px h-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                <div className="flex items-center gap-1.5">
+                  <Lock className="w-3 h-3" style={{ color: 'rgba(236,72,153,0.8)' }} />
+                  <code className="text-xs font-bold text-pink-300">admin</code>
                 </div>
               </div>
+            </div>
           </div>
         </div>
 
         {/* Footer text */}
-
+        <p className="text-center mt-6 text-xs" style={{ color: 'rgba(100,116,139,0.7)' }}>
+          Smart LPG Store Management System &copy; {new Date().getFullYear()}
+        </p>
+      </div>
+    </div>
+  );
 }
