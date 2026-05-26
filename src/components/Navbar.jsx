@@ -67,76 +67,43 @@ export default function Navbar({ session, onMenuToggle, onLogout, onSettingsClic
           <Bell className="w-4 h-4" />
         </button>
 
-        {/* User dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition-all duration-200"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,92,246,0.10)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-            >
-              {/* Avatar */}
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)' }}>
-                {initials}
-              </div>
-              <span className="hidden sm:block text-sm font-semibold text-white">{session.name}</span>
-              <ChevronDown className="hidden sm:block w-3.5 h-3.5" style={{ color: 'rgba(148,163,184,0.6)' }} />
-            </button>
-          </DropdownMenuTrigger>
+        <DropdownMenuLabel>
+          <div className="flex items-center gap-2.5 py-1">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
+              style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)' }}>
+              {initials}
+            </div>
+            <div>
+              <div className="text-sm font-bold text-white">{session.name}</div>
+              <div className="text-xs" style={{ color: 'rgba(100,116,139,0.8)' }}>Administrator</div>
+            </div>
+          </div>
+        </DropdownMenuLabel>
 
-          <DropdownMenuContent
-            align="end"
-            className="w-52 animate-scale-in"
-            style={{
-              background: 'rgba(15,11,40,0.97)',
-              backdropFilter: 'blur(24px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-              borderRadius: '1rem',
-            }}
-          >
-            <DropdownMenuLabel>
-              <div className="flex items-center gap-2.5 py-1">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
-                  style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)' }}>
-                  {initials}
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-white">{session.name}</div>
-                  <div className="text-xs" style={{ color: 'rgba(100,116,139,0.8)' }}>Administrator</div>
-                </div>
-              </div>
-            </DropdownMenuLabel>
+        <DropdownMenuSeparator style={{ background: 'rgba(255,255,255,0.07)' }} />
 
-            <DropdownMenuSeparator style={{ background: 'rgba(255,255,255,0.07)' }} />
+        <DropdownMenuItem
+          className="cursor-pointer rounded-lg mx-1 my-0.5 transition-all duration-150"
+          style={{ color: 'rgba(148,163,184,0.85)' }}
+          onClick={onSettingsClick}
+        >
+          <Settings className="mr-2.5 h-4 w-4" style={{ color: 'rgba(167,139,250,0.8)' }} />
+          Settings
+        </DropdownMenuItem>
 
-            <DropdownMenuItem
-              className="cursor-pointer rounded-lg mx-1 my-0.5 transition-all duration-150"
-              style={{ color: 'rgba(148,163,184,0.85)' }}
-              onClick={onSettingsClick}
-            >
-              <Settings className="mr-2.5 h-4 w-4" style={{ color: 'rgba(167,139,250,0.8)' }} />
-              Settings
-            </DropdownMenuItem>
+        <DropdownMenuSeparator style={{ background: 'rgba(255,255,255,0.07)' }} />
 
-            <DropdownMenuSeparator style={{ background: 'rgba(255,255,255,0.07)' }} />
-
-            <DropdownMenuItem
-              className="cursor-pointer rounded-lg mx-1 my-0.5 transition-all duration-150"
-              style={{ color: 'rgba(248,113,113,0.85)' }}
-              onClick={onLogout}
-            >
-              <LogOut className="mr-2.5 h-4 w-4 text-red-400" />
-              Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
+        <DropdownMenuItem
+          className="cursor-pointer rounded-lg mx-1 my-0.5 transition-all duration-150"
+          style={{ color: 'rgba(248,113,113,0.85)' }}
+          onClick={onLogout}
+        >
+          <LogOut className="mr-2.5 h-4 w-4 text-red-400" />
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+      </div >
+    </header >
   );
 }
