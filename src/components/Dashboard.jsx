@@ -258,79 +258,69 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                <button
-                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl font-medium transition-all shadow-lg text-sm lg:text-base whitespace-nowrap"
-                  onClick={() => {
-                    const res = recordSale(type, 1, perKgRate, '')
-                    if (!res || !res.success) {
-                      setToast({ message: res && res.message ? res.message : 'Cylinder 0 hai — out of stock', type: 'error' })
-                    } else {
-                      setToast({ message: 'Sale recorded', type: 'success' })
-                    }
-                  }}
-                >
-                  <ShoppingCart className="w-4 h-4" /> Sell -1
-                </button>
-                <button
-                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-medium transition-all shadow-lg text-sm lg:text-base whitespace-nowrap"
-                  onClick={() => {
-                    setManagingEmpty(type)
-                    setEmptyQty('')
-                  }}
-                >
-                  <RefreshCw className="w-4 h-4" /> Manage Empty
-                </button>
-              </div>
+
+                <ShoppingCart className="w-4 h-4" /> Sell -1
+              </button>
+              <button
+                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-medium transition-all shadow-lg text-sm lg:text-base whitespace-nowrap"
+                onClick={() => {
+                  setManagingEmpty(type)
+                  setEmptyQty('')
+                }}
+              >
+                <RefreshCw className="w-4 h-4" /> Manage Empty
+              </button>
             </div>
-            {managingEmpty === type && (
-              <div className="mt-4 p-4 bg-amber-500/20 backdrop-blur-sm border border-amber-400/30 rounded-xl">
-                <div className="text-sm font-semibold text-amber-200 mb-3">Refill Empty Cylinders</div>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      className="w-24 sm:w-32 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold text-white placeholder-white/50 focus:border-amber-400 focus:ring-2 focus:ring-amber-400 focus:outline-none"
-                      placeholder="Qty"
-                      value={emptyQty}
-                      onChange={(e) => setEmptyQty(e.target.value)}
-                      min="0"
-                      max={st.empty}
-                    />
-                    <span className="text-xs sm:text-sm text-amber-200 whitespace-nowrap">Available: {st.empty}</span>
-                  </div>
-                  <div className="flex gap-2 sm:ml-auto">
-                    <button
-                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-medium text-white hover:bg-white/20 transition-all text-sm"
-                      onClick={() => {
+          </div>
+            { managingEmpty === type && (
+            <div className="mt-4 p-4 bg-amber-500/20 backdrop-blur-sm border border-amber-400/30 rounded-xl">
+              <div className="text-sm font-semibold text-amber-200 mb-3">Refill Empty Cylinders</div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    className="w-24 sm:w-32 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold text-white placeholder-white/50 focus:border-amber-400 focus:ring-2 focus:ring-amber-400 focus:outline-none"
+                    placeholder="Qty"
+                    value={emptyQty}
+                    onChange={(e) => setEmptyQty(e.target.value)}
+                    min="0"
+                    max={st.empty}
+                  />
+                  <span className="text-xs sm:text-sm text-amber-200 whitespace-nowrap">Available: {st.empty}</span>
+                </div>
+                <div className="flex gap-2 sm:ml-auto">
+                  <button
+                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-medium text-white hover:bg-white/20 transition-all text-sm"
+                    onClick={() => {
+                      setManagingEmpty(null)
+                      setEmptyQty('')
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all shadow-lg text-sm flex items-center justify-center gap-2"
+                    onClick={() => {
+                      const result = manageEmpty(type, emptyQty)
+                      if (result.success) {
                         setManagingEmpty(null)
                         setEmptyQty('')
-                      }}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all shadow-lg text-sm flex items-center justify-center gap-2"
-                      onClick={() => {
-                        const result = manageEmpty(type, emptyQty)
-                        if (result.success) {
-                          setManagingEmpty(null)
-                          setEmptyQty('')
-                          setToast({ message: result.message, type: 'success' })
-                        } else {
-                          setToast({ message: result.message, type: 'error' })
-                        }
-                      }}
-                    >
-                      <CheckCircle className="w-4 h-4" /> Refill
-                    </button>
-                  </div>
+                        setToast({ message: result.message, type: 'success' })
+                      } else {
+                        setToast({ message: result.message, type: 'error' })
+                      }
+                    }}
+                  >
+                    <CheckCircle className="w-4 h-4" /> Refill
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          )}
       </div>
+        ))}
     </div>
+    </div >
   )
 }
 
