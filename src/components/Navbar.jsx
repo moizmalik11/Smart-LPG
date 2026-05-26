@@ -21,10 +21,9 @@ export default function Navbar({ session, onMenuToggle, onLogout, onSettingsClic
     <header
       className="sticky top-0 z-30 flex items-center justify-between px-4 lg:px-6 py-3"
       style={{
-        background: 'rgba(8,6,24,0.85)',
-        backdropFilter: 'blur(24px) saturate(160%)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+        background: '#ffffff',
+        borderBottom: '1px solid #e2e8f0',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
       }}
     >
       {/* Left side */}
@@ -32,8 +31,8 @@ export default function Navbar({ session, onMenuToggle, onLogout, onSettingsClic
         {/* Mobile hamburger */}
         <button
           id="mobile-menu-btn"
-          className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105"
-          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff' }}
+          className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 hover:bg-slate-100"
+          style={{ border: '1px solid #e2e8f0', color: '#1e293b' }}
           onClick={onMenuToggle}
         >
           <Menu className="w-5 h-5" />
@@ -41,28 +40,26 @@ export default function Navbar({ session, onMenuToggle, onLogout, onSettingsClic
 
         {/* Page title */}
         <div className="hidden lg:block">
-          <h1 className="text-lg font-bold text-white leading-tight tracking-tight">
+          <h1 className="text-base font-bold text-slate-900 leading-tight tracking-tight">
             {session.name}
           </h1>
-          <p className="text-xs font-medium" style={{ color: 'rgba(139,92,246,0.8)' }}>
+          <p className="text-[11px] font-semibold" style={{ color: '#4f46e5' }}>
             Smart LPG Management
           </p>
         </div>
 
         {/* Mobile: show shop name */}
         <div className="lg:hidden">
-          <span className="text-sm font-bold text-white">{session.name}</span>
+          <span className="text-sm font-bold text-slate-900">{session.name}</span>
         </div>
       </div>
 
       {/* Right side */}
       <div className="flex items-center gap-2">
-        {/* Notification bell placeholder */}
+        {/* Notification bell */}
         <button
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(148,163,184,0.7)' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.12)'; e.currentTarget.style.color = 'rgba(167,139,250,0.9)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(148,163,184,0.7)'; }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 hover:bg-slate-100"
+          style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b' }}
         >
           <Bell className="w-4 h-4" />
         </button>
@@ -71,21 +68,21 @@ export default function Navbar({ session, onMenuToggle, onLogout, onSettingsClic
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition-all duration-200"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition-all duration-150 border"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: '#ffffff',
+                borderColor: '#e2e8f0',
               }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,92,246,0.10)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+              onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+              onMouseLeave={e => e.currentTarget.style.background = '#ffffff'}
             >
-              {/* Avatar */}
+              {/* Avatar (Indigo solid) */}
               <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)' }}>
+                style={{ background: '#4f46e5' }}>
                 {initials}
               </div>
-              <span className="hidden sm:block text-sm font-semibold text-white">{session.name}</span>
-              <ChevronDown className="hidden sm:block w-3.5 h-3.5" style={{ color: 'rgba(148,163,184,0.6)' }} />
+              <span className="hidden sm:block text-sm font-semibold text-slate-800">{session.name}</span>
+              <ChevronDown className="hidden sm:block w-3.5 h-3.5 text-slate-400" />
             </button>
           </DropdownMenuTrigger>
 
@@ -93,45 +90,43 @@ export default function Navbar({ session, onMenuToggle, onLogout, onSettingsClic
             align="end"
             className="w-52 animate-scale-in"
             style={{
-              background: 'rgba(15,11,40,0.97)',
-              backdropFilter: 'blur(24px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-              borderRadius: '1rem',
+              background: '#ffffff',
+              border: '1px solid #cbd5e1',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+              borderRadius: '0.75rem',
+              padding: '0.25rem',
             }}
           >
-            <DropdownMenuLabel>
-              <div className="flex items-center gap-2.5 py-1">
+            <DropdownMenuLabel className="px-2 py-1.5">
+              <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
-                  style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)' }}>
+                  style={{ background: '#4f46e5' }}>
                   {initials}
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-white">{session.name}</div>
-                  <div className="text-xs" style={{ color: 'rgba(100,116,139,0.8)' }}>Administrator</div>
+                  <div className="text-xs font-bold text-slate-900 leading-tight">{session.name}</div>
+                  <div className="text-[10px] font-semibold text-slate-400 mt-0.5">Administrator</div>
                 </div>
               </div>
             </DropdownMenuLabel>
 
-            <DropdownMenuSeparator style={{ background: 'rgba(255,255,255,0.07)' }} />
+            <DropdownMenuSeparator className="bg-slate-100 my-1" />
 
             <DropdownMenuItem
-              className="cursor-pointer rounded-lg mx-1 my-0.5 transition-all duration-150"
-              style={{ color: 'rgba(148,163,184,0.85)' }}
+              className="cursor-pointer rounded-lg px-2 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all"
               onClick={onSettingsClick}
             >
-              <Settings className="mr-2.5 h-4 w-4" style={{ color: 'rgba(167,139,250,0.8)' }} />
+              <Settings className="mr-2.5 h-4 w-4 text-indigo-600" />
               Settings
             </DropdownMenuItem>
 
-            <DropdownMenuSeparator style={{ background: 'rgba(255,255,255,0.07)' }} />
+            <DropdownMenuSeparator className="bg-slate-100 my-1" />
 
             <DropdownMenuItem
-              className="cursor-pointer rounded-lg mx-1 my-0.5 transition-all duration-150"
-              style={{ color: 'rgba(248,113,113,0.85)' }}
+              className="cursor-pointer rounded-lg px-2 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-all"
               onClick={onLogout}
             >
-              <LogOut className="mr-2.5 h-4 w-4 text-red-400" />
+              <LogOut className="mr-2.5 h-4 w-4 text-red-500" />
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
