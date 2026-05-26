@@ -55,7 +55,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
   }, [store])
 
   return (
-    <div className="flex min-h-screen" style={{ background: 'linear-gradient(135deg, #050510 0%, #0d0520 40%, #080318 70%, #050510 100%)' }}>
+    <div className="flex min-h-screen" style={{ background: '#f8fafc' }}>
       {/* Sidebar */}
       <Sidebar
         session={session}
@@ -77,15 +77,15 @@ export default function Dashboard({ session, renameShop, onLogout }) {
 
         {/* Mobile Per-kg Rate strip */}
         <div className="lg:hidden px-4 py-3"
-          style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          style={{ background: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(167,139,250,0.8)' }}>Per-kg Rate</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Per-kg Rate</span>
             <div className="flex items-center gap-2">
               <input
-                className="w-20 px-2 py-1.5 text-sm font-bold text-white rounded-lg focus:outline-none transition-all"
+                className="w-20 px-2 py-1 text-sm font-bold text-slate-900 rounded-lg focus:outline-none transition-all"
                 style={{
-                  background: perKgEditing ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.06)',
-                  border: perKgEditing ? '1px solid rgba(139,92,246,0.5)' : '1px solid rgba(255,255,255,0.1)'
+                  background: perKgEditing ? '#f5f3ff' : '#f8fafc',
+                  border: perKgEditing ? '1px solid #4f46e5' : '1px solid #cbd5e1'
                 }}
                 type="number"
                 value={perKgDraft}
@@ -95,20 +95,19 @@ export default function Dashboard({ session, renameShop, onLogout }) {
               />
               {!perKgEditing ? (
                 <button
-                  className="px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition-all hover:scale-105"
-                  style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)' }}
+                  className="px-3 py-1 text-xs font-semibold text-white rounded-lg transition-all hover:bg-indigo-700"
+                  style={{ background: '#4f46e5' }}
                   onClick={() => { setPerKgDraft(perKgRate); setPerKgEditing(true); }}
                 >Edit</button>
               ) : (
                 <>
                   <button
-                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-105"
-                    style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(148,163,184,0.8)' }}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-all bg-slate-100 border hover:bg-slate-200 text-slate-600"
                     onClick={() => { setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                   ><X className="w-3.5 h-3.5" /></button>
                   <button
-                    className="px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition-all hover:scale-105 flex items-center gap-1"
-                    style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}
+                    className="px-3 py-1 text-xs font-semibold text-white rounded-lg transition-all hover:bg-green-700 flex items-center gap-1"
+                    style={{ background: '#16a34a' }}
                     onClick={() => {
                       const newRate = Number(perKgDraft || 0)
                       setPerKgRate(newRate)
@@ -122,80 +121,77 @@ export default function Dashboard({ session, renameShop, onLogout }) {
           </div>
         </div>
 
+        {/* Toast Notifications */}
         {toast && (
           <div className="fixed right-4 top-4 lg:right-6 lg:top-20 z-50 animate-slide-up">
             <div
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-white max-w-xs"
+              className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold shadow-lg max-w-xs border-l-4"
               style={{
-                background: toast.type === 'error'
-                  ? 'linear-gradient(135deg, rgba(220,38,38,0.95), rgba(190,24,93,0.95))'
-                  : 'linear-gradient(135deg, rgba(5,150,105,0.95), rgba(16,185,129,0.95))',
-                backdropFilter: 'blur(20px)',
-                border: toast.type === 'error' ? '1px solid rgba(248,113,113,0.4)' : '1px solid rgba(52,211,153,0.4)',
-                boxShadow: toast.type === 'error' ? '0 16px 40px rgba(220,38,38,0.35)' : '0 16px 40px rgba(5,150,105,0.35)',
+                background: '#ffffff',
+                borderTop: '1px solid #e2e8f0',
+                borderRight: '1px solid #e2e8f0',
+                borderBottom: '1px solid #e2e8f0',
+                borderColor: toast.type === 'error' ? '#ef4444' : '#10b981',
+                color: '#1e293b',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)',
               }}
             >
-              <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.2)' }}>
+              <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" 
+                style={{ background: toast.type === 'error' ? '#fee2e2' : '#d1fae5' }}>
                 {toast.type === 'error'
-                  ? <X className="w-3.5 h-3.5" />
-                  : <CheckCircle className="w-3.5 h-3.5" />}
+                  ? <X className="w-3.5 h-3.5 text-red-600" />
+                  : <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />}
               </div>
               {toast.message}
             </div>
           </div>
         )}
 
+        {/* Edit Shop Modal */}
         {showEdit && (
           <div className="modal-overlay" onClick={() => setShowEdit(false)}>
-            <div className="relative animate-slide-up">
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-blue-500/30 rounded-3xl blur-xl"></div>
-              <div className="modal relative bg-white/15 backdrop-blur-3xl border-2 border-white/30 p-8 rounded-3xl shadow-2xl" onClick={e => e.stopPropagation()}>
-                <h3 className="text-3xl font-bold text-white mb-3 drop-shadow-2xl">Edit Shop Name</h3>
-                <p className="text-sm text-purple-200/90 mb-6 font-medium">Changing the name will create/point to a shop id slug.</p>
-                <div className="mb-6">
-                  <label className="block text-sm font-bold text-white/95 mb-3 tracking-wide">Shop Name</label>
-                  <input
-                    className="w-full p-4 bg-white/15 backdrop-blur-xl border-2 border-white/30 rounded-2xl font-semibold text-white placeholder-white/60 focus:border-purple-400/70 focus:ring-2 focus:ring-purple-400/50 focus:outline-none transition-all hover:bg-white/20"
-                    value={newShopName}
-                    onChange={e => setNewShopName(e.target.value)}
-                    placeholder="Enter shop name"
-                  />
-                </div>
-                <div className="flex justify-end gap-4">
-                  <button
-                    className="px-6 py-3 bg-white/15 backdrop-blur-xl border-2 border-white/30 rounded-2xl font-semibold text-white hover:bg-white/25 transition-all duration-300 hover:scale-105"
-                    onClick={() => setShowEdit(false)}
-                  >
-                    Cancel
-                  </button>
-                  <div className="relative group">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-2xl opacity-75 group-hover:opacity-100 blur transition duration-300"></div>
-                    <button
-                      className="relative px-6 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white rounded-2xl font-semibold transition-all duration-300 shadow-xl shadow-purple-500/50 hover:scale-105 flex items-center gap-2"
-                      onClick={() => { renameShop(newShopName); setShowEdit(false); }}
-                    >
-                      <Save className="w-5 h-5" /> Save Changes
-                    </button>
-                  </div>
-                </div>
+            <div className="modal p-6 w-full max-w-md animate-scale-in" onClick={e => e.stopPropagation()}>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Edit Shop Name</h3>
+              <p className="text-xs text-slate-500 mb-5">Changing the name will migrate historical store ledger records to the new name.</p>
+              <div className="mb-5">
+                <label className="block text-xs font-bold text-slate-700 mb-2 tracking-wide uppercase">Shop Name</label>
+                <input
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-lg font-medium text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all"
+                  value={newShopName}
+                  onChange={e => setNewShopName(e.target.value)}
+                  placeholder="Enter shop name"
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+                  onClick={() => setShowEdit(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5"
+                  onClick={() => { renameShop(newShopName); setShowEdit(false); }}
+                >
+                  <Save className="w-4 h-4" /> Save
+                </button>
               </div>
             </div>
           </div>
         )}
 
-        <section className="flex-1 p-4 lg:p-6 overflow-auto">
+        <section className="flex-1 p-4 lg:p-6 overflow-auto space-y-6">
           {view === 'overview' && (
-            <div className="space-y-5">
+            <div className="space-y-6">
               {/* Per-kg rate - desktop */}
-              <div className="hidden lg:flex items-center justify-between px-5 py-4 rounded-2xl"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div className="hidden lg:flex items-center justify-between px-5 py-4 rounded-xl border"
+                style={{ background: '#ffffff', borderColor: '#e2e8f0' }}>
                 <div>
-                  <div className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: 'rgba(167,139,250,0.7)' }}>Per-kg Rate</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Per-kg Rate</div>
                   {!perKgEditing
-                    ? <div className="text-2xl font-bold text-white">PKR {perKgRate.toLocaleString()}</div>
+                    ? <div className="text-2xl font-bold text-slate-900">PKR {perKgRate.toLocaleString()}</div>
                     : <input
-                      className="w-32 px-3 py-1.5 text-lg font-bold text-white rounded-lg focus:outline-none"
-                      style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.4)' }}
+                      className="w-32 px-3 py-1 text-lg font-bold text-slate-900 rounded-lg border border-indigo-300 bg-indigo-50/50 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                       type="number" value={perKgDraft}
                       onChange={e => setPerKgDraft(e.target.value)} autoFocus
                     />
@@ -204,20 +200,19 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                 <div className="flex gap-2">
                   {!perKgEditing ? (
                     <button
-                      className="px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all hover:scale-105"
-                      style={{ background: 'linear-gradient(135deg, #7c3aed, #be185d)', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
+                      className="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-all hover:bg-indigo-700"
+                      style={{ background: '#4f46e5' }}
                       onClick={() => { setPerKgDraft(perKgRate); setPerKgEditing(true); }}
                     >Edit Rate</button>
                   ) : (
                     <>
                       <button
-                        className="px-3 py-2 text-sm text-white rounded-xl transition-all hover:scale-105 flex items-center gap-1"
-                        style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
+                        className="px-3.5 py-2 text-sm text-slate-700 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 transition-all flex items-center gap-1"
                         onClick={() => { setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                       ><X className="w-4 h-4" /> Cancel</button>
                       <button
-                        className="px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all hover:scale-105 flex items-center gap-1.5"
-                        style={{ background: 'linear-gradient(135deg, #059669, #10b981)', boxShadow: '0 4px 16px rgba(5,150,105,0.3)' }}
+                        className="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-all hover:bg-green-700 flex items-center gap-1.5"
+                        style={{ background: '#16a34a' }}
                         onClick={() => {
                           const newRate = Number(perKgDraft || 0)
                           setPerKgRate(newRate)
@@ -231,81 +226,78 @@ export default function Dashboard({ session, renameShop, onLogout }) {
               </div>
 
               {/* Stat cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {/* Filled cylinders */}
-                <div className="stat-card group animate-fade-in-up"
-                  style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.12), rgba(16,185,129,0.06))', border: '1px solid rgba(52,211,153,0.2)', boxShadow: '0 8px 32px rgba(52,211,153,0.1)' }}>
-                  <div className="flex items-start justify-between mb-5">
-                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
-                      style={{ background: 'rgba(52,211,153,0.15)', boxShadow: '0 0 20px rgba(52,211,153,0.25)' }}>
-                      <CheckCircle className="w-5 h-5 text-emerald-400" />
+                <div className="stat-card animate-fade-in-up">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: '#d1fae5' }}>
+                      <CheckCircle className="w-5 h-5 text-emerald-600" />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
-                      style={{ background: 'rgba(52,211,153,0.12)', color: 'rgba(52,211,153,0.8)', border: '1px solid rgba(52,211,153,0.2)' }}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      style={{ background: '#e2fbf0', color: '#047857', border: '1px solid #a7f3d0' }}>
                       Filled
                     </span>
                   </div>
-                  <div className="text-5xl font-extrabold text-white mb-2" style={{ fontFamily: 'Outfit,sans-serif' }}>{totalFilled}</div>
-                  <div className="text-sm font-medium" style={{ color: 'rgba(52,211,153,0.7)' }}>Ready for sale</div>
+                  <div className="text-4xl font-extrabold text-slate-900 mb-1">{totalFilled}</div>
+                  <div className="text-xs font-semibold text-emerald-600">Ready for sale</div>
                 </div>
 
                 {/* Empty cylinders */}
-                <div className="stat-card group animate-fade-in-up animation-delay-200"
-                  style={{ background: 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))', border: '1px solid rgba(251,191,36,0.2)', boxShadow: '0 8px 32px rgba(251,191,36,0.1)' }}>
-                  <div className="flex items-start justify-between mb-5">
-                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
-                      style={{ background: 'rgba(251,191,36,0.15)', boxShadow: '0 0 20px rgba(251,191,36,0.25)' }}>
-                      <Circle className="w-5 h-5 text-amber-400" />
+                <div className="stat-card animate-fade-in-up">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: '#fef3c7' }}>
+                      <Circle className="w-5 h-5 text-amber-600" />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
-                      style={{ background: 'rgba(251,191,36,0.12)', color: 'rgba(251,191,36,0.8)', border: '1px solid rgba(251,191,36,0.2)' }}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      style={{ background: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' }}>
                       Empty
                     </span>
                   </div>
-                  <div className="text-5xl font-extrabold text-white mb-2" style={{ fontFamily: 'Outfit,sans-serif' }}>{totalEmpty}</div>
-                  <div className="text-sm font-medium" style={{ color: 'rgba(251,191,36,0.7)' }}>Awaiting refill</div>
+                  <div className="text-4xl font-extrabold text-slate-900 mb-1">{totalEmpty}</div>
+                  <div className="text-xs font-semibold text-amber-600">Awaiting refill</div>
                 </div>
 
                 {/* Today's sales */}
-                <div className="stat-card group animate-fade-in-up animation-delay-400 sm:col-span-2 lg:col-span-1"
-                  style={{ background: 'linear-gradient(135deg, rgba(96,165,250,0.12), rgba(59,130,246,0.06))', border: '1px solid rgba(96,165,250,0.2)', boxShadow: '0 8px 32px rgba(96,165,250,0.1)' }}>
-                  <div className="flex items-start justify-between mb-5">
-                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
-                      style={{ background: 'rgba(96,165,250,0.15)', boxShadow: '0 0 20px rgba(96,165,250,0.25)' }}>
-                      <DollarSign className="w-5 h-5 text-blue-400" />
+                <div className="stat-card animate-fade-in-up sm:col-span-2 lg:col-span-1">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: '#e0e7ff' }}>
+                      <DollarSign className="w-5 h-5 text-indigo-600" />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
-                      style={{ background: 'rgba(96,165,250,0.12)', color: 'rgba(96,165,250,0.8)', border: '1px solid rgba(96,165,250,0.2)' }}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      style={{ background: '#eef2ff', color: '#4338ca', border: '1px solid #c7d2fe' }}>
                       Today
                     </span>
                   </div>
-                  <div className="text-3xl font-extrabold text-white mb-2" style={{ fontFamily: 'Outfit,sans-serif' }}>{formatPKR(todaysSalesValue)}</div>
-                  <div className="text-sm font-medium" style={{ color: 'rgba(96,165,250,0.7)' }}>{todaysTransactions.length} transactions</div>
+                  <div className="text-2xl font-extrabold text-slate-900 mb-1">{formatPKR(todaysSalesValue)}</div>
+                  <div className="text-xs font-semibold text-indigo-600">{todaysTransactions.length} transactions</div>
                 </div>
               </div>
             </div>
           )}
 
           {view === 'inventory' && (
-            <div className="bg-white/15 backdrop-blur-3xl p-6 lg:p-8 rounded-3xl shadow-2xl border-2 border-white/30">
-              <h3 className="text-3xl font-extrabold text-white mb-6 drop-shadow-2xl flex items-center gap-3">
-                <Package className="w-8 h-8" />
+            <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+              <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                <Package className="w-6 h-6 text-indigo-600" />
                 <span>Inventory Management</span>
               </h3>
-              <div className="space-y-5">
+              <div className="space-y-4">
                 {Object.entries(store.inventory).map(([type, st]) => (
-                  <div key={type} className="group bg-gradient-to-br from-white/15 to-white/10 backdrop-blur-xl p-6 lg:p-7 border-2 border-white/30 rounded-2xl hover:shadow-2xl hover:bg-white/20 hover:border-white/40 transition-all duration-300 hover:scale-[1.02]">
+                  <div key={type} className="bg-white p-5 border border-slate-200 rounded-xl hover:shadow-md transition-all duration-200">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div className="flex-1">
-                        <div className="text-xl lg:text-2xl font-extrabold text-white mb-3 drop-shadow-lg">{type} Cylinders</div>
-                        <div className="flex flex-wrap gap-2 lg:gap-4 text-sm">
-                          <span className="px-3 py-1 bg-green-500/30 backdrop-blur-sm border border-green-400/50 text-green-200 rounded-lg font-semibold whitespace-nowrap flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Filled: {st.filled}</span>
-                          <span className="px-3 py-1 bg-amber-500/30 backdrop-blur-sm border border-amber-400/50 text-amber-200 rounded-lg font-semibold whitespace-nowrap">Empty: {st.empty}</span>
+                        <div className="text-lg font-bold text-slate-800 mb-2">{type} Cylinders</div>
+                        <div className="flex flex-wrap gap-3 text-xs">
+                          <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-md font-semibold flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Filled: {st.filled}</span>
+                          <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 rounded-md font-semibold">Empty: {st.empty}</span>
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <button
-                          className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl font-medium transition-all shadow-lg text-sm lg:text-base whitespace-nowrap"
+                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all shadow-sm text-sm flex items-center justify-center gap-1.5"
                           onClick={() => {
                             const res = recordSale(type, 1, perKgRate, '')
                             if (!res || !res.success) {
@@ -318,7 +310,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                           <ShoppingCart className="w-4 h-4" /> Sell -1
                         </button>
                         <button
-                          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-medium transition-all shadow-lg text-sm lg:text-base whitespace-nowrap"
+                          className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-all shadow-sm text-sm flex items-center justify-center gap-1.5"
                           onClick={() => {
                             setManagingEmpty(type)
                             setEmptyQty('')
@@ -329,24 +321,24 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       </div>
                     </div>
                     {managingEmpty === type && (
-                      <div className="mt-4 p-4 bg-amber-500/20 backdrop-blur-sm border border-amber-400/30 rounded-xl">
-                        <div className="text-sm font-semibold text-amber-200 mb-3">Refill Empty Cylinders</div>
+                      <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                        <div className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Refill Empty Cylinders</div>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                           <div className="flex items-center gap-2">
                             <input
                               type="number"
-                              className="w-24 sm:w-32 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold text-white placeholder-white/50 focus:border-amber-400 focus:ring-2 focus:ring-amber-400 focus:outline-none"
+                              className="w-24 sm:w-32 p-2 bg-white border border-slate-300 rounded-lg font-semibold text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm"
                               placeholder="Qty"
                               value={emptyQty}
                               onChange={(e) => setEmptyQty(e.target.value)}
                               min="0"
                               max={st.empty}
                             />
-                            <span className="text-xs sm:text-sm text-amber-200 whitespace-nowrap">Available: {st.empty}</span>
+                            <span className="text-xs font-medium text-slate-500 whitespace-nowrap">Available Empty: {st.empty}</span>
                           </div>
                           <div className="flex gap-2 sm:ml-auto">
                             <button
-                              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-medium text-white hover:bg-white/20 transition-all text-sm"
+                              className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-300 rounded-lg font-semibold text-slate-600 hover:bg-slate-100 transition-all text-xs"
                               onClick={() => {
                                 setManagingEmpty(null)
                                 setEmptyQty('')
@@ -355,7 +347,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                               Cancel
                             </button>
                             <button
-                              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium transition-all shadow-lg text-sm flex items-center justify-center gap-2"
+                              className="flex-1 sm:flex-none px-3.5 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-sm text-xs flex items-center justify-center gap-1.5"
                               onClick={() => {
                                 const result = manageEmpty(type, emptyQty)
                                 if (result.success) {
@@ -367,7 +359,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                                 }
                               }}
                             >
-                              <CheckCircle className="w-4 h-4" /> Refill
+                              <CheckCircle className="w-3.5 h-3.5" /> Refill
                             </button>
                           </div>
                         </div>
@@ -380,63 +372,63 @@ export default function Dashboard({ session, renameShop, onLogout }) {
           )}
 
           {view === 'shipments' && (
-            <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-2xl font-bold text-white drop-shadow-lg flex items-center gap-2"><BookOpen className="w-6 h-6" /> Khata Book (Udhar)</h3>
+            <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-3"><BookOpen className="w-6 h-6 text-indigo-600" /> Khata Book (Udhar)</h3>
                 <button
-                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all shadow-lg"
+                  className="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5 shadow-sm"
                   onClick={() => setShowHistory(true)}
                 >
-                  <History className="w-4 h-4 mr-1 inline" /> History
+                  <History className="w-4 h-4" /> History
                 </button>
               </div>
 
-              <div className="mb-5 flex flex-col sm:flex-row gap-3">
-                <input value={khataName} onChange={e => setKhataName(e.target.value)} placeholder="Name" className="flex-1 sm:w-48 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
-                <input value={khataKg} onChange={e => setKhataKg(e.target.value)} placeholder="Kg" type="number" className="flex-1 sm:w-32 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent" />
-                <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg whitespace-nowrap" onClick={() => {
+              <div className="mb-6 flex flex-col sm:flex-row gap-3">
+                <input value={khataName} onChange={e => setKhataName(e.target.value)} placeholder="Customer Name" className="flex-1 p-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
+                <input value={khataKg} onChange={e => setKhataKg(e.target.value)} placeholder="Gas Qty (Kg)" type="number" className="flex-1 sm:w-32 p-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
+                <button className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold shadow-sm whitespace-nowrap" onClick={() => {
                   const res = addKhataEntry(khataName, khataKg, perKgRate)
                   if (res && res.success) { setToast({ message: res.message, type: 'success' }); setKhataName(''); setKhataKg('') }
                   else setToast({ message: res.message || 'Error', type: 'error' })
-                }}>Add</button>
+                }}>Add Log Entry</button>
               </div>
 
               <div className="space-y-3">
-                {Object.entries(store.khatabook || {}).length === 0 && <div className="text-purple-200">No khata entries yet</div>}
+                {Object.entries(store.khatabook || {}).length === 0 && <div className="text-sm font-semibold text-slate-500 py-6 text-center">No khata entries recorded yet</div>}
                 {Object.entries(store.khatabook || {}).map(([name, data], idx) => (
-                  <div key={idx} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/15 hover:shadow-lg transition-all">
+                  <div key={idx} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 border border-slate-200 rounded-xl hover:shadow-sm transition-all">
                     <div className="flex-1">
-                      <div className="font-bold text-base lg:text-lg text-white drop-shadow-md">{name}</div>
-                      <div className="flex flex-wrap gap-2 lg:gap-4 mt-1">
-                        <span className="text-xs lg:text-sm text-purple-200 whitespace-nowrap">Total Kg: <span className="font-semibold text-white">{data.kg || 0} kg</span></span>
-                        <span className="text-xs lg:text-sm text-red-300 whitespace-nowrap">Total Udhar: <span className="font-bold text-red-200">{formatPKR(data.amount || 0)}</span></span>
+                      <div className="font-bold text-slate-900 text-base">{name}</div>
+                      <div className="flex flex-wrap gap-4 mt-1 text-xs font-semibold text-slate-500">
+                        <span>Total Weight: <span className="text-slate-800">{data.kg || 0} kg</span></span>
+                        <span>Outstanding Balance: <span className="text-red-600">{formatPKR(data.amount || 0)}</span></span>
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                       {addingTo === name ? (
                         <>
-                          <input type="number" value={addKgValue} onChange={e => setAddKgValue(e.target.value)} placeholder="Kg" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-full sm:w-28 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" />
-                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap" onClick={() => {
+                          <input type="number" value={addKgValue} onChange={e => setAddKgValue(e.target.value)} placeholder="Weight (Kg)" className="p-2 bg-white border border-slate-300 rounded-lg w-full sm:w-28 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
+                          <button className="flex-1 sm:flex-none px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold whitespace-nowrap" onClick={() => {
                             const res = addKhataEntry(name, addKgValue, perKgRate)
                             if (res && res.success) { setToast({ message: res.message, type: 'success' }); setAddingTo(null); setAddKgValue('') }
                             else setToast({ message: res.message || 'Error', type: 'error' })
-                          }}>+ Add Kg</button>
-                          <button className="flex-1 sm:flex-none px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 text-sm" onClick={() => { setAddingTo(null); setAddKgValue('') }}>Cancel</button>
+                          }}>+ Add Weight</button>
+                          <button className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-xs" onClick={() => { setAddingTo(null); setAddKgValue('') }}>Cancel</button>
                         </>
                       ) : settlingName === name ? (
                         <>
-                          <input type="number" value={settleAmount} onChange={e => setSettleAmount(e.target.value)} placeholder="PKR" className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg w-full sm:w-32 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm" />
-                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap flex items-center justify-center gap-2" onClick={() => {
+                          <input type="number" value={settleAmount} onChange={e => setSettleAmount(e.target.value)} placeholder="PKR Amount" className="p-2 bg-white border border-slate-300 rounded-lg w-full sm:w-32 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
+                          <button className="flex-1 sm:flex-none px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" onClick={() => {
                             const res = settleKhata(name, settleAmount)
                             if (res && res.success) { setToast({ message: res.message, type: 'success' }); setSettlingName(null); setSettleAmount('') }
                             else setToast({ message: res.message || 'Error', type: 'error' })
-                          }}><DollarSign className="w-4 h-4" /> Pay</button>
-                          <button className="flex-1 sm:flex-none px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 text-sm" onClick={() => { setSettlingName(null); setSettleAmount('') }}>Cancel</button>
+                          }}><DollarSign className="w-3.5 h-3.5" /> Settle</button>
+                          <button className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-xs" onClick={() => { setSettlingName(null); setSettleAmount('') }}>Cancel</button>
                         </>
                       ) : (
                         <>
-                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap" onClick={() => { setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
-                          <button className="flex-1 sm:flex-none px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg text-sm whitespace-nowrap flex items-center justify-center gap-2" onClick={() => { setSettlingName(name); setSettleAmount('') }}><DollarSign className="w-4 h-4" /> Settle</button>
+                          <button className="flex-1 sm:flex-none px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold whitespace-nowrap" onClick={() => { setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
+                          <button className="flex-1 sm:flex-none px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" onClick={() => { setSettlingName(name); setSettleAmount('') }}><DollarSign className="w-3.5 h-3.5" /> Settle Payment</button>
                         </>
                       )}
                     </div>
@@ -448,27 +440,27 @@ export default function Dashboard({ session, renameShop, onLogout }) {
 
           {showHistory && (
             <div className="modal-overlay" onClick={() => setShowHistory(false)}>
-              <div className="modal bg-white/10 backdrop-blur-2xl border border-white/20 p-6 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-auto" onClick={e => e.stopPropagation()}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-2xl font-bold text-white drop-shadow-lg flex items-center gap-2"><FileText className="w-6 h-6" /> Last Month Payment History</h3>
+              <div className="modal p-6 max-w-3xl w-full" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-5 border-b pb-3">
+                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2"><FileText className="w-5 h-5 text-indigo-600" /> 30-Day Settlement History</h3>
                   <button
-                    className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg shadow-lg flex items-center gap-2"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-500"
                     onClick={() => setShowHistory(false)}
                   >
-                    <X className="w-4 h-4" /> Close
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="overflow-auto">
+                <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-white/10 backdrop-blur-sm">
-                        <th className="py-3 px-4 text-sm font-bold text-purple-200 uppercase tracking-wide">Date</th>
-                        <th className="py-3 px-4 text-sm font-bold text-purple-200 uppercase tracking-wide">Name</th>
-                        <th className="py-3 px-4 text-sm font-bold text-purple-200 uppercase tracking-wide">Paid Amount</th>
-                        <th className="py-3 px-4 text-sm font-bold text-purple-200 uppercase tracking-wide">Remaining</th>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Paid Amount</th>
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Remaining</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-slate-100">
                       {(() => {
                         const lastMonth = new Date()
                         lastMonth.setDate(lastMonth.getDate() - 30)
@@ -476,33 +468,30 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                         const historyTxns = store.transactions
                           .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
                           .sort((a, b) => b.date.localeCompare(a.date))
+                        
+                        if (historyTxns.length === 0) {
+                          return <tr><td className="py-6 text-center text-slate-500 text-xs font-semibold" colSpan={4}>No logs in last 30 days</td></tr>
+                        }
+
                         return historyTxns.map((t, i) => {
                           const currentData = store.khatabook && store.khatabook[t.name] ? store.khatabook[t.name] : { amount: 0 }
                           const remaining = currentData.amount || 0
                           return (
-                            <tr key={i} className="border-t border-white/20 hover:bg-white/10 transition-all">
-                              <td className="py-3 px-4 text-sm text-purple-200 font-medium">{t.date}</td>
-                              <td className="py-3 px-4 text-sm font-semibold text-white">{t.name}</td>
-                              <td className="py-3 px-4 text-sm font-bold text-green-300">{formatPKR(t.paid)}</td>
-                              <td className="py-3 px-4 text-sm">
+                            <tr key={i} className="hover:bg-slate-50 transition-all text-xs font-semibold">
+                              <td className="py-3 px-3 text-slate-500">{t.date}</td>
+                              <td className="py-3 px-3 text-slate-900">{t.name}</td>
+                              <td className="py-3 px-3 text-green-600">{formatPKR(t.paid)}</td>
+                              <td className="py-3 px-3">
                                 {remaining === 0 ? (
-                                  <span className="text-green-300 font-bold">Clear</span>
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-green-50 text-green-700 border border-green-200">Clear</span>
                                 ) : (
-                                  <span className="text-red-300 font-bold">{formatPKR(remaining)}</span>
+                                  <span className="text-slate-800">{formatPKR(remaining)}</span>
                                 )}
                               </td>
                             </tr>
                           )
                         })
                       })()}
-                      {(() => {
-                        const lastMonth = new Date()
-                        lastMonth.setDate(lastMonth.getDate() - 30)
-                        const lastMonthStr = lastMonth.toISOString().slice(0, 10)
-                        return store.transactions.filter(t => t.type === 'settlement' && t.date >= lastMonthStr).length === 0
-                      })() && (
-                          <tr><td className="py-8 text-center text-purple-200" colSpan={4}>No payments in last month</td></tr>
-                        )}
                     </tbody>
                   </table>
                 </div>
@@ -511,27 +500,27 @@ export default function Dashboard({ session, renameShop, onLogout }) {
           )}
 
           {view === 'reports' && (
-            <div className="space-y-4 lg:space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-                <div className="bg-gradient-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-blue-400/30">
-                  <div className="text-sm font-semibold text-blue-300 uppercase tracking-wide mb-2">Today's Sales</div>
-                  <div className="text-3xl font-bold text-white drop-shadow-lg">{formatPKR(todaysSalesValue)}</div>
-                  <div className="text-xs text-blue-200 mt-1">{todaysTransactions.length} transactions</div>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="p-5 border border-slate-200 bg-indigo-50/40 rounded-xl">
+                  <div className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Today's Revenue</div>
+                  <div className="text-2xl font-extrabold text-slate-900">{formatPKR(todaysSalesValue)}</div>
+                  <div className="text-[10px] font-semibold text-indigo-500 mt-0.5">{todaysTransactions.length} transactions today</div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-500/20 to-violet-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-purple-400/30">
-                  <div className="text-sm font-semibold text-purple-300 uppercase tracking-wide mb-2">Weekly Sales</div>
-                  <div className="text-3xl font-bold text-white drop-shadow-lg">{formatPKR(weeklySales)}</div>
-                  <div className="text-xs text-purple-200 mt-1">Last 7 days</div>
+                <div className="p-5 border border-slate-200 bg-violet-50/40 rounded-xl">
+                  <div className="text-xs font-bold text-violet-600 uppercase tracking-wider mb-1">Weekly Aggregate</div>
+                  <div className="text-2xl font-extrabold text-slate-900">{formatPKR(weeklySales)}</div>
+                  <div className="text-[10px] font-semibold text-violet-500 mt-0.5">Calculated over last 7 days</div>
                 </div>
-                <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-emerald-400/30">
-                  <div className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-2">Total Transactions</div>
-                  <div className="text-3xl font-bold text-white drop-shadow-lg">{store.transactions.length}</div>
-                  <div className="text-xs text-emerald-200 mt-1">All time</div>
+                <div className="p-5 border border-slate-200 bg-emerald-50/40 rounded-xl">
+                  <div className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Total Logs</div>
+                  <div className="text-2xl font-extrabold text-slate-900">{store.transactions.length}</div>
+                  <div className="text-[10px] font-semibold text-emerald-500 mt-0.5">All-time total transactions</div>
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-2xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl border border-white/20">
-                <h3 className="text-lg lg:text-2xl font-bold text-white mb-4 lg:mb-5 drop-shadow-lg flex items-center gap-2"><BarChart3 className="w-6 h-6" /> Weekly Sales Chart</h3>
+              <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm">
+                <h3 className="text-lg font-bold text-slate-900 mb-5 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-indigo-600" /> Weekly Sales Chart</h3>
                 <div className="space-y-3">
                   {(() => {
                     const weekDates = []
@@ -553,18 +542,20 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       const dayName = new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })
                       return (
                         <div key={i} className="flex items-center gap-3">
-                          <div className="w-16 text-sm font-semibold text-white">{dayName}</div>
-                          <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-lg h-10 relative overflow-hidden border border-white/20">
-                            <div
-                              className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-full rounded-lg transition-all duration-500 flex items-center px-3"
-                              style={{ width: `${barWidth}%`, minWidth: day.sales > 0 ? '60px' : '0' }}
-                            >
-                              {day.sales > 0 && (
-                                <span className="text-white font-bold text-sm drop-shadow-md">{formatPKR(day.sales)}</span>
-                              )}
-                            </div>
+                          <div className="w-12 text-xs font-semibold text-slate-600">{dayName}</div>
+                          <div className="flex-1 bg-slate-100 rounded-lg h-9 relative overflow-hidden">
+                            {day.sales > 0 ? (
+                              <div
+                                className="bg-indigo-600 h-full rounded-lg transition-all duration-300 flex items-center px-3"
+                                style={{ width: `${barWidth}%`, minWidth: '70px' }}
+                              >
+                                <span className="text-white font-bold text-[10px]">{formatPKR(day.sales)}</span>
+                              </div>
+                            ) : (
+                              <div className="h-full w-full flex items-center px-3 text-[10px] font-semibold text-slate-400">PKR 0.00</div>
+                            )}
                           </div>
-                          <div className="w-24 text-right text-xs text-purple-200">{day.date}</div>
+                          <div className="w-20 text-right text-[10px] font-semibold text-slate-400">{day.date}</div>
                         </div>
                       )
                     })
@@ -572,28 +563,28 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
-                <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
-                  <h3 className="text-xl font-bold text-white mb-4 drop-shadow-lg flex items-center gap-2"><Target className="w-5 h-5" /> Inventory Status</h3>
-                  <div className="space-y-3">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div className="bg-white border border-slate-200 p-5 rounded-xl">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><Target className="w-4.5 h-4.5 text-indigo-600" /> Inventory Status</h3>
+                  <div className="space-y-4">
                     {Object.entries(store.inventory).map(([type, st]) => {
                       const total = st.filled + st.empty
                       const filledPercent = total > 0 ? (st.filled / total) * 100 : 0
                       return (
                         <div key={type}>
-                          <div className="flex justify-between mb-2">
-                            <span className="font-semibold text-white">{type}</span>
-                            <span className="text-sm text-purple-200">{st.filled}/{total}</span>
+                          <div className="flex justify-between mb-1.5 text-xs font-bold text-slate-700">
+                            <span>{type} Cylinders</span>
+                            <span>{st.filled} / {total} Filled</span>
                           </div>
-                          <div className="w-full bg-white/10 backdrop-blur-sm rounded-full h-4 overflow-hidden border border-white/20">
+                          <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
                             <div
-                              className="bg-gradient-to-r from-green-500 to-emerald-600 h-full rounded-full transition-all duration-500"
+                              className="bg-emerald-600 h-full rounded-full transition-all duration-300"
                               style={{ width: `${filledPercent}%` }}
                             />
                           </div>
-                          <div className="flex justify-between mt-1 text-xs">
-                            <span className="text-green-300">Filled: {st.filled}</span>
-                            <span className="text-amber-300">Empty: {st.empty}</span>
+                          <div className="flex justify-between mt-1 text-[10px] font-bold">
+                            <span className="text-emerald-600">Filled: {st.filled}</span>
+                            <span className="text-amber-600">Empty: {st.empty}</span>
                           </div>
                         </div>
                       )
@@ -601,29 +592,29 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                   </div>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
-                  <h3 className="text-xl font-bold text-white mb-4 drop-shadow-lg flex items-center gap-2"><TrendingUp className="w-5 h-5" /> Transaction Types</h3>
+                <div className="bg-white border border-slate-200 p-5 rounded-xl">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><TrendingUp className="w-4.5 h-4.5 text-indigo-600" /> Transaction Shares</h3>
                   <div className="space-y-4">
                     {['sale', 'shipment', 'refill'].map(type => {
                       const count = store.transactions.filter(t => t.type === type).length
                       const total = store.transactions.length || 1
                       const percent = (count / total) * 100
                       const colors = {
-                        sale: { bg: 'from-blue-500 to-indigo-500', text: 'text-blue-200', light: 'bg-blue-500/30' },
-                        shipment: { bg: 'from-green-500 to-emerald-500', text: 'text-green-200', light: 'bg-green-500/30' },
-                        refill: { bg: 'from-amber-500 to-orange-500', text: 'text-amber-200', light: 'bg-amber-500/30' }
+                        sale: { bg: 'bg-indigo-600', text: 'text-indigo-700', light: 'bg-indigo-50 border-indigo-200' },
+                        shipment: { bg: 'bg-emerald-600', text: 'text-emerald-700', light: 'bg-emerald-50 border-emerald-200' },
+                        refill: { bg: 'bg-amber-500', text: 'text-amber-700', light: 'bg-amber-50 border-amber-200' }
                       }
                       return (
                         <div key={type}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`px-3 py-1 rounded-lg text-sm font-bold uppercase backdrop-blur-sm border border-white/20 ${colors[type].light} ${colors[type].text}`}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${colors[type].light} ${colors[type].text}`}>
                               {type}
                             </span>
-                            <span className="text-sm font-bold text-white">{count} ({percent.toFixed(0)}%)</span>
+                            <span className="text-xs font-bold text-slate-800">{count} ({percent.toFixed(0)}%)</span>
                           </div>
-                          <div className="w-full bg-white/10 backdrop-blur-sm rounded-full h-3 overflow-hidden border border-white/20">
+                          <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200">
                             <div
-                              className={`bg-gradient-to-r ${colors[type].bg} h-full rounded-full transition-all duration-500`}
+                              className={`${colors[type].bg} h-full rounded-full transition-all duration-300`}
                               style={{ width: `${percent}%` }}
                             />
                           </div>
@@ -638,40 +629,38 @@ export default function Dashboard({ session, renameShop, onLogout }) {
 
           {view === 'sales' && (
             <>
-              <div className="bg-gradient-to-br from-purple-500/20 to-violet-500/20 backdrop-blur-xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-lg border border-purple-400/30 hover:shadow-xl hover:shadow-purple-500/20 transition-all mb-4 lg:mb-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-xs lg:text-sm font-semibold text-purple-300 uppercase tracking-wide mb-2">Weekly Sales (Last 7 Days)</div>
-                    <div className="text-2xl lg:text-4xl font-bold text-white drop-shadow-lg">{formatPKR(weeklySales)}</div>
-                  </div>
-                  <div className="transform group-hover:scale-110 transition-transform duration-300"><BarChart3 className="w-10 h-10 lg:w-12 lg:h-12 text-white" /></div>
+              <div className="p-5 border border-slate-200 bg-indigo-50/40 rounded-xl mb-5 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Weekly Sales Revenue</div>
+                  <div className="text-3xl font-extrabold text-slate-900">{formatPKR(weeklySales)}</div>
                 </div>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-100 text-indigo-600"><BarChart3 className="w-6 h-6" /></div>
               </div>
-              <div className="bg-white/10 backdrop-blur-2xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl border border-white/20">
-                <h3 className="text-2xl font-bold text-white mb-5 drop-shadow-lg flex items-center gap-2"><DollarSign className="w-6 h-6" /> Sales Records</h3>
+              <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm">
+                <h3 className="text-xl font-bold text-slate-900 mb-5 flex items-center gap-2"><DollarSign className="w-5.5 h-5.5 text-indigo-600" /> Sales Ledger</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[600px]">
                     <thead>
-                      <tr className="bg-white/10 backdrop-blur-sm">
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Date</th>
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Qty</th>
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Amount</th>
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Rate (/kg)</th>
-                        <th className="py-2 lg:py-3 px-2 lg:px-4 text-xs lg:text-sm font-bold text-purple-200 uppercase tracking-wide">Note</th>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Qty Sold</th>
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Revenue</th>
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Unit Rate</th>
+                        <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Remarks</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-slate-100 text-xs font-semibold">
                       {store.transactions.filter(t => t.type === 'sale').map((s, i) => (
-                        <tr key={i} className="border-t border-white/20 hover:bg-white/10 transition-all">
-                          <td className="py-3 px-4 text-sm text-purple-200 font-medium">{s.date}</td>
-                          <td className="py-3 px-4 text-sm font-semibold text-white">{s.qty}</td>
-                          <td className="py-3 px-4 text-sm font-bold text-green-300">{formatPKR(s.amount)}</td>
-                          <td className="py-3 px-4 text-sm text-purple-200">{formatPKR(s.ratePerKg)}</td>
-                          <td className="py-3 px-4 text-sm text-purple-200">{s.note}</td>
+                        <tr key={i} className="hover:bg-slate-50 transition-all">
+                          <td className="py-3 px-3 text-slate-500">{s.date}</td>
+                          <td className="py-3 px-3 text-slate-900">{s.qty}</td>
+                          <td className="py-3 px-3 text-green-600">{formatPKR(s.amount)}</td>
+                          <td className="py-3 px-3 text-slate-600">{formatPKR(s.ratePerKg)}</td>
+                          <td className="py-3 px-3 text-slate-500">{s.note}</td>
                         </tr>
                       ))}
                       {store.transactions.filter(t => t.type === 'sale').length === 0 && (
-                        <tr><td className="py-8 text-center text-purple-200" colSpan={5}>No sales yet</td></tr>
+                        <tr><td className="py-8 text-center text-slate-500 font-semibold" colSpan={5}>No cylinder sales logged yet</td></tr>
                       )}
                     </tbody>
                   </table>
@@ -681,24 +670,23 @@ export default function Dashboard({ session, renameShop, onLogout }) {
           )}
 
           {view === 'settings' && (
-            <div className="space-y-4 lg:space-y-6">
-              <div className="bg-white/10 backdrop-blur-2xl p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl border border-white/20">
+            <div className="space-y-6">
+              <div className="bg-white border border-slate-200 p-5 rounded-xl">
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-2xl font-bold text-white drop-shadow-lg flex items-center gap-2"><SettingsIcon className="w-6 h-6" /> Personal Details</h3>
+                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2"><SettingsIcon className="w-5 h-5 text-indigo-600" /> Establishment Profile</h3>
                   <div>
                     {!personalEditing ? (
                       <button
-                        className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg shadow-lg flex items-center gap-2"
+                        className="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
                         onClick={() => setPersonalEditing(true)}
                       >
-                        <Edit2 className="w-4 h-4" /> Edit
+                        <Edit2 className="w-3.5 h-3.5 text-indigo-600" /> Edit Profile
                       </button>
                     ) : (
                       <div className="flex items-center gap-2">
                         <button
-                          className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg shadow-lg flex items-center gap-2"
+                          className="px-3.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1"
                           onClick={() => {
-                            // persist changes
                             if (!localSession || !localSession.name) {
                               setToast({ message: 'Shop name is required', type: 'error' })
                               return
@@ -713,16 +701,16 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                             setToast({ message: 'Personal details saved successfully!', type: 'success' })
                           }}
                         >
-                          <Save className="w-4 h-4" /> Save
+                          <Save className="w-3.5 h-3.5" /> Save
                         </button>
                         <button
-                          className="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white rounded-lg"
+                          className="px-3.5 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-600 text-xs font-bold rounded-lg transition-all"
                           onClick={() => {
                             setPersonalEditing(false)
                             setLocalSession(session)
                           }}
                         >
-                          <X className="w-4 h-4 mr-1 inline" /> Cancel
+                          Cancel
                         </button>
                       </div>
                     )}
@@ -730,118 +718,115 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                 </div>
 
                 {(!localSession || !localSession.name || !localSession.ownerName || !localSession.phone) && !personalEditing ? (
-                  <div className="p-4 mb-4 rounded-lg bg-amber-500/20 backdrop-blur-sm border border-amber-400/30 text-amber-200">Please add shop name, owner name and phone number. Click <strong>Edit</strong> to add details.</div>
+                  <div className="p-3 mb-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">Please complete your establishment profile. Click edit to add owner name and phone coordinates.</div>
                 ) : null}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-semibold text-purple-200 mb-2">Shop Name</label>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wide">Shop / Slotted Name</label>
                     <input
                       type="text"
                       value={localSession?.name || ''}
                       onChange={(e) => setLocalSession({ ...localSession, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all disabled:bg-white/5 disabled:text-white/50"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
                       placeholder="Enter shop name"
                       disabled={!personalEditing}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-purple-200 mb-2">Owner Name</label>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wide">Owner Name</label>
                     <input
                       type="text"
                       value={localSession?.ownerName || ''}
                       onChange={(e) => setLocalSession({ ...localSession, ownerName: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all disabled:bg-white/5 disabled:text-white/50"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
                       placeholder="Enter owner name"
                       disabled={!personalEditing}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-purple-200 mb-2">Phone Number</label>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wide">Phone Number</label>
                     <input
                       type="tel"
                       value={localSession?.phone || ''}
                       onChange={(e) => setLocalSession({ ...localSession, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all disabled:bg-white/5 disabled:text-white/50"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
                       placeholder="Enter phone number"
                       disabled={!personalEditing}
                     />
                   </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-purple-200 mb-2">Address</label>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wide">Address</label>
                     <input
                       type="text"
                       value={localSession?.address || ''}
                       onChange={(e) => setLocalSession({ ...localSession, address: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all disabled:bg-white/5 disabled:text-white/50"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
                       placeholder="Enter address"
                       disabled={!personalEditing}
                     />
                   </div>
                 </div>
-
               </div>
 
-              <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl border border-white/20">
-                <h3 className="text-2xl font-bold text-white mb-5 drop-shadow-lg flex items-center gap-2"><Package className="w-6 h-6" /> Inventory Management</h3>
-                <div className="space-y-6">
+              <div className="bg-white border border-slate-200 p-5 rounded-xl">
+                <h3 className="text-xl font-bold text-slate-900 mb-5 flex items-center gap-2"><Package className="w-5 h-5 text-indigo-600" /> Stock Audits</h3>
+                <div className="space-y-4">
                   {Object.entries(store.inventory).map(([type, counts]) => {
                     const total = (counts.filled || 0) + (counts.empty || 0)
                     const isEditing = inventoryEdits[type]?.editing
                     const draftTotal = inventoryEdits[type]?.total ?? total
                     const filledPercent = total > 0 ? ((counts.filled || 0) / total) * 100 : 0
                     return (
-                      <div key={type} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 shadow-lg hover:bg-white/15 hover:shadow-xl transition-all">
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow-md">
-                            <Package className="w-6 h-6" /> {type} Cylinders
+                      <div key={type} className="border border-slate-200 rounded-xl p-4 hover:bg-slate-50/50 transition-all">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <Package className="w-5 h-5 text-indigo-500" /> {type} Cylinders
                           </h4>
                           {!isEditing && (
                             <button
-                              className="px-4 py-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white rounded-lg transition-all shadow-lg flex items-center gap-2"
+                              className="px-3 py-1.5 border border-slate-300 hover:bg-white text-slate-700 text-xs font-bold rounded-lg transition-all flex items-center gap-1 shadow-sm"
                               onClick={() => setInventoryEdits({ ...inventoryEdits, [type]: { ...(inventoryEdits[type] || {}), editing: true, total } })}
                             >
-                              <Edit2 className="w-4 h-4" /> Edit Total
+                              <Edit2 className="w-3.5 h-3.5 text-indigo-600" /> Edit Total
                             </button>
                           )}
                         </div>
 
                         {!isEditing ? (
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div className="text-lg font-semibold text-purple-200">Total Cylinders: <span className="text-white">{total}</span></div>
-                            </div>
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-sm">
-                                <span className="text-green-300 font-medium">Filled: {counts.filled || 0}</span>
-                                <span className="text-amber-300 font-medium">Empty: {counts.empty || 0}</span>
+                          <div className="space-y-3">
+                            <div className="text-sm font-semibold text-slate-700">Total Cylinders: <span className="text-slate-900 font-extrabold">{total}</span></div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-xs font-bold">
+                                <span className="text-emerald-600">Filled: {counts.filled || 0}</span>
+                                <span className="text-amber-600">Empty: {counts.empty || 0}</span>
                               </div>
-                              <div className="w-full bg-white/10 backdrop-blur-sm rounded-full h-4 overflow-hidden border border-white/20">
+                              <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
                                 <div
-                                  className="bg-gradient-to-r from-green-500 to-emerald-600 h-full rounded-full transition-all duration-500"
+                                  className="bg-emerald-600 h-full rounded-full transition-all duration-300"
                                   style={{ width: `${filledPercent}%` }}
                                 />
                               </div>
                             </div>
                           </div>
                         ) : (
-                          <div className="bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg p-4">
-                            <div className="text-sm text-blue-200 mb-3">Enter new total cylinders. You'll be asked to specify how many are filled and empty.</div>
-                            <div className="flex items-center gap-4">
+                          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                            <div className="text-xs font-semibold text-slate-500 mb-3">Enter the new total cylinder count. You'll set the exact filled/empty split next.</div>
+                            <div className="flex items-center gap-3">
                               <div className="flex-1">
-                                <label className="block text-sm font-semibold text-white mb-2">Total Cylinders</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Total count</label>
                                 <input
                                   type="number"
                                   min="0"
                                   value={draftTotal}
                                   onChange={(e) => setInventoryEdits({ ...inventoryEdits, [type]: { ...(inventoryEdits[type] || {}), editing: true, total: parseInt(e.target.value) || 0 } })}
-                                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all text-lg font-semibold"
+                                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
                                   placeholder="e.g., 30"
                                 />
                               </div>
-                              <div className="flex flex-col gap-2">
+                              <div className="flex gap-2 self-end">
                                 <button
-                                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg transition-all shadow-lg font-semibold"
+                                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
                                   onClick={() => {
                                     const newTotal = Number(inventoryEdits[type]?.total ?? 0)
                                     if (isNaN(newTotal) || newTotal < 0) {
@@ -852,17 +837,17 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                                     setShowInventoryModal(true)
                                   }}
                                 >
-                                  <Save className="w-4 h-4 mr-1 inline" /> Save
+                                  Save
                                 </button>
                                 <button
-                                  className="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white rounded-lg transition-all font-semibold"
+                                  className="px-4 py-2 border border-slate-300 hover:bg-white text-slate-600 rounded-lg text-xs font-bold transition-all"
                                   onClick={() => {
                                     const copy = { ...inventoryEdits }
                                     delete copy[type]
                                     setInventoryEdits(copy)
                                   }}
                                 >
-                                  <X className="w-4 h-4 mr-1 inline" /> Cancel
+                                  Cancel
                                 </button>
                               </div>
                             </div>
@@ -877,13 +862,13 @@ export default function Dashboard({ session, renameShop, onLogout }) {
           )}
 
           {showInventoryModal && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowInventoryModal(false)}>
-              <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-4 lg:p-6 rounded-xl lg:rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
-                <h3 className="text-2xl font-bold text-white mb-4 drop-shadow-lg">Set Cylinder Distribution</h3>
-                <p className="text-sm text-purple-200 mb-5">Total {inventoryModalData.type} cylinders: {inventoryModalData.total}</p>
+            <div className="modal-overlay" onClick={() => setShowInventoryModal(false)}>
+              <div className="modal p-6 w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Set Distribution</h3>
+                <p className="text-xs text-slate-500 mb-4">Total cylinders: {inventoryModalData.total}</p>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-purple-200 mb-2">Filled Cylinders</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Filled Cylinders</label>
                     <input
                       type="number"
                       min="0"
@@ -894,11 +879,11 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                         const empty = inventoryModalData.total - filled
                         setInventoryModalData({ ...inventoryModalData, filled, empty })
                       }}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-green-400 focus:border-transparent focus:outline-none transition-all"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-purple-200 mb-2">Empty Cylinders</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Empty Cylinders</label>
                     <input
                       type="number"
                       min="0"
@@ -909,22 +894,22 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                         const filled = inventoryModalData.total - empty
                         setInventoryModalData({ ...inventoryModalData, filled, empty })
                       }}
-                      className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-amber-400 focus:border-transparent focus:outline-none transition-all"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
                     />
                   </div>
-                  <div className="text-sm text-purple-200">
-                    Filled + Empty = {inventoryModalData.filled + inventoryModalData.empty} (must equal {inventoryModalData.total})
+                  <div className="text-xs font-bold text-slate-500">
+                    Sum: {inventoryModalData.filled + inventoryModalData.empty} / {inventoryModalData.total}
                   </div>
                 </div>
-                <div className="mt-4 lg:mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end">
+                <div className="mt-5 flex gap-2 justify-end">
                   <button
-                    className="px-4 lg:px-5 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg lg:rounded-xl font-medium text-white hover:bg-white/20 transition-all"
+                    className="px-4 py-2 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-600 transition-all"
                     onClick={() => setShowInventoryModal(false)}
                   >
                     Cancel
                   </button>
                   <button
-                    className="px-4 lg:px-5 py-2 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-white rounded-lg lg:rounded-xl font-medium transition-all shadow-lg"
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
                     onClick={() => {
                       if (inventoryModalData.filled + inventoryModalData.empty !== inventoryModalData.total) {
                         setToast({ message: 'Filled + Empty must equal total', type: 'error' })
@@ -942,7 +927,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       }
                     }}
                   >
-                    <Save className="w-4 h-4 mr-1 inline" /> Save Inventory
+                    Save Stock
                   </button>
                 </div>
               </div>
