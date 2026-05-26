@@ -5,7 +5,7 @@ import Navbar from './Navbar'
 import { DollarSign, Package, CheckCircle, X, Save, TrendingUp, Target, BarChart3, Edit, Edit2, Settings as SettingsIcon, FileText, Circle, ShoppingCart, RefreshCw, BookOpen, History } from 'lucide-react'
 
 export default function Dashboard({ session, renameShop, onLogout }) {
-  const { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory } = useStore(session.id)
+  const { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate } = useStore(session.id)
 
   const [perKgRate, setPerKgRate] = useState(0)
   const [view, setView] = useState('overview')
@@ -46,6 +46,13 @@ export default function Dashboard({ session, renameShop, onLogout }) {
     const t = setTimeout(() => setToast(null), 3000)
     return () => clearTimeout(t)
   }, [toast])
+
+  useEffect(() => {
+    if (store && store.perKgRate !== undefined) {
+      setPerKgRate(store.perKgRate)
+      setPerKgDraft(store.perKgRate)
+    }
+  }, [store])
 
   return (
     <div className="flex min-h-screen" style={{ background: 'linear-gradient(135deg, #050510 0%, #0d0520 40%, #080318 70%, #050510 100%)' }}>
@@ -102,7 +109,12 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                   <button
                     className="px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition-all hover:scale-105 flex items-center gap-1"
                     style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}
-                    onClick={() => { setPerKgRate(Number(perKgDraft || 0)); setPerKgEditing(false); }}
+                    onClick={() => {
+                      const newRate = Number(perKgDraft || 0)
+                      setPerKgRate(newRate)
+                      updatePerKgRate(newRate)
+                      setPerKgEditing(false)
+                    }}
                   ><Save className="w-3.5 h-3.5" /> Save</button>
                 </>
               )}
@@ -206,7 +218,12 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       <button
                         className="px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all hover:scale-105 flex items-center gap-1.5"
                         style={{ background: 'linear-gradient(135deg, #059669, #10b981)', boxShadow: '0 4px 16px rgba(5,150,105,0.3)' }}
-                        onClick={() => { setPerKgRate(Number(perKgDraft || 0)); setPerKgEditing(false); }}
+                        onClick={() => {
+                          const newRate = Number(perKgDraft || 0)
+                          setPerKgRate(newRate)
+                          updatePerKgRate(newRate)
+                          setPerKgEditing(false)
+                        }}
                       ><Save className="w-4 h-4" /> Save</button>
                     </>
                   )}
@@ -686,10 +703,11 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                               setToast({ message: 'Shop name is required', type: 'error' })
                               return
                             }
+                            let updatedSession = session
                             if (localSession.name !== session.name) {
-                              renameShop(localSession.name)
+                              updatedSession = renameShop(localSession.name) || updatedSession
                             }
-                            const toSave = { ...session, name: localSession.name, ownerName: localSession.ownerName, phone: localSession.phone, address: localSession.address }
+                            const toSave = { ...updatedSession, ownerName: localSession.ownerName, phone: localSession.phone, address: localSession.address }
                             localStorage.setItem('lpg_session', JSON.stringify(toSave))
                             setPersonalEditing(false)
                             setToast({ message: 'Personal details saved successfully!', type: 'success' })

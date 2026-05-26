@@ -43,6 +43,7 @@ export default function App() {
     const ns = { name: newName, id: newId }
     setSession(ns)
     localStorage.setItem('lpg_session', JSON.stringify(ns))
+    return ns
   }
 
   const handleLoginSuccess = () => {

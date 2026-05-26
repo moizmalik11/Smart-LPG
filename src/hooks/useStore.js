@@ -13,7 +13,10 @@ function saveStore(id, data){
 
 function todayDateKey(){
   const d = new Date()
-  return d.toISOString().slice(0,10)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 function getWeekDates(){
@@ -40,7 +43,7 @@ export function useStore(sessionId){
     return todaysTransactions.reduce((sum,t)=> sum + (t.type==='sale' ? t.amount : 0), 0)
   },[todaysTransactions])
 
-  const weekDates = useMemo(()=>getWeekDates(),[]) 
+  const weekDates = useMemo(()=>getWeekDates(),[todaysKey]) 
   const weeklySales = useMemo(()=>{
     return store.transactions
       .filter(t => t.type==='sale' && weekDates.includes(t.date))
@@ -69,7 +72,8 @@ export function useStore(sessionId){
       return { success: false, message: 'Cylinder 0 hai — out of stock' }
     }
 
-    const weight = type === '45kg' ? 45 : 0
+    const match = type.match(/([\d.]+)\s*kg/i)
+    const weight = match ? parseFloat(match[1]) : 0
     const amount = Number(q) * weight * Number(perKgRate || 0)
     setStore(s=>{
       const next = JSON.parse(JSON.stringify(s))
@@ -117,7 +121,7 @@ export function useStore(sessionId){
       
       // Migrate old format (number) to new format (object)
       if(typeof next.khatabook[key] === 'number'){
-        next.khatabook[key] = { kg: next.khatabook[key], amount: 0 }
+        next.khatabook[key] = { kg: next.khatabook[key], amount: next.khatabook[key] * (next.perKgRate || s.perKgRate || 0) }
       }
       
       if(!next.khatabook[key]) next.khatabook[key] = { kg: 0, amount: 0 }
@@ -135,6 +139,18 @@ export function useStore(sessionId){
     if(!name || !name.toString().trim()) return { success: false, message: 'Name required' }
     if(!paid || paid <= 0) return { success: false, message: 'Invalid amount' }
 
+    // Pre-validate overpayment using current store state (taking care of legacy number format)
+    const rawRecord = store.khatabook ? store.khatabook[name] : null
+    if (!rawRecord) {
+      return { success: false, message: 'Record not found' }
+    }
+    const currentAmount = typeof rawRecord === 'number' 
+      ? rawRecord * (store.perKgRate || 0) 
+      : (rawRecord.amount || 0)
+    if (paid > currentAmount) {
+      return { success: false, message: 'ye amount remaining se zyada hai' }
+    }
+
     setStore(s=>{
       const next = JSON.parse(JSON.stringify(s))
       if(!next.khatabook) next.khatabook = {}
@@ -143,20 +159,19 @@ export function useStore(sessionId){
       
       // Migrate old format (number) to new format (object)
       if(typeof next.khatabook[key] === 'number'){
-        next.khatabook[key] = { kg: next.khatabook[key], amount: 0 }
+        next.khatabook[key] = { kg: next.khatabook[key], amount: next.khatabook[key] * (next.perKgRate || s.perKgRate || 0) }
       }
       
-      const currentAmount = next.khatabook[key].amount || 0
-      if(paid > currentAmount){
-        return s // Don't update if overpayment
+      const currentAmt = next.khatabook[key].amount || 0
+      if(paid > currentAmt){
+        return s // Guard check inside updater
       }
       
       const currentKg = next.khatabook[key].kg || 0
-      const newAmount = Math.max(0, currentAmount - paid)
+      const newAmount = Math.max(0, currentAmt - paid)
       
       // Calculate how much kg was paid for
-      // If rate is stored in perKgRate or calculate from existing data
-      const ratePerKg = currentKg > 0 && currentAmount > 0 ? currentAmount / currentKg : 0
+      const ratePerKg = currentKg > 0 && currentAmt > 0 ? currentAmt / currentKg : 0
       const paidKg = ratePerKg > 0 ? paid / ratePerKg : 0
       const newKg = Math.max(0, currentKg - paidKg)
       
@@ -171,12 +186,6 @@ export function useStore(sessionId){
       }
       return next
     })
-    
-    // Check if payment was processed (if not, it means overpayment)
-    const currentAmount = store.khatabook && store.khatabook[name] ? (store.khatabook[name].amount || 0) : 0
-    if(paid > currentAmount){
-      return { success: false, message: 'ye amount remaining se zyada hai' }
-    }
     
     return { success: true, message: 'Payment recorded' }
   }
@@ -197,5 +206,14 @@ export function useStore(sessionId){
     return { success: true, message: 'Inventory updated' }
   }
 
-  return { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory }
+  const updatePerKgRate = (rate) => {
+    const r = Number(rate || 0)
+    setStore(s => {
+      const next = JSON.parse(JSON.stringify(s))
+      next.perKgRate = r
+      return next
+    })
+  }
+
+  return { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate }
 }
