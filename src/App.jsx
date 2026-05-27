@@ -48,6 +48,7 @@ export default function App() {
 
   const handleLoginSuccess = () => {
     setIsAuthenticated(true)
+    setSession(initialSession())
     navigate('/dashboard')
   }
 

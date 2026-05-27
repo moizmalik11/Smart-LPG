@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useStore } from '../hooks/useStore'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
+import BottomNav from './BottomNav'
 import { DollarSign, Package, CheckCircle, X, Save, TrendingUp, Target, BarChart3, Edit, Edit2, Settings as SettingsIcon, FileText, Circle, ShoppingCart, RefreshCw, BookOpen, History } from 'lucide-react'
 
 export default function Dashboard({ session, renameShop, onLogout }) {
@@ -56,7 +57,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
 
   return (
     <div className="flex min-h-screen" style={{ background: '#f8fafc' }}>
-      {/* Sidebar */}
+      {/* Sidebar (Desktop navigation) */}
       <Sidebar
         session={session}
         activeView={view}
@@ -64,6 +65,9 @@ export default function Dashboard({ session, renameShop, onLogout }) {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />
+
+      {/* Mobile Bottom Navigation */}
+      <BottomNav activeView={view} onViewChange={setView} />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col w-full lg:ml-[268px]">
@@ -180,7 +184,8 @@ export default function Dashboard({ session, renameShop, onLogout }) {
           </div>
         )}
 
-        <section className="flex-1 p-4 lg:p-6 overflow-auto space-y-6">
+        {/* content window container optimized with bottom offset for mobileBottomNav */}
+        <section className="flex-1 p-3 sm:p-4 lg:p-6 pb-24 lg:pb-6 overflow-auto space-y-6">
           {view === 'overview' && (
             <div className="space-y-6">
               {/* Per-kg rate - desktop */}
@@ -226,7 +231,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
               </div>
 
               {/* Stat cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {/* Filled cylinders */}
                 <div className="stat-card animate-fade-in-up">
                   <div className="flex items-start justify-between mb-4">
@@ -272,21 +277,21 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                     </span>
                   </div>
                   <div className="text-2xl font-extrabold text-slate-900 mb-1">{formatPKR(todaysSalesValue)}</div>
-                  <div className="text-xs font-semibold text-indigo-600">{todaysTransactions.length} transactions</div>
+                  <div className="text-xs font-semibold text-indigo-600">{todaysTransactions.length} transactions today</div>
                 </div>
               </div>
             </div>
           )}
 
           {view === 'inventory' && (
-            <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+            <div className="bg-white border border-slate-200 p-4 sm:p-6 rounded-2xl shadow-sm">
               <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
                 <Package className="w-6 h-6 text-indigo-600" />
                 <span>Inventory Management</span>
               </h3>
               <div className="space-y-4">
                 {Object.entries(store.inventory).map(([type, st]) => (
-                  <div key={type} className="bg-white p-5 border border-slate-200 rounded-xl hover:shadow-md transition-all duration-200">
+                  <div key={type} className="bg-white p-4 sm:p-5 border border-slate-200 rounded-xl hover:shadow-md transition-all duration-200">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div className="flex-1">
                         <div className="text-lg font-bold text-slate-800 mb-2">{type} Cylinders</div>
@@ -297,7 +302,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       </div>
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <button
-                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all shadow-sm text-sm flex items-center justify-center gap-1.5"
+                          className="px-4 py-3 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all shadow-sm text-sm flex items-center justify-center gap-1.5"
                           onClick={() => {
                             const res = recordSale(type, 1, perKgRate, '')
                             if (!res || !res.success) {
@@ -310,7 +315,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                           <ShoppingCart className="w-4 h-4" /> Sell -1
                         </button>
                         <button
-                          className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-all shadow-sm text-sm flex items-center justify-center gap-1.5"
+                          className="px-4 py-3 sm:py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-all shadow-sm text-sm flex items-center justify-center gap-1.5"
                           onClick={() => {
                             setManagingEmpty(type)
                             setEmptyQty('')
@@ -324,10 +329,10 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-lg">
                         <div className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Refill Empty Cylinders</div>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 w-full sm:w-auto">
                             <input
                               type="number"
-                              className="w-24 sm:w-32 p-2 bg-white border border-slate-300 rounded-lg font-semibold text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm"
+                              className="w-24 sm:w-32 p-2.5 bg-white border border-slate-300 rounded-lg font-semibold text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm"
                               placeholder="Qty"
                               value={emptyQty}
                               onChange={(e) => setEmptyQty(e.target.value)}
@@ -336,9 +341,9 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                             />
                             <span className="text-xs font-medium text-slate-500 whitespace-nowrap">Available Empty: {st.empty}</span>
                           </div>
-                          <div className="flex gap-2 sm:ml-auto">
+                          <div className="flex gap-2 w-full sm:w-auto sm:ml-auto">
                             <button
-                              className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-300 rounded-lg font-semibold text-slate-600 hover:bg-slate-100 transition-all text-xs"
+                              className="flex-1 sm:flex-none px-3 py-2 border border-slate-300 rounded-lg font-semibold text-slate-600 hover:bg-slate-100 transition-all text-xs"
                               onClick={() => {
                                 setManagingEmpty(null)
                                 setEmptyQty('')
@@ -347,7 +352,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                               Cancel
                             </button>
                             <button
-                              className="flex-1 sm:flex-none px-3.5 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-sm text-xs flex items-center justify-center gap-1.5"
+                              className="flex-1 sm:flex-none px-3.5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-sm text-xs flex items-center justify-center gap-1.5"
                               onClick={() => {
                                 const result = manageEmpty(type, emptyQty)
                                 if (result.success) {
@@ -372,7 +377,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
           )}
 
           {view === 'shipments' && (
-            <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+            <div className="bg-white border border-slate-200 p-4 sm:p-6 rounded-2xl shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-3"><BookOpen className="w-6 h-6 text-indigo-600" /> Khata Book (Udhar)</h3>
                 <button
@@ -386,7 +391,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
               <div className="mb-6 flex flex-col sm:flex-row gap-3">
                 <input value={khataName} onChange={e => setKhataName(e.target.value)} placeholder="Customer Name" className="flex-1 p-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
                 <input value={khataKg} onChange={e => setKhataKg(e.target.value)} placeholder="Gas Qty (Kg)" type="number" className="flex-1 sm:w-32 p-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
-                <button className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold shadow-sm whitespace-nowrap" onClick={() => {
+                <button className="px-5 py-3 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold shadow-sm whitespace-nowrap" onClick={() => {
                   const res = addKhataEntry(khataName, khataKg, perKgRate)
                   if (res && res.success) { setToast({ message: res.message, type: 'success' }); setKhataName(''); setKhataKg('') }
                   else setToast({ message: res.message || 'Error', type: 'error' })
@@ -407,28 +412,28 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                       {addingTo === name ? (
                         <>
-                          <input type="number" value={addKgValue} onChange={e => setAddKgValue(e.target.value)} placeholder="Weight (Kg)" className="p-2 bg-white border border-slate-300 rounded-lg w-full sm:w-28 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
-                          <button className="flex-1 sm:flex-none px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold whitespace-nowrap" onClick={() => {
+                          <input type="number" value={addKgValue} onChange={e => setAddKgValue(e.target.value)} placeholder="Weight (Kg)" className="p-2.5 bg-white border border-slate-300 rounded-lg w-full sm:w-28 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
+                          <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold whitespace-nowrap" onClick={() => {
                             const res = addKhataEntry(name, addKgValue, perKgRate)
                             if (res && res.success) { setToast({ message: res.message, type: 'success' }); setAddingTo(null); setAddKgValue('') }
                             else setToast({ message: res.message || 'Error', type: 'error' })
                           }}>+ Add Weight</button>
-                          <button className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-xs" onClick={() => { setAddingTo(null); setAddKgValue('') }}>Cancel</button>
+                          <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-xs" onClick={() => { setAddingTo(null); setAddKgValue('') }}>Cancel</button>
                         </>
                       ) : settlingName === name ? (
                         <>
-                          <input type="number" value={settleAmount} onChange={e => setSettleAmount(e.target.value)} placeholder="PKR Amount" className="p-2 bg-white border border-slate-300 rounded-lg w-full sm:w-32 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
-                          <button className="flex-1 sm:flex-none px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" onClick={() => {
+                          <input type="number" value={settleAmount} onChange={e => setSettleAmount(e.target.value)} placeholder="PKR Amount" className="p-2.5 bg-white border border-slate-300 rounded-lg w-full sm:w-32 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
+                          <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" onClick={() => {
                             const res = settleKhata(name, settleAmount)
                             if (res && res.success) { setToast({ message: res.message, type: 'success' }); setSettlingName(null); setSettleAmount('') }
                             else setToast({ message: res.message || 'Error', type: 'error' })
                           }}><DollarSign className="w-3.5 h-3.5" /> Settle</button>
-                          <button className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-xs" onClick={() => { setSettlingName(null); setSettleAmount('') }}>Cancel</button>
+                          <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-xs" onClick={() => { setSettlingName(null); setSettleAmount('') }}>Cancel</button>
                         </>
                       ) : (
                         <>
-                          <button className="flex-1 sm:flex-none px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold whitespace-nowrap" onClick={() => { setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
-                          <button className="flex-1 sm:flex-none px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" onClick={() => { setSettlingName(name); setSettleAmount('') }}><DollarSign className="w-3.5 h-3.5" /> Settle Payment</button>
+                          <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold whitespace-nowrap" onClick={() => { setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
+                          <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" onClick={() => { setSettlingName(name); setSettleAmount('') }}><DollarSign className="w-3.5 h-3.5" /> Settle Payment</button>
                         </>
                       )}
                     </div>
@@ -440,9 +445,9 @@ export default function Dashboard({ session, renameShop, onLogout }) {
 
           {showHistory && (
             <div className="modal-overlay" onClick={() => setShowHistory(false)}>
-              <div className="modal p-6 max-w-3xl w-full" onClick={e => e.stopPropagation()}>
+              <div className="modal p-4 sm:p-6 max-w-3xl w-full" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-5 border-b pb-3">
-                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2"><FileText className="w-5 h-5 text-indigo-600" /> 30-Day Settlement History</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2"><FileText className="w-5 h-5 text-indigo-600" /> 30-Day Settlement History</h3>
                   <button
                     className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-500"
                     onClick={() => setShowHistory(false)}
@@ -450,7 +455,50 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="overflow-x-auto">
+
+                {/* Mobile list cards for settlement history (visible on mobile only) */}
+                <div className="block md:hidden space-y-3 max-h-[50vh] overflow-y-auto pr-1">
+                  {(() => {
+                    const lastMonth = new Date()
+                    lastMonth.setDate(lastMonth.getDate() - 30)
+                    const lastMonthStr = lastMonth.toISOString().slice(0, 10)
+                    const historyTxns = store.transactions
+                      .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
+                      .sort((a, b) => b.date.localeCompare(a.date))
+                    
+                    if (historyTxns.length === 0) {
+                      return <div className="text-center py-8 text-slate-500 text-xs font-semibold">No logs in last 30 days</div>
+                    }
+
+                    return historyTxns.map((t, i) => {
+                      const currentData = store.khatabook && store.khatabook[t.name] ? store.khatabook[t.name] : { amount: 0 }
+                      const remaining = currentData.amount || 0
+                      return (
+                        <div key={i} className="bg-slate-50 p-3 border border-slate-200 rounded-xl space-y-1.5 text-xs font-semibold">
+                          <div className="flex justify-between text-slate-500 text-[10px]">
+                            <span>{t.date}</span>
+                            <span>Payment Log</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-slate-800">{t.name}</span>
+                            <span className="text-green-600 font-bold">{formatPKR(t.paid)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[11px] text-slate-500">
+                            <span>Remaining Balance:</span>
+                            {remaining === 0 ? (
+                              <span className="px-2 py-0.5 rounded-full text-[9px] bg-green-50 text-green-700 border border-green-200">Clear</span>
+                            ) : (
+                              <span className="text-slate-800 font-semibold">{formatPKR(remaining)}</span>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })
+                  })()}
+                </div>
+
+                {/* Desktop table logs (visible on desktop only) */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
@@ -501,7 +549,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
 
           {view === 'reports' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 <div className="p-5 border border-slate-200 bg-indigo-50/40 rounded-xl">
                   <div className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Today's Revenue</div>
                   <div className="text-2xl font-extrabold text-slate-900">{formatPKR(todaysSalesValue)}</div>
@@ -519,7 +567,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm">
+              <div className="bg-white border border-slate-200 p-4 sm:p-5 rounded-xl shadow-sm">
                 <h3 className="text-lg font-bold text-slate-900 mb-5 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-indigo-600" /> Weekly Sales Chart</h3>
                 <div className="space-y-3">
                   {(() => {
@@ -636,9 +684,35 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                 </div>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-100 text-indigo-600"><BarChart3 className="w-6 h-6" /></div>
               </div>
-              <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm">
+
+              <div className="bg-white border border-slate-200 p-4 sm:p-5 rounded-xl shadow-sm">
                 <h3 className="text-xl font-bold text-slate-900 mb-5 flex items-center gap-2"><DollarSign className="w-5.5 h-5.5 text-indigo-600" /> Sales Ledger</h3>
-                <div className="overflow-x-auto">
+                
+                {/* Mobile list cards for sales records (visible on mobile only) */}
+                <div className="md:hidden space-y-3">
+                  {store.transactions.filter(t => t.type === 'sale').map((s, i) => (
+                    <div key={i} className="bg-white p-4 border border-slate-200 rounded-xl space-y-2.5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-semibold text-slate-500">{s.date}</span>
+                        <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-bold">Cylinder Sale</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-bold text-slate-800">{s.qty} Cylinder{s.qty > 1 ? 's' : ''}</span>
+                        <span className="text-sm font-extrabold text-green-600">{formatPKR(s.amount)}</span>
+                      </div>
+                      <div className="flex justify-between text-[11px] font-semibold text-slate-500 border-t pt-2">
+                        <span>Rate: {formatPKR(s.ratePerKg)}/kg</span>
+                        {s.note && <span>{s.note}</span>}
+                      </div>
+                    </div>
+                  ))}
+                  {store.transactions.filter(t => t.type === 'sale').length === 0 && (
+                    <div className="text-center py-8 text-slate-500 text-xs font-semibold">No cylinder sales logged yet</div>
+                  )}
+                </div>
+
+                {/* Desktop table logs (visible on desktop only) */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[600px]">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200">
@@ -671,13 +745,13 @@ export default function Dashboard({ session, renameShop, onLogout }) {
 
           {view === 'settings' && (
             <div className="space-y-6">
-              <div className="bg-white border border-slate-200 p-5 rounded-xl">
+              <div className="bg-white border border-slate-200 p-4 sm:p-5 rounded-xl">
                 <div className="flex items-center justify-between mb-5">
                   <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2"><SettingsIcon className="w-5 h-5 text-indigo-600" /> Establishment Profile</h3>
                   <div>
                     {!personalEditing ? (
                       <button
-                        className="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
+                        className="px-3 py-2 sm:py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5"
                         onClick={() => setPersonalEditing(true)}
                       >
                         <Edit2 className="w-3.5 h-3.5 text-indigo-600" /> Edit Profile
@@ -721,14 +795,14 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                   <div className="p-3 mb-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">Please complete your establishment profile. Click edit to add owner name and phone coordinates.</div>
                 ) : null}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wide">Shop / Slotted Name</label>
                     <input
                       type="text"
                       value={localSession?.name || ''}
                       onChange={(e) => setLocalSession({ ...localSession, name: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
                       placeholder="Enter shop name"
                       disabled={!personalEditing}
                     />
@@ -739,7 +813,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       type="text"
                       value={localSession?.ownerName || ''}
                       onChange={(e) => setLocalSession({ ...localSession, ownerName: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
                       placeholder="Enter owner name"
                       disabled={!personalEditing}
                     />
@@ -750,7 +824,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       type="tel"
                       value={localSession?.phone || ''}
                       onChange={(e) => setLocalSession({ ...localSession, phone: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
                       placeholder="Enter phone number"
                       disabled={!personalEditing}
                     />
@@ -761,7 +835,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       type="text"
                       value={localSession?.address || ''}
                       onChange={(e) => setLocalSession({ ...localSession, address: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400 font-semibold"
                       placeholder="Enter address"
                       disabled={!personalEditing}
                     />
@@ -769,7 +843,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 p-5 rounded-xl">
+              <div className="bg-white border border-slate-200 p-4 sm:p-5 rounded-xl">
                 <h3 className="text-xl font-bold text-slate-900 mb-5 flex items-center gap-2"><Package className="w-5 h-5 text-indigo-600" /> Stock Audits</h3>
                 <div className="space-y-4">
                   {Object.entries(store.inventory).map(([type, counts]) => {
@@ -785,7 +859,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                           </h4>
                           {!isEditing && (
                             <button
-                              className="px-3 py-1.5 border border-slate-300 hover:bg-white text-slate-700 text-xs font-bold rounded-lg transition-all flex items-center gap-1 shadow-sm"
+                              className="px-3 py-2 sm:py-1.5 border border-slate-300 hover:bg-white text-slate-700 text-xs font-bold rounded-lg transition-all flex items-center gap-1 shadow-sm"
                               onClick={() => setInventoryEdits({ ...inventoryEdits, [type]: { ...(inventoryEdits[type] || {}), editing: true, total } })}
                             >
                               <Edit2 className="w-3.5 h-3.5 text-indigo-600" /> Edit Total
@@ -820,13 +894,13 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                                   min="0"
                                   value={draftTotal}
                                   onChange={(e) => setInventoryEdits({ ...inventoryEdits, [type]: { ...(inventoryEdits[type] || {}), editing: true, total: parseInt(e.target.value) || 0 } })}
-                                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
+                                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
                                   placeholder="e.g., 30"
                                 />
                               </div>
                               <div className="flex gap-2 self-end">
                                 <button
-                                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                                  className="px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
                                   onClick={() => {
                                     const newTotal = Number(inventoryEdits[type]?.total ?? 0)
                                     if (isNaN(newTotal) || newTotal < 0) {
@@ -840,7 +914,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                                   Save
                                 </button>
                                 <button
-                                  className="px-4 py-2 border border-slate-300 hover:bg-white text-slate-600 rounded-lg text-xs font-bold transition-all"
+                                  className="px-4 py-2.5 border border-slate-300 hover:bg-white text-slate-600 rounded-lg text-xs font-bold transition-all"
                                   onClick={() => {
                                     const copy = { ...inventoryEdits }
                                     delete copy[type]
@@ -879,7 +953,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                         const empty = inventoryModalData.total - filled
                         setInventoryModalData({ ...inventoryModalData, filled, empty })
                       }}
-                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
                     />
                   </div>
                   <div>
@@ -894,7 +968,7 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                         const filled = inventoryModalData.total - empty
                         setInventoryModalData({ ...inventoryModalData, filled, empty })
                       }}
-                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-semibold"
                     />
                   </div>
                   <div className="text-xs font-bold text-slate-500">
