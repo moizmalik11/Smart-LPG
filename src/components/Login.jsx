@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { Lock, User, Eye, EyeOff, LogIn, Flame, Store, CheckCircle } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
+import { Lock, User, Eye, EyeOff, LogIn, Flame, Store, CheckCircle, Mail } from 'lucide-react';
+import { supabase as realSupabase } from '../lib/supabaseClient';
+
 
 export default function Login({ onLoginSuccess }) {
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'signup'
   
   // Shared & Form state fields
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
   // Signup state fields
   const [shopName, setShopName] = useState('');
+  const [username, setUsername] = useState(''); // Custom nickname / username
   const [confirmPassword, setConfirmPassword] = useState('');
   
   // Feedback status
@@ -20,24 +22,21 @@ export default function Login({ onLoginSuccess }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!username.trim() || !password) {
-      setError('Please enter your credentials');
+    if (!email.trim() || !password) {
+      setError('Please enter your email and password');
       return;
     }
     setIsLoading(true);
     setError('');
 
-    // Transform username into Supabase email format automatically
-    const email = username.includes('@') ? username.trim() : `${username.trim().toLowerCase()}@smartlpg.com`;
-
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
+      const { data, error: authError } = await realSupabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
         password
       });
 
       if (authError) {
-        setError(authError.message === 'Invalid login credentials' ? 'Invalid username or password' : authError.message);
+        setError(authError.message === 'Invalid login credentials' ? 'Invalid email or password' : authError.message);
         setIsLoading(false);
       } else {
         setError('');
@@ -50,8 +49,12 @@ export default function Login({ onLoginSuccess }) {
   };
 
   const handleSignUp = async () => {
-    if (!shopName.trim() || !username.trim() || !password || !confirmPassword) {
+    if (!shopName.trim() || !email.trim() || !username.trim() || !password || !confirmPassword) {
       setError('Please fill in all signup fields');
+      return;
+    }
+    if (!email.includes('@')) {
+      setError('Please enter a valid email address');
       return;
     }
     if (password !== confirmPassword) {
@@ -67,13 +70,10 @@ export default function Login({ onLoginSuccess }) {
     setError('');
     setSuccess('');
 
-    // Format username to standard smartlpg system email format
-    const email = `${username.trim().toLowerCase()}@smartlpg.com`;
-
     try {
-      // 1. Sign up user via Supabase auth
-      const { data, error: authError } = await supabase.auth.signUp({
-        email,
+      // 1. Sign up user via Supabase auth using their actual email
+      const { data, error: authError } = await realSupabase.auth.signUp({
+        email: email.trim().toLowerCase(),
         password
       });
 
@@ -84,12 +84,13 @@ export default function Login({ onLoginSuccess }) {
       }
 
       if (data && data.user) {
-        // 2. Create profile row in shops table
-        const { error: profileError } = await supabase
+        // 2. Create profile row in shops table (saving both name AND custom username nickname!)
+        const { error: profileError } = await realSupabase
           .from('shops')
           .insert({
             id: data.user.id,
             name: shopName.trim(),
+            username: username.trim().toLowerCase(),
             owner_name: '',
             phone: '',
             address: '',
@@ -103,7 +104,7 @@ export default function Login({ onLoginSuccess }) {
         }
 
         // 3. Create default cylinder stock item in inventory table
-        const { error: inventoryError } = await supabase
+        const { error: inventoryError } = await realSupabase
           .from('inventory')
           .insert({
             shop_id: data.user.id,
@@ -232,98 +233,98 @@ export default function Login({ onLoginSuccess }) {
             {/* Tab: SIGN IN Form */}
             {activeTab === 'login' ? (
               <div className="space-y-4">
-                {/* Username */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 uppercase mb-2 tracking-wider">
-                    Username
-                  </label>
-                  <div className="relative group">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                      style={{ width: '18px', height: '18px' }} />
-                    <input
-                      id="username"
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Enter your username"
-                      className="w-full pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-150"
-                      style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '14px' }}
-                      onFocus={e => {
-                        e.target.style.borderColor = '#4f46e5';
-                        e.target.style.background = '#f5f3ff';
-                        e.target.style.boxShadow = '0 0 0 1px #4f46e5';
-                      }}
-                      onBlur={e => {
-                        e.target.style.borderColor = '#cbd5e1';
-                        e.target.style.background = '#f8fafc';
-                        e.target.style.boxShadow = 'none';
-                      }}
-                    />
-                  </div>
-                </div>
+                 {/* Email Address */}
+                 <div>
+                   <label className="block text-xs font-bold text-slate-600 uppercase mb-2 tracking-wider">
+                     Email Address
+                   </label>
+                   <div className="relative group">
+                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                       style={{ width: '18px', height: '18px' }} />
+                     <input
+                       id="email-signin"
+                       type="email"
+                       value={email}
+                       onChange={(e) => setEmail(e.target.value)}
+                       onKeyPress={handleKeyPress}
+                       placeholder="Enter your email address"
+                       className="w-full pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-150"
+                       style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '14px' }}
+                       onFocus={e => {
+                         e.target.style.borderColor = '#4f46e5';
+                         e.target.style.background = '#f5f3ff';
+                         e.target.style.boxShadow = '0 0 0 1px #4f46e5';
+                       }}
+                       onBlur={e => {
+                         e.target.style.borderColor = '#cbd5e1';
+                         e.target.style.background = '#f8fafc';
+                         e.target.style.boxShadow = 'none';
+                       }}
+                     />
+                   </div>
+                 </div>
 
-                {/* Password */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 uppercase mb-2 tracking-wider">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                      style={{ width: '18px', height: '18px' }} />
-                    <input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Enter your password"
-                      className="w-full pl-10 pr-12 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-150"
-                      style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '14px' }}
-                      onFocus={e => {
-                        e.target.style.borderColor = '#4f46e5';
-                        e.target.style.background = '#f5f3ff';
-                        e.target.style.boxShadow = '0 0 0 1px #4f46e5';
-                      }}
-                      onBlur={e => {
-                        e.target.style.borderColor = '#cbd5e1';
-                        e.target.style.background = '#f8fafc';
-                        e.target.style.boxShadow = 'none';
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-all duration-150 text-slate-400 hover:text-indigo-600"
-                    >
-                      {showPassword ? <EyeOff style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
-                    </button>
-                  </div>
-                </div>
+                 {/* Password */}
+                 <div>
+                   <label className="block text-xs font-bold text-slate-600 uppercase mb-2 tracking-wider">
+                     Password
+                   </label>
+                   <div className="relative">
+                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                       style={{ width: '18px', height: '18px' }} />
+                     <input
+                       id="password-signin"
+                       type={showPassword ? 'text' : 'password'}
+                       value={password}
+                       onChange={(e) => setPassword(e.target.value)}
+                       onKeyPress={handleKeyPress}
+                       placeholder="Enter your password"
+                       className="w-full pl-10 pr-12 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-150"
+                       style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '14px' }}
+                       onFocus={e => {
+                         e.target.style.borderColor = '#4f46e5';
+                         e.target.style.background = '#f5f3ff';
+                         e.target.style.boxShadow = '0 0 0 1px #4f46e5';
+                       }}
+                       onBlur={e => {
+                         e.target.style.borderColor = '#cbd5e1';
+                         e.target.style.background = '#f8fafc';
+                         e.target.style.boxShadow = 'none';
+                       }}
+                     />
+                     <button
+                       type="button"
+                       onClick={() => setShowPassword(!showPassword)}
+                       className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-all duration-150 text-slate-400 hover:text-indigo-600"
+                     >
+                       {showPassword ? <EyeOff style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
+                     </button>
+                   </div>
+                 </div>
 
-                {/* Submit button */}
-                <button
-                  id="login-btn"
-                  onClick={handleLogin}
-                  disabled={isLoading}
-                  className="w-full py-3.5 mt-2 font-bold text-white text-sm transition-all duration-150 disabled:opacity-60 hover:bg-indigo-700 shadow-md flex items-center justify-center gap-2 animate-pulse-subtle"
-                  style={{ background: '#4f46e5', borderRadius: '14px' }}
-                >
-                  {isLoading ? (
-                    <>
-                      <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Signing in...
-                    </>
-                  ) : (
-                    <>
-                      <LogIn className="w-4 h-4" />
-                      Sign In
-                    </>
-                  )}
-                </button>
+                 {/* Submit button */}
+                 <button
+                   id="login-btn"
+                   onClick={handleLogin}
+                   disabled={isLoading}
+                   className="w-full py-3.5 mt-2 font-bold text-white text-sm transition-all duration-150 disabled:opacity-60 hover:bg-indigo-700 shadow-md flex items-center justify-center gap-2 animate-pulse-subtle"
+                   style={{ background: '#4f46e5', borderRadius: '14px' }}
+                 >
+                   {isLoading ? (
+                     <>
+                       <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                       </svg>
+                       Signing in...
+                     </>
+                   ) : (
+                     <>
+                       <LogIn className="w-4 h-4" />
+                       Sign In
+                     </>
+                   )}
+                 </button>
               </div>
             ) : (
               /* Tab: CREATE ACCOUNT Form */
@@ -337,6 +338,7 @@ export default function Login({ onLoginSuccess }) {
                     <Store className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                       style={{ width: '18px', height: '18px' }} />
                     <input
+                      id="shop-name-signup"
                       type="text"
                       value={shopName}
                       onChange={(e) => setShopName(e.target.value)}
@@ -358,7 +360,38 @@ export default function Login({ onLoginSuccess }) {
                   </div>
                 </div>
 
-                {/* Username */}
+                {/* Email Address */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-2 tracking-wider">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                      style={{ width: '18px', height: '18px' }} />
+                    <input
+                      id="email-signup"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Enter your email address"
+                      className="w-full pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-150"
+                      style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '14px' }}
+                      onFocus={e => {
+                        e.target.style.borderColor = '#4f46e5';
+                        e.target.style.background = '#f5f3ff';
+                        e.target.style.boxShadow = '0 0 0 1px #4f46e5';
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = '#cbd5e1';
+                        e.target.style.background = '#f8fafc';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Username Nickname */}
                 <div>
                   <label className="block text-xs font-bold text-slate-600 uppercase mb-2 tracking-wider">
                     Select Username
@@ -367,11 +400,12 @@ export default function Login({ onLoginSuccess }) {
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                       style={{ width: '18px', height: '18px' }} />
                     <input
+                      id="username-signup"
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Choose username"
+                      placeholder="Choose a username nickname"
                       className="w-full pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-150"
                       style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '14px' }}
                       onFocus={e => {
@@ -397,6 +431,7 @@ export default function Login({ onLoginSuccess }) {
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                       style={{ width: '18px', height: '18px' }} />
                     <input
+                      id="password-signup"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -434,6 +469,7 @@ export default function Login({ onLoginSuccess }) {
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                       style={{ width: '18px', height: '18px' }} />
                     <input
+                      id="confirm-password-signup"
                       type={showPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -463,18 +499,18 @@ export default function Login({ onLoginSuccess }) {
                   style={{ background: '#4f46e5', borderRadius: '14px' }}
                 >
                   {isLoading ? (
-                    <>
-                      <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Creating account...
-                    </>
+                     <>
+                       <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                       </svg>
+                       Creating account...
+                     </>
                   ) : (
-                    <>
-                      <LogIn className="w-4 h-4" />
-                      Sign Up & Log In
-                    </>
+                     <>
+                       <LogIn className="w-4 h-4" />
+                       Sign Up & Log In
+                     </>
                   )}
                 </button>
               </div>
