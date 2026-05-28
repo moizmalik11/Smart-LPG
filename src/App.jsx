@@ -61,20 +61,32 @@ export default function App() {
     setLoading(false)
   }
 
-  // rename shop directly updates Supabase shops profile database table
-  async function renameShop(newName) {
-    if (!newName || !session) return
+  // update shop details directly updates Supabase shops profile database table and synchronizes active session state
+  async function updateShopDetails(updatedFields) {
+    if (!session || !updatedFields) return
     const { error } = await supabase
       .from('shops')
-      .update({ name: newName })
+      .update(updatedFields)
       .eq('id', session.id)
 
     if (!error) {
-      const updated = { ...session, name: newName }
+      const updated = {
+        ...session,
+        name: updatedFields.name !== undefined ? updatedFields.name : session.name,
+        ownerName: updatedFields.owner_name !== undefined ? updatedFields.owner_name : session.ownerName,
+        phone: updatedFields.phone !== undefined ? updatedFields.phone : session.phone,
+        address: updatedFields.address !== undefined ? updatedFields.address : session.address
+      }
       setSession(updated)
       return updated
     }
   }
+
+  // rename shop directly updates Supabase shops profile database table
+  async function renameShop(newName) {
+    return await updateShopDetails({ name: newName })
+  }
+
 
   const handleLoginSuccess = () => {
     navigate('/dashboard')
@@ -120,7 +132,7 @@ export default function App() {
         element={
           isAuthenticated && session ? (
             <div className="app">
-              <Dashboard session={session} renameShop={renameShop} onLogout={handleLogout} />
+              <Dashboard session={session} renameShop={renameShop} updateShopDetails={updateShopDetails} onLogout={handleLogout} />
             </div>
           ) : (
             <Navigate to="/login" replace />
