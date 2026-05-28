@@ -5,7 +5,7 @@ import Navbar from './Navbar'
 import BottomNav from './BottomNav'
 import { DollarSign, Package, CheckCircle, X, Save, TrendingUp, Target, BarChart3, Edit, Edit2, Settings as SettingsIcon, FileText, Circle, ShoppingCart, RefreshCw, BookOpen, History } from 'lucide-react'
 
-export default function Dashboard({ session, renameShop, onLogout }) {
+export default function Dashboard({ session, renameShop, updateShopDetails, onLogout }) {
   const { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate } = useStore(session.id)
 
   const [perKgRate, setPerKgRate] = useState(0)
@@ -86,10 +86,11 @@ export default function Dashboard({ session, renameShop, onLogout }) {
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Per-kg Rate</span>
             <div className="flex items-center gap-2">
               <input
-                className="w-20 px-2 py-1 text-sm font-bold text-slate-900 rounded-lg focus:outline-none transition-all"
+                className="w-20 px-2 py-1 text-sm font-bold text-slate-900 focus:outline-none transition-all"
                 style={{
                   background: perKgEditing ? '#f5f3ff' : '#f8fafc',
-                  border: perKgEditing ? '1px solid #4f46e5' : '1px solid #cbd5e1'
+                  border: perKgEditing ? '1px solid #4f46e5' : '1px solid #cbd5e1',
+                  borderRadius: '12px'
                 }}
                 type="number"
                 value={perKgDraft}
@@ -99,19 +100,20 @@ export default function Dashboard({ session, renameShop, onLogout }) {
               />
               {!perKgEditing ? (
                 <button
-                  className="px-3 py-1 text-xs font-semibold text-white rounded-lg transition-all hover:bg-indigo-700"
-                  style={{ background: '#4f46e5' }}
+                  className="px-3 py-1 text-xs font-semibold text-white transition-all hover:bg-indigo-700 shadow-sm"
+                  style={{ background: '#4f46e5', borderRadius: '12px' }}
                   onClick={() => { setPerKgDraft(perKgRate); setPerKgEditing(true); }}
                 >Edit</button>
               ) : (
                 <>
                   <button
-                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-all bg-slate-100 border hover:bg-slate-200 text-slate-600"
+                    className="w-7 h-7 flex items-center justify-center transition-all bg-slate-100 border hover:bg-slate-200 text-slate-600"
+                    style={{ borderRadius: '12px' }}
                     onClick={() => { setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                   ><X className="w-3.5 h-3.5" /></button>
                   <button
-                    className="px-3 py-1 text-xs font-semibold text-white rounded-lg transition-all hover:bg-green-700 flex items-center gap-1"
-                    style={{ background: '#16a34a' }}
+                    className="px-3 py-1 text-xs font-semibold text-white transition-all hover:bg-green-700 flex items-center gap-1 shadow-sm"
+                    style={{ background: '#16a34a', borderRadius: '12px' }}
                     onClick={async () => {
                       const newRate = Number(perKgDraft || 0)
                       setPerKgRate(newRate)
@@ -206,7 +208,8 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                       {!perKgEditing
                         ? <div className="text-2xl font-bold text-slate-900">PKR {perKgRate.toLocaleString()}</div>
                         : <input
-                          className="w-32 px-3 py-1 text-lg font-bold text-slate-900 rounded-lg border border-indigo-300 bg-indigo-50/50 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-32 px-3 py-1 text-lg font-bold text-slate-900 border border-indigo-300 bg-indigo-50/50 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          style={{ borderRadius: '12px' }}
                           type="number" value={perKgDraft}
                           onChange={e => setPerKgDraft(e.target.value)} autoFocus
                         />
@@ -215,19 +218,20 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                     <div className="flex gap-2">
                       {!perKgEditing ? (
                         <button
-                          className="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-all hover:bg-indigo-700"
-                          style={{ background: '#4f46e5' }}
+                          className="px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-indigo-700 shadow-md"
+                          style={{ background: '#4f46e5', borderRadius: '12px' }}
                           onClick={() => { setPerKgDraft(perKgRate); setPerKgEditing(true); }}
                         >Edit Rate</button>
                       ) : (
                         <>
                           <button
-                            className="px-3.5 py-2 text-sm text-slate-700 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 transition-all flex items-center gap-1"
+                            className="px-3.5 py-2 text-sm text-slate-700 border border-slate-300 bg-white hover:bg-slate-50 transition-all flex items-center gap-1"
+                            style={{ borderRadius: '12px' }}
                             onClick={() => { setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                           ><X className="w-4 h-4" /> Cancel</button>
                           <button
-                            className="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-all hover:bg-green-700 flex items-center gap-1.5"
-                            style={{ background: '#16a34a' }}
+                            className="px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-green-700 flex items-center gap-1.5 shadow-md"
+                            style={{ background: '#16a34a', borderRadius: '12px' }}
                             onClick={async () => {
                               const newRate = Number(perKgDraft || 0)
                               setPerKgRate(newRate)
@@ -312,11 +316,12 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                           </div>
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <button
-                              className="px-4 py-3 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all shadow-sm text-sm flex items-center justify-center gap-1.5"
+                              className="px-4 py-3 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-all shadow-md text-sm flex items-center justify-center gap-1.5"
+                              style={{ borderRadius: '12px' }}
                               onClick={async () => {
-                                const res = await recordSale(type, 1, perKgRate, '')
-                                if (!res || !res.success) {
-                                  setToast({ message: res && res.message ? res.message : 'Cylinder 0 hai — out of stock', type: 'error' })
+                                const result = await recordSale(type, 1, perKgRate, `Direct sale of 1x ${type}`)
+                                if (!result.success) {
+                                  setToast({ message: result.message, type: 'error' })
                                 } else {
                                   setToast({ message: 'Sale recorded', type: 'success' })
                                 }
@@ -325,7 +330,8 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                               <ShoppingCart className="w-4 h-4" /> Sell -1
                             </button>
                             <button
-                              className="px-4 py-3 sm:py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-all shadow-sm text-sm flex items-center justify-center gap-1.5"
+                              className="px-4 py-3 sm:py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-all shadow-md text-sm flex items-center justify-center gap-1.5"
+                              style={{ borderRadius: '12px' }}
                               onClick={() => {
                                 setManagingEmpty(type)
                                 setEmptyQty('')
@@ -336,13 +342,14 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                           </div>
                         </div>
                         {managingEmpty === type && (
-                          <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                          <div className="mt-4 p-4 bg-slate-50 border border-slate-200" style={{ borderRadius: '16px' }}>
                             <div className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Refill Empty Cylinders</div>
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                               <div className="flex items-center gap-2 w-full sm:w-auto">
                                 <input
                                   type="number"
-                                  className="w-24 sm:w-32 p-2.5 bg-white border border-slate-300 rounded-lg font-semibold text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm"
+                                  className="w-24 sm:w-32 p-2.5 bg-white border border-slate-300 font-semibold text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none text-sm"
+                                  style={{ borderRadius: '12px' }}
                                   placeholder="Qty"
                                   value={emptyQty}
                                   onChange={(e) => setEmptyQty(e.target.value)}
@@ -353,7 +360,8 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                               </div>
                               <div className="flex gap-2 w-full sm:w-auto sm:ml-auto">
                                 <button
-                                  className="flex-1 sm:flex-none px-3 py-2 border border-slate-300 rounded-lg font-semibold text-slate-600 hover:bg-slate-100 transition-all text-xs"
+                                  className="flex-1 sm:flex-none px-3 py-2 border border-slate-300 font-semibold text-slate-600 hover:bg-slate-100 transition-all text-xs"
+                                  style={{ borderRadius: '12px' }}
                                   onClick={() => {
                                     setManagingEmpty(null)
                                     setEmptyQty('')
@@ -362,7 +370,8 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                                   Cancel
                                 </button>
                                 <button
-                                  className="flex-1 sm:flex-none px-3.5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-sm text-xs flex items-center justify-center gap-1.5"
+                                  className="flex-1 sm:flex-none px-3.5 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold transition-all shadow-md text-xs flex items-center justify-center gap-1.5"
+                                  style={{ borderRadius: '12px' }}
                                   onClick={async () => {
                                     const result = await manageEmpty(type, emptyQty)
                                     if (result.success) {
@@ -391,17 +400,18 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-3"><BookOpen className="w-6 h-6 text-indigo-600" /> Khata Book (Udhar)</h3>
                     <button
-                      className="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5 shadow-sm"
+                      className="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all flex items-center gap-1.5 shadow-sm"
+                      style={{ borderRadius: '12px' }}
                       onClick={() => setShowHistory(true)}
                     >
                       <History className="w-4 h-4" /> History
                     </button>
                   </div>
-
+ 
                   <div className="mb-6 flex flex-col sm:flex-row gap-3">
-                    <input value={khataName} onChange={e => setKhataName(e.target.value)} placeholder="Customer Name" className="flex-1 p-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
-                    <input value={khataKg} onChange={e => setKhataKg(e.target.value)} placeholder="Gas Qty (Kg)" type="number" className="flex-1 sm:w-32 p-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
-                    <button className="px-5 py-3 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold shadow-sm whitespace-nowrap" onClick={async () => {
+                    <input value={khataName} onChange={e => setKhataName(e.target.value)} placeholder="Customer Name" className="flex-1 p-2.5 bg-white border border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" style={{ borderRadius: '12px' }} />
+                    <input value={khataKg} onChange={e => setKhataKg(e.target.value)} placeholder="Gas Qty (Kg)" type="number" className="flex-1 sm:w-32 p-2.5 bg-white border border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" style={{ borderRadius: '12px' }} />
+                    <button className="px-5 py-3 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md whitespace-nowrap" style={{ borderRadius: '12px' }} onClick={async () => {
                       const res = await addKhataEntry(khataName, khataKg, perKgRate)
                       if (res && res.success) { setToast({ message: res.message, type: 'success' }); setKhataName(''); setKhataKg('') }
                       else setToast({ message: res.message || 'Error', type: 'error' })
@@ -422,28 +432,28 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                           {addingTo === name ? (
                             <>
-                              <input type="number" value={addKgValue} onChange={e => setAddKgValue(e.target.value)} placeholder="Weight (Kg)" className="p-2.5 bg-white border border-slate-300 rounded-lg w-full sm:w-28 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold whitespace-nowrap" onClick={async () => {
+                              <input type="number" value={addKgValue} onChange={e => setAddKgValue(e.target.value)} placeholder="Weight (Kg)" className="p-2.5 bg-white border border-slate-300 w-full sm:w-28 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" style={{ borderRadius: '12px' }} />
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold whitespace-nowrap" style={{ borderRadius: '12px' }} onClick={async () => {
                                 const res = await addKhataEntry(name, addKgValue, perKgRate)
                                 if (res && res.success) { setToast({ message: res.message, type: 'success' }); setAddingTo(null); setAddKgValue('') }
                                 else setToast({ message: res.message || 'Error', type: 'error' })
                               }}>+ Add Weight</button>
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-xs" onClick={() => { setAddingTo(null); setAddKgValue('') }}>Cancel</button>
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs" style={{ borderRadius: '12px' }} onClick={() => { setAddingTo(null); setAddKgValue('') }}>Cancel</button>
                             </>
                           ) : settlingName === name ? (
                             <>
-                              <input type="number" value={settleAmount} onChange={e => setSettleAmount(e.target.value)} placeholder="PKR Amount" className="p-2.5 bg-white border border-slate-300 rounded-lg w-full sm:w-32 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" />
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" onClick={async () => {
+                              <input type="number" value={settleAmount} onChange={e => setSettleAmount(e.target.value)} placeholder="PKR Amount" className="p-2.5 bg-white border border-slate-300 w-full sm:w-32 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" style={{ borderRadius: '12px' }} />
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" style={{ borderRadius: '12px' }} onClick={async () => {
                                 const res = await settleKhata(name, settleAmount)
                                 if (res && res.success) { setToast({ message: res.message, type: 'success' }); setSettlingName(null); setSettleAmount('') }
                                 else setToast({ message: res.message || 'Error', type: 'error' })
                               }}><DollarSign className="w-3.5 h-3.5" /> Settle</button>
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-xs" onClick={() => { setSettlingName(null); setSettleAmount('') }}>Cancel</button>
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs" style={{ borderRadius: '12px' }} onClick={() => { setSettlingName(null); setSettleAmount('') }}>Cancel</button>
                             </>
                           ) : (
                             <>
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold whitespace-nowrap" onClick={() => { setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" onClick={() => { setSettlingName(name); setSettleAmount('') }}><DollarSign className="w-3.5 h-3.5" /> Settle Payment</button>
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold whitespace-nowrap" style={{ borderRadius: '12px' }} onClick={() => { setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" style={{ borderRadius: '12px' }} onClick={() => { setSettlingName(name); setSettleAmount('') }}><DollarSign className="w-3.5 h-3.5" /> Settle Payment</button>
                             </>
                           )}
                         </div>
@@ -775,26 +785,19 @@ export default function Dashboard({ session, renameShop, onLogout }) {
                                   setToast({ message: 'Shop name is required', type: 'error' })
                                   return
                                 }
-                                let updatedSession = session
-                                if (localSession.name !== session.name) {
-                                  updatedSession = await renameShop(localSession.name) || updatedSession
-                                }
                                 
-                                // Update shops details in Supabase
-                                const { error } = await supabase
-                                  .from('shops')
-                                  .update({
-                                    owner_name: localSession.ownerName || '',
-                                    phone: localSession.phone || '',
-                                    address: localSession.address || ''
-                                  })
-                                  .eq('id', session.id)
+                                const updated = await updateShopDetails({
+                                  name: localSession.name,
+                                  owner_name: localSession.ownerName || '',
+                                  phone: localSession.phone || '',
+                                  address: localSession.address || ''
+                                })
 
-                                if (!error) {
+                                if (updated) {
                                   setPersonalEditing(false)
                                   setToast({ message: 'Personal details saved successfully!', type: 'success' })
                                 } else {
-                                  setToast({ message: error.message, type: 'error' })
+                                  setToast({ message: 'Error saving profile details', type: 'error' })
                                 }
                               }}
                             >
