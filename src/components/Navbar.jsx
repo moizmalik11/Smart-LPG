@@ -71,14 +71,15 @@ export default function Navbar({ session, onMenuToggle, onLogout, onSettingsClic
               className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition-all duration-150 border"
               style={{
                 background: '#ffffff',
-                borderColor: '#e2e8f0',
+                borderColor: '#cbd5e1',
+                borderRadius: '12px',
               }}
               onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
               onMouseLeave={e => e.currentTarget.style.background = '#ffffff'}
             >
               {/* Avatar (Indigo solid) */}
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: '#4f46e5' }}>
+              <div className="w-8 h-8 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                style={{ background: '#4f46e5', borderRadius: '50%' }}>
                 {initials}
               </div>
               <span className="hidden sm:block text-sm font-semibold text-slate-800">{session.name}</span>
@@ -99,8 +100,8 @@ export default function Navbar({ session, onMenuToggle, onLogout, onSettingsClic
           >
             <DropdownMenuLabel className="px-2 py-1.5">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
-                  style={{ background: '#4f46e5' }}>
+                <div className="w-8 h-8 flex items-center justify-center text-white text-xs font-bold"
+                  style={{ background: '#4f46e5', borderRadius: '50%' }}>
                   {initials}
                 </div>
                 <div>
