@@ -1,15 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-
-function loadStore(id){
-  const key = `lpg_store_${id}`
-  const raw = localStorage.getItem(key)
-  return raw ? JSON.parse(raw) : { inventory: { '45kg': { filled:0, empty:0 } }, transactions: [], khatabook: {}, perKgRate: 0 }
-}
-
-function saveStore(id, data){
-  const key = `lpg_store_${id}`
-  localStorage.setItem(key, JSON.stringify(data))
-}
+import { supabase } from '../lib/supabaseClient'
 
 function todayDateKey(){
   const d = new Date()
@@ -30,83 +20,217 @@ function getWeekDates(){
   return week
 }
 
-// Custom hook for store management
 export function useStore(sessionId){
-  const [store, setStore] = useState(()=>loadStore(sessionId))
+  const [store, setStore] = useState({ inventory: { '45kg': { filled: 0, empty: 0 } }, transactions: [], khatabook: {}, perKgRate: 0 })
+  const [loading, setLoading] = useState(true)
   const todaysKey = todayDateKey()
 
-  useEffect(()=>{saveStore(sessionId, store)},[store, sessionId])
-  useEffect(()=>{setStore(loadStore(sessionId))},[sessionId])
+  useEffect(() => {
+    if (!sessionId) return
+    fetchStoreData()
+  }, [sessionId])
+
+  const fetchStoreData = async () => {
+    setLoading(true)
+    try {
+      // 1. Fetch shop per_kg_rate profile
+      const { data: shopData } = await supabase
+        .from('shops')
+        .select('per_kg_rate')
+        .eq('id', sessionId)
+        .single()
+
+      // 2. Fetch inventory stock counts
+      const { data: inventoryData } = await supabase
+        .from('inventory')
+        .select('*')
+        .eq('shop_id', sessionId)
+
+      // 3. Fetch khata entries
+      const { data: khataData } = await supabase
+        .from('khatabook')
+        .select('*')
+        .eq('shop_id', sessionId)
+
+      // 4. Fetch transactions ledger
+      const { data: txData } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('shop_id', sessionId)
+        .order('created_at', { ascending: false })
+
+      // Structure inventory key mapping
+      const inventoryMap = {}
+      if (inventoryData) {
+        inventoryData.forEach(item => {
+          inventoryMap[item.cylinder_type] = {
+            filled: item.filled,
+            empty: item.empty
+          }
+        })
+      }
+      if (!inventoryMap['45kg']) {
+        inventoryMap['45kg'] = { filled: 0, empty: 0 }
+      }
+
+      // Structure khatabook key mapping
+      const khataMap = {}
+      if (khataData) {
+        khataData.forEach(item => {
+          khataMap[item.customer_name] = {
+            kg: Number(item.kg),
+            amount: Number(item.amount)
+          }
+        })
+      }
+
+      // Sync local hook state tree
+      setStore({
+        inventory: inventoryMap,
+        transactions: txData || [],
+        khatabook: khataMap,
+        perKgRate: shopData?.per_kg_rate || 0
+      })
+    } catch (err) {
+      console.error('Error fetching Supabase store coordinates:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const todaysTransactions = useMemo(()=> store.transactions.filter(t=>t.date===todaysKey),[store,todaysKey])
   const todaysSalesValue = useMemo(()=>{
-    return todaysTransactions.reduce((sum,t)=> sum + (t.type==='sale' ? t.amount : 0), 0)
+    return todaysTransactions.reduce((sum,t)=> sum + (t.type==='sale' ? Number(t.amount || 0) : 0), 0)
   },[todaysTransactions])
 
   const weekDates = useMemo(()=>getWeekDates(),[todaysKey]) 
   const weeklySales = useMemo(()=>{
     return store.transactions
       .filter(t => t.type==='sale' && weekDates.includes(t.date))
-      .reduce((sum,t)=> sum + t.amount, 0)
+      .reduce((sum,t)=> sum + Number(t.amount || 0), 0)
   },[store, weekDates])
 
   const totalFilled = Object.values(store.inventory).reduce((s,i)=>s + (i.filled||0),0)
   const totalEmpty = Object.values(store.inventory).reduce((s,i)=>s + (i.empty||0),0)
 
-  const addShipment = (type='45kg', count=1, note='') => {
-    setStore(s=>{
-      const next = JSON.parse(JSON.stringify(s))
-      if(!next.inventory[type]) next.inventory[type] = {filled:0,empty:0}
-      next.inventory[type].filled += Number(count)
-      next.transactions.unshift({ date: todaysKey, type:'shipment', qty: Number(count), note: note || 'shipment received' })
-      return next
-    })
+  const updatePerKgRate = async (rate) => {
+    const r = Number(rate || 0)
+    const { error } = await supabase
+      .from('shops')
+      .update({ per_kg_rate: r })
+      .eq('id', sessionId)
+
+    if (!error) {
+      setStore(prev => ({ ...prev, perKgRate: r }))
+      return { success: true, message: 'Price rate updated' }
+    }
+    return { success: false, message: error.message }
   }
 
-  const recordSale = (type='45kg', qty=1, perKgRate=0, note='') => {
+  const updateInventory = async (type, filled, empty) => {
+    const f = Number(filled || 0)
+    const e = Number(empty || 0)
+    if(f < 0 || e < 0) return { success: false, message: 'Invalid counts' }
+
+    const { error } = await supabase
+      .from('inventory')
+      .upsert({
+        shop_id: sessionId,
+        cylinder_type: type,
+        filled: f,
+        empty: e
+      }, { onConflict: 'shop_id,cylinder_type' })
+
+    if (!error) {
+      await supabase.from('transactions').insert({
+        shop_id: sessionId,
+        date: todaysKey,
+        type: 'inventory_update',
+        note: `Manual audit for ${type}`
+      })
+      await fetchStoreData()
+      return { success: true, message: 'Inventory updated' }
+    }
+    return { success: false, message: error.message }
+  }
+
+  const recordSale = async (type='45kg', qty=1, perKgRate=0, note='') => {
     const q = Number(qty || 0)
     if(!q || q <= 0) return { success: false, message: 'Invalid quantity' }
 
-    const current = store.inventory && store.inventory[type] ? store.inventory[type] : { filled: 0, empty: 0 }
+    const current = store.inventory[type] || { filled: 0, empty: 0 }
     if(current.filled < q){
       return { success: false, message: 'Cylinder 0 hai — out of stock' }
     }
 
     const match = type.match(/([\d.]+)\s*kg/i)
     const weight = match ? parseFloat(match[1]) : 0
-    const amount = Number(q) * weight * Number(perKgRate || 0)
-    setStore(s=>{
-      const next = JSON.parse(JSON.stringify(s))
-      if(!next.inventory[type]) next.inventory[type] = {filled:0,empty:0}
-      next.inventory[type].filled = Math.max(0, next.inventory[type].filled - q)
-      next.inventory[type].empty += q
-      next.transactions.unshift({ date: todaysKey, type:'sale', qty: q, amount, ratePerKg: Number(perKgRate||0), note: note || 'sale' })
-      return next
-    })
-    return { success: true, message: 'Sale recorded', amount }
+    const amount = q * weight * Number(perKgRate || 0)
+
+    // 1. Update Inventory counts in Supabase
+    const { error: stockError } = await supabase
+      .from('inventory')
+      .update({
+        filled: current.filled - q,
+        empty: current.empty + q
+      })
+      .eq('shop_id', sessionId)
+      .eq('cylinder_type', type)
+
+    if (stockError) return { success: false, message: stockError.message }
+
+    // 2. Insert transaction row
+    const { error: txError } = await supabase
+      .from('transactions')
+      .insert({
+        shop_id: sessionId,
+        date: todaysKey,
+        type: 'sale',
+        qty: q,
+        amount,
+        rate_per_kg: Number(perKgRate),
+        note: note || 'Sale logged'
+      })
+
+    if (txError) return { success: false, message: txError.message }
+
+    await fetchStoreData()
+    return { success: true, message: 'Sale recorded successfully', amount }
   }
 
-  const manageEmpty = (type, qty) => {
+  const manageEmpty = async (type, qty) => {
     const q = Number(qty || 0)
     if(!q || q <= 0) return { success: false, message: 'Invalid quantity' }
     
-    const current = store.inventory[type]
-    if(!current || q > current.empty){
+    const current = store.inventory[type] || { filled: 0, empty: 0 }
+    if(q > current.empty){
       return { success: false, message: 'Not enough empty cylinders' }
     }
     
-    setStore(s=>{
-      const next = JSON.parse(JSON.stringify(s))
-      if(!next.inventory[type]) next.inventory[type] = {filled:0,empty:0}
-      next.inventory[type].empty -= q
-      next.inventory[type].filled += q
-      next.transactions.unshift({ date: todaysKey, type:'refill', qty: q, note: 'empty -> filled' })
-      return next
+    const { error: stockError } = await supabase
+      .from('inventory')
+      .update({
+        empty: current.empty - q,
+        filled: current.filled + q
+      })
+      .eq('shop_id', sessionId)
+      .eq('cylinder_type', type)
+
+    if (stockError) return { success: false, message: stockError.message }
+
+    await supabase.from('transactions').insert({
+      shop_id: sessionId,
+      date: todaysKey,
+      type: 'refill',
+      qty: q,
+      note: 'Empty refilled'
     })
+
+    await fetchStoreData()
     return { success: true, message: 'Refilled successfully' }
   }
 
-  const addKhataEntry = (name, kg, perKgRate) => {
+  const addKhataEntry = async (name, kg, perKgRate) => {
     const q = Number(kg || 0)
     const rate = Number(perKgRate || 0)
     if(!name || !name.toString().trim()) return { success: false, message: 'Name required' }
@@ -114,106 +238,105 @@ export function useStore(sessionId){
     if(!rate || rate <= 0) return { success: false, message: 'Per-kg rate not set' }
 
     const amount = q * rate
-    setStore(s=>{
-      const next = JSON.parse(JSON.stringify(s))
-      if(!next.khatabook) next.khatabook = {}
-      const key = name.toString().trim()
-      
-      // Migrate old format (number) to new format (object)
-      if(typeof next.khatabook[key] === 'number'){
-        next.khatabook[key] = { kg: next.khatabook[key], amount: next.khatabook[key] * (next.perKgRate || s.perKgRate || 0) }
-      }
-      
-      if(!next.khatabook[key]) next.khatabook[key] = { kg: 0, amount: 0 }
-      next.khatabook[key].kg = (next.khatabook[key].kg || 0) + q
-      next.khatabook[key].amount = (next.khatabook[key].amount || 0) + amount
-      if(!next.transactions) next.transactions = []
-      next.transactions.unshift({ date: todaysKey, type:'khata', name: key, kg: q, amount, rate, note: 'credit' })
-      return next
+    const key = name.toString().trim()
+
+    // Fetch active customer entry if exists
+    const { data: currentRecord } = await supabase
+      .from('khatabook')
+      .select('*')
+      .eq('shop_id', sessionId)
+      .eq('customer_name', key)
+      .maybeSingle()
+
+    const newKg = (currentRecord?.kg || 0) + q
+    const newAmount = (currentRecord?.amount || 0) + amount
+
+    const { error: khataError } = await supabase
+      .from('khatabook')
+      .upsert({
+        shop_id: sessionId,
+        customer_name: key,
+        kg: newKg,
+        amount: newAmount
+      }, { onConflict: 'shop_id,customer_name' })
+
+    if (khataError) return { success: false, message: khataError.message }
+
+    await supabase.from('transactions').insert({
+      shop_id: sessionId,
+      date: todaysKey,
+      type: 'khata',
+      name: key,
+      qty: q,
+      amount,
+      rate_per_kg: rate,
+      note: 'Credit entry'
     })
+
+    await fetchStoreData()
     return { success: true, message: 'Recorded in Khata' }
   }
 
-  const settleKhata = (name, paidAmount) => {
+  const settleKhata = async (name, paidAmount) => {
     const paid = Number(paidAmount || 0)
     if(!name || !name.toString().trim()) return { success: false, message: 'Name required' }
     if(!paid || paid <= 0) return { success: false, message: 'Invalid amount' }
 
-    // Pre-validate overpayment using current store state (taking care of legacy number format)
-    const rawRecord = store.khatabook ? store.khatabook[name] : null
-    if (!rawRecord) {
-      return { success: false, message: 'Record not found' }
-    }
-    const currentAmount = typeof rawRecord === 'number' 
-      ? rawRecord * (store.perKgRate || 0) 
-      : (rawRecord.amount || 0)
+    const key = name.toString().trim()
+
+    // Fetch customer profile
+    const { data: currentRecord } = await supabase
+      .from('khatabook')
+      .select('*')
+      .eq('shop_id', sessionId)
+      .eq('customer_name', key)
+      .maybeSingle()
+
+    if (!currentRecord) return { success: false, message: 'Record not found' }
+
+    const currentAmount = Number(currentRecord.amount || 0)
     if (paid > currentAmount) {
       return { success: false, message: 'ye amount remaining se zyada hai' }
     }
 
-    setStore(s=>{
-      const next = JSON.parse(JSON.stringify(s))
-      if(!next.khatabook) next.khatabook = {}
-      const key = name.toString().trim()
-      if(!next.khatabook[key]) return s
-      
-      // Migrate old format (number) to new format (object)
-      if(typeof next.khatabook[key] === 'number'){
-        next.khatabook[key] = { kg: next.khatabook[key], amount: next.khatabook[key] * (next.perKgRate || s.perKgRate || 0) }
-      }
-      
-      const currentAmt = next.khatabook[key].amount || 0
-      if(paid > currentAmt){
-        return s // Guard check inside updater
-      }
-      
-      const currentKg = next.khatabook[key].kg || 0
-      const newAmount = Math.max(0, currentAmt - paid)
-      
-      // Calculate how much kg was paid for
-      const ratePerKg = currentKg > 0 && currentAmt > 0 ? currentAmt / currentKg : 0
-      const paidKg = ratePerKg > 0 ? paid / ratePerKg : 0
-      const newKg = Math.max(0, currentKg - paidKg)
-      
-      next.khatabook[key].amount = newAmount
-      next.khatabook[key].kg = newKg
-      
-      if(!next.transactions) next.transactions = []
-      next.transactions.unshift({ date: todaysKey, type:'settlement', name: key, paid, paidKg, note: 'payment' })
-      
-      if(newAmount === 0 && newKg === 0){
-        delete next.khatabook[key]
-      }
-      return next
-    })
+    const currentKg = Number(currentRecord.kg || 0)
+    const newAmount = Math.max(0, currentAmount - paid)
     
+    // Calculate proportional kg
+    const ratePerKg = currentKg > 0 && currentAmount > 0 ? currentAmount / currentKg : 0
+    const paidKg = ratePerKg > 0 ? paid / ratePerKg : 0
+    const newKg = Math.max(0, currentKg - paidKg)
+
+    if (newAmount === 0 && newKg === 0) {
+      await supabase
+        .from('khatabook')
+        .delete()
+        .eq('shop_id', sessionId)
+        .eq('customer_name', key)
+    } else {
+      await supabase
+        .from('khatabook')
+        .update({
+          kg: newKg,
+          amount: newAmount
+        })
+        .eq('shop_id', sessionId)
+        .eq('customer_name', key)
+    }
+
+    await supabase.from('transactions').insert({
+      shop_id: sessionId,
+      date: todaysKey,
+      type: 'settlement',
+      name: key,
+      amount: paid,
+      qty: paidKg,
+      note: 'Payment logged'
+    })
+
+    await fetchStoreData()
     return { success: true, message: 'Payment recorded' }
   }
 
-  const updateInventory = (type, filled, empty) => {
-    const f = Number(filled || 0)
-    const e = Number(empty || 0)
-    if(f < 0 || e < 0) return { success: false, message: 'Invalid counts' }
-    
-    setStore(s=>{
-      const next = JSON.parse(JSON.stringify(s))
-      if(!next.inventory) next.inventory = {}
-      next.inventory[type] = { filled: f, empty: e }
-      if(!next.transactions) next.transactions = []
-      next.transactions.unshift({ date: todaysKey, type:'inventory_update', cylinderType: type, filled: f, empty: e, note: 'manual update' })
-      return next
-    })
-    return { success: true, message: 'Inventory updated' }
-  }
-
-  const updatePerKgRate = (rate) => {
-    const r = Number(rate || 0)
-    setStore(s => {
-      const next = JSON.parse(JSON.stringify(s))
-      next.perKgRate = r
-      return next
-    })
-  }
-
-  return { store, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, addShipment, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate }
+  return { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate }
 }
