@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-function todayDateKey(){
-  const d = new Date()
+function formatDateLocal(d) {
   const year = d.getFullYear()
   const month = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+function todayDateKey(){
+  return formatDateLocal(new Date())
 }
 
 function getWeekDates(){
@@ -15,7 +18,7 @@ function getWeekDates(){
   for(let i=6; i>=0; i--){
     const d = new Date(today)
     d.setDate(today.getDate() - i)
-    week.push(d.toISOString().slice(0,10))
+    week.push(formatDateLocal(d))
   }
   return week
 }

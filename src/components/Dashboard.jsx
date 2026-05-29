@@ -3,12 +3,39 @@ import { useStore } from '../hooks/useStore'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
 import BottomNav from './BottomNav'
+import {
+  X,
+  Save,
+  CheckCircle,
+  Circle,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  RefreshCw,
+  BookOpen,
+  History,
+  Download,
+  FileText,
+  BarChart3,
+  Target,
+  TrendingUp,
+  Trash2,
+  Edit2,
+  Settings as SettingsIcon
+} from 'lucide-react'
 const Spinner = () => (
   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
   </svg>
 )
+
+const formatDateLocal = (d) => {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 export default function Dashboard({ session, renameShop, updateShopDetails, onLogout }) {
   const { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale, actionLoading } = useStore(session.id)
@@ -310,7 +337,11 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
   }
 
   const [perKgRate, setPerKgRate] = useState(0)
-  const [view, setView] = useState('overview')
+  const [view, setView] = useState(() => localStorage.getItem('activeDashboardView') || 'overview')
+
+  useEffect(() => {
+    localStorage.setItem('activeDashboardView', view)
+  }, [view])
   const [showEdit, setShowEdit] = useState(false)
   const [newShopName, setNewShopName] = useState(session.name)
   const [perKgEditing, setPerKgEditing] = useState(false)
@@ -837,7 +868,7 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                         {(() => {
                           const lastMonth = new Date()
                           lastMonth.setDate(lastMonth.getDate() - 30)
-                          const lastMonthStr = lastMonth.toISOString().slice(0, 10)
+                          const lastMonthStr = formatDateLocal(lastMonth)
                           const historyTxns = store.transactions
                             .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
                             .sort((a, b) => b.date.localeCompare(a.date))
@@ -887,7 +918,7 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                             {(() => {
                               const lastMonth = new Date()
                               lastMonth.setDate(lastMonth.getDate() - 30)
-                              const lastMonthStr = lastMonth.toISOString().slice(0, 10)
+                              const lastMonthStr = formatDateLocal(lastMonth)
                               const historyTxns = store.transactions
                                 .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
                                 .sort((a, b) => b.date.localeCompare(a.date))
@@ -950,7 +981,7 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                         for (let i = 6; i >= 0; i--) {
                           const d = new Date()
                           d.setDate(d.getDate() - i)
-                          weekDates.push(d.toISOString().slice(0, 10))
+                          weekDates.push(formatDateLocal(d))
                         }
                         const salesByDay = weekDates.map(date => {
                           const daySales = store.transactions
