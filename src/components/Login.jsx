@@ -106,12 +106,12 @@ export default function Login({ onLoginSuccess }) {
         // 3. Create default cylinder stock item in inventory table
         const { error: inventoryError } = await realSupabase
           .from('inventory')
-          .insert({
+          .upsert({
             shop_id: data.user.id,
             cylinder_type: '45kg',
-            filled: 10,
+            filled: 0,
             empty: 0
-          });
+          }, { onConflict: 'shop_id,cylinder_type' });
 
         if (inventoryError) {
           setError(`Inventory Initialization Error: ${inventoryError.message}`);
