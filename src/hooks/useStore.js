@@ -165,7 +165,8 @@ export function useStore(sessionId){
 
     const match = type.match(/([\d.]+)\s*kg/i)
     const weight = match ? parseFloat(match[1]) : 0
-    const amount = q * weight * Number(perKgRate || 0)
+    const activeRate = Number(perKgRate) || Number(store.perKgRate || 0)
+    const amount = q * weight * activeRate
 
     // 1. Update Inventory counts in Supabase
     const { error: stockError } = await supabase
@@ -188,7 +189,7 @@ export function useStore(sessionId){
         type: 'sale',
         qty: q,
         amount,
-        rate_per_kg: Number(perKgRate),
+        rate_per_kg: activeRate,
         note: note || 'Sale logged'
       })
 
@@ -338,5 +339,43 @@ export function useStore(sessionId){
     return { success: true, message: 'Payment recorded' }
   }
 
-  return { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate }
+  const deleteSale = async (transactionId, note, qty) => {
+    if (!transactionId) return { success: false, message: 'Transaction ID required' }
+    
+    // Parse cylinder type from transaction note (e.g. "Direct sale of 1x 45kg" -> "45kg")
+    let cylinderType = '45kg'
+    if (note) {
+      const match = note.match(/(\d+\s*kg)/i)
+      if (match) {
+        cylinderType = match[1].toLowerCase().replace(/\s+/g, '')
+      }
+    }
+
+    const current = store.inventory[cylinderType] || { filled: 0, empty: 0 }
+
+    const { error: stockError } = await supabase
+      .from('inventory')
+      .update({
+        filled: current.filled + Number(qty || 0),
+        empty: Math.max(0, current.empty - Number(qty || 0))
+      })
+      .eq('shop_id', sessionId)
+      .eq('cylinder_type', cylinderType)
+
+    if (stockError) return { success: false, message: stockError.message }
+
+    const { error: txError } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('id', transactionId)
+      .eq('shop_id', sessionId)
+
+    if (txError) return { success: false, message: txError.message }
+
+    await fetchStoreData()
+    return { success: true, message: 'Sale deleted successfully!' }
+  }
+
+  return { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale }
 }
+
