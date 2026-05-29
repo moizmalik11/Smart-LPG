@@ -3,10 +3,306 @@ import { useStore } from '../hooks/useStore'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
 import BottomNav from './BottomNav'
-import { DollarSign, Package, CheckCircle, X, Save, TrendingUp, Target, BarChart3, Edit, Edit2, Settings as SettingsIcon, FileText, Circle, ShoppingCart, RefreshCw, BookOpen, History } from 'lucide-react'
+import { DollarSign, Package, CheckCircle, X, Save, TrendingUp, Target, BarChart3, Edit, Edit2, Settings as SettingsIcon, FileText, Circle, ShoppingCart, RefreshCw, BookOpen, History, Trash2, Download } from 'lucide-react'
 
 export default function Dashboard({ session, renameShop, updateShopDetails, onLogout }) {
-  const { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate } = useStore(session.id)
+  const { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale } = useStore(session.id)
+
+  const downloadCustomerPDF = (customerName) => {
+    const txns = store.transactions
+      .filter(t => (t.type === 'khata' || t.type === 'settlement') && t.name === customerName)
+      .sort((a, b) => a.created_at.localeCompare(b.created_at))
+
+    const customerData = store.khatabook && store.khatabook[customerName] ? store.khatabook[customerName] : { kg: 0, amount: 0 }
+
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) {
+      alert('Please allow popups to download the PDF slip!')
+      return
+    }
+
+    const todayStr = new Date().toLocaleDateString('en-PK', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+
+    let rowsHTML = ''
+    txns.forEach(t => {
+      const dateObj = new Date(t.date)
+      const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' })
+      const typeLabel = t.type === 'khata' ? 'Udhar (Credit)' : 'Settle (Paid)'
+      const qtyText = t.qty ? `${Number(t.qty).toFixed(2)} kg` : '-'
+      const rateText = t.rate_per_kg ? `PKR ${t.rate_per_kg}` : '-'
+      const amountText = t.amount ? `PKR ${t.amount.toLocaleString()}` : 'PKR 0.00'
+      const amountClass = t.type === 'khata' ? 'text-red' : 'text-green'
+      
+      rowsHTML += `
+        <tr>
+          <td>${t.date} (${dayName})</td>
+          <td><span class="badge ${t.type}">${typeLabel}</span></td>
+          <td>${qtyText}</td>
+          <td>${rateText}</td>
+          <td class="font-bold ${amountClass}">${amountText}</td>
+        </tr>
+      `
+    })
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Udhar_Slip_${customerName}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+          body {
+            font-family: 'Outfit', sans-serif;
+            color: #1e293b;
+            background: #ffffff;
+            margin: 0;
+            padding: 40px;
+          }
+          .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+          }
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ef4444;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+          }
+          .logo-section h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+            color: #4f46e5;
+            letter-spacing: -0.5px;
+          }
+          .logo-section p {
+            margin: 5px 0 0 0;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+          }
+          .meta-section {
+            text-align: right;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+          }
+          .meta-section strong {
+            color: #1e293b;
+          }
+          .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 800;
+            color: #ef4444;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+          }
+          .details-box {
+            display: flex;
+            justify-content: space-between;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+          }
+          .details-box div {
+            font-size: 14px;
+            color: #64748b;
+          }
+          .details-box div strong {
+            color: #1e293b;
+            font-size: 16px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+          }
+          th {
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #cbd5e1;
+          }
+          td {
+            padding: 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+          }
+          .badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+          }
+          .badge.khata {
+            background: #fee2e2;
+            color: #b91c1c;
+          }
+          .badge.settlement {
+            background: #d1fae5;
+            color: #065f46;
+          }
+          .text-red {
+            color: #ef4444;
+          }
+          .text-green {
+            color: #16a34a;
+          }
+          .summary-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 40px;
+          }
+          .summary-card {
+            background: #fff8f8;
+            border: 1px solid #fee2e2;
+            border-radius: 12px;
+            padding: 15px 20px;
+            min-width: 250px;
+          }
+          .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #64748b;
+          }
+          .summary-row.total {
+            margin-top: 10px;
+            border-top: 1px solid #fca5a5;
+            padding-top: 10px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #b91c1c;
+          }
+          .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 40px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+          }
+          .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding: 0 20px;
+          }
+          .sig-line {
+            width: 180px;
+            border-top: 1px solid #cbd5e1;
+            text-align: center;
+            font-size: 11px;
+            color: #64748b;
+            padding-top: 8px;
+            margin-top: 40px;
+          }
+          @media print {
+            body { padding: 0; }
+            .container { border: none; box-shadow: none; padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo-section">
+              <h1>${session.name || 'Smart LPG'}</h1>
+              <p>Gas Cylinder Management System</p>
+            </div>
+            <div class="meta-section">
+              Slip Date: <strong>${todayStr}</strong><br />
+              Shop ID: <strong>${session.id.slice(0, 8)}</strong>
+            </div>
+          </div>
+          
+          <div class="title">Udhar Ledger (Khata Book Slip)</div>
+          
+          <div class="details-box">
+            <div>
+              Customer Name: <br />
+              <strong>${customerName}</strong>
+            </div>
+            <div style="text-align: right;">
+              Current Rate per Kg: <br />
+              <strong>PKR ${Number(store.perKgRate || 0).toLocaleString()}</strong>
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Date & Day</th>
+                <th>Type</th>
+                <th>Weight (Kg)</th>
+                <th>Rate/Kg</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHTML || '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">No chronological ledger entries registered.</td></tr>'}
+            </tbody>
+          </table>
+          
+          <div class="summary-container">
+            <div class="summary-card">
+              <div class="summary-row">
+                <span>Total Gas Borrowed:</span>
+                <strong style="color: #1e293b;">${Number(customerData.kg || 0).toFixed(2)} kg</strong>
+              </div>
+              <div class="summary-row total">
+                <span>Total Net Udhar:</span>
+                <span>PKR ${Number(customerData.amount || 0).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="signature-section">
+            <div class="sig-line">Customer Signature</div>
+            <div class="sig-line">Authorized Stamp/Signature</div>
+          </div>
+          
+          <div class="footer-note">
+            This is a system generated transaction ledger slip for ${session.name}. Thank you for your business.
+          </div>
+        </div>
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() { window.close(); }, 500);
+          }
+        </script>
+      </body>
+      </html>
+    `
+    printWindow.document.write(htmlContent)
+    printWindow.document.close()
+  }
 
   const [perKgRate, setPerKgRate] = useState(0)
   const [view, setView] = useState('overview')
@@ -425,8 +721,8 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                         <div className="flex-1">
                           <div className="font-bold text-slate-900 text-base">{name}</div>
                           <div className="flex flex-wrap gap-4 mt-1 text-xs font-semibold text-slate-500">
-                            <span>Total Weight: <span className="text-slate-800">{data.kg || 0} kg</span></span>
-                            <span>Outstanding Balance: <span className="text-red-600">{formatPKR(data.amount || 0)}</span></span>
+                            <span>Total Weight: <span className="text-slate-800">{Number(data.kg || 0).toFixed(2)} kg</span></span>
+                            <span>Udhar: <span className="text-red-600">{formatPKR(data.amount || 0)}</span></span>
                           </div>
                         </div>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -452,6 +748,13 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                             </>
                           ) : (
                             <>
+                              <button 
+                                className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1.5" 
+                                style={{ borderRadius: '12px' }} 
+                                onClick={() => downloadCustomerPDF(name)}
+                              >
+                                <Download className="w-3.5 h-3.5" /> Slip
+                              </button>
                               <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold whitespace-nowrap" style={{ borderRadius: '12px' }} onClick={() => { setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
                               <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" style={{ borderRadius: '12px' }} onClick={() => { setSettlingName(name); setSettleAmount('') }}><DollarSign className="w-3.5 h-3.5" /> Settle Payment</button>
                             </>
@@ -463,109 +766,129 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                 </div>
               )}
 
-              {showHistory && (
-                <div className="modal-overlay" onClick={() => setShowHistory(false)}>
-                  <div className="modal p-4 sm:p-6 max-w-3xl w-full" onClick={e => e.stopPropagation()}>
-                    <div className="flex items-center justify-between mb-5 border-b pb-3">
-                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2"><FileText className="w-5 h-5 text-indigo-600" /> 30-Day Settlement History</h3>
-                      <button
-                        className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-500"
-                        onClick={() => setShowHistory(false)}
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
+              {showHistory && (() => {
+                const customerRunningBalances = {}
+                const txnRemainingBalances = {}
+                const allSortedTxns = [...store.transactions]
+                  .filter(t => (t.type === 'khata' || t.type === 'settlement') && t.name)
+                  .sort((a, b) => b.created_at.localeCompare(a.created_at))
 
-                    {/* Mobile list cards for settlement history */}
-                    <div className="block md:hidden space-y-3 max-h-[50vh] overflow-y-auto pr-1">
-                      {(() => {
-                        const lastMonth = new Date()
-                        lastMonth.setDate(lastMonth.getDate() - 30)
-                        const lastMonthStr = lastMonth.toISOString().slice(0, 10)
-                        const historyTxns = store.transactions
-                          .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
-                          .sort((a, b) => b.date.localeCompare(a.date))
-                        
-                        if (historyTxns.length === 0) {
-                          return <div className="text-center py-8 text-slate-500 text-xs font-semibold">No logs in last 30 days</div>
-                        }
+                allSortedTxns.forEach(t => {
+                  const name = t.name
+                  if (customerRunningBalances[name] === undefined) {
+                    customerRunningBalances[name] = store.khatabook && store.khatabook[name] ? Number(store.khatabook[name].amount || 0) : 0
+                  }
+                  txnRemainingBalances[t.id] = customerRunningBalances[name]
+                  const amt = Number(t.amount || 0)
+                  if (t.type === 'settlement') {
+                    customerRunningBalances[name] += amt
+                  } else if (t.type === 'khata') {
+                    customerRunningBalances[name] -= amt
+                  }
+                })
 
-                        return historyTxns.map((t, i) => {
-                          const currentData = store.khatabook && store.khatabook[t.name] ? store.khatabook[t.name] : { amount: 0 }
-                          const remaining = currentData.amount || 0
-                          return (
-                            <div key={i} className="bg-slate-50 p-3 border border-slate-200 rounded-xl space-y-1.5 text-xs font-semibold">
-                              <div className="flex justify-between text-slate-500 text-[10px]">
-                                <span>{t.date}</span>
-                                <span>Payment Log</span>
+                return (
+                  <div className="modal-overlay" onClick={() => setShowHistory(false)}>
+                    <div className="modal p-4 sm:p-6 max-w-3xl w-full" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center justify-between mb-5 border-b pb-3">
+                        <h3 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2"><FileText className="w-5 h-5 text-indigo-600" /> 30-Day Settlement History</h3>
+                        <button
+                          className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-500"
+                          onClick={() => setShowHistory(false)}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Mobile list cards for settlement history */}
+                      <div className="block md:hidden space-y-3 max-h-[50vh] overflow-y-auto pr-1">
+                        {(() => {
+                          const lastMonth = new Date()
+                          lastMonth.setDate(lastMonth.getDate() - 30)
+                          const lastMonthStr = lastMonth.toISOString().slice(0, 10)
+                          const historyTxns = store.transactions
+                            .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
+                            .sort((a, b) => b.date.localeCompare(a.date))
+                          
+                          if (historyTxns.length === 0) {
+                            return <div className="text-center py-8 text-slate-500 text-xs font-semibold">No logs in last 30 days</div>
+                          }
+
+                          return historyTxns.map((t, i) => {
+                            const remaining = txnRemainingBalances[t.id] ?? 0
+                            return (
+                              <div key={i} className="bg-slate-50 p-3 border border-slate-200 rounded-xl space-y-1.5 text-xs font-semibold">
+                                <div className="flex justify-between text-slate-500 text-[10px]">
+                                  <span>{t.date}</span>
+                                  <span>Payment Log</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold text-slate-800">{t.name}</span>
+                                  <span className="text-green-600 font-bold">{formatPKR(t.amount || (t.qty && store.perKgRate ? t.qty * store.perKgRate : 0))}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-[11px] text-slate-500">
+                                  <span>Remaining Balance:</span>
+                                  {remaining === 0 ? (
+                                    <span className="px-2 py-0.5 rounded-full text-[9px] bg-green-50 text-green-700 border border-green-200">Clear</span>
+                                  ) : (
+                                    <span className="text-slate-800 font-semibold">{formatPKR(remaining)}</span>
+                                  )}
+                                </div>
                               </div>
-                              <div className="flex justify-between items-center">
-                                <span className="font-bold text-slate-800">{t.name}</span>
-                                <span className="text-green-600 font-bold">{formatPKR(t.paid)}</span>
-                              </div>
-                              <div className="flex justify-between items-center text-[11px] text-slate-500">
-                                <span>Remaining Balance:</span>
-                                {remaining === 0 ? (
-                                  <span className="px-2 py-0.5 rounded-full text-[9px] bg-green-50 text-green-700 border border-green-200">Clear</span>
-                                ) : (
-                                  <span className="text-slate-800 font-semibold">{formatPKR(remaining)}</span>
-                                )}
-                              </div>
-                            </div>
-                          )
-                        })
-                      })()}
-                    </div>
+                            )
+                          })
+                        })()}
+                      </div>
 
-                    {/* Desktop table logs */}
-                    <div className="hidden md:block overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200">
-                            <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
-                            <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
-                            <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Paid Amount</th>
-                            <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Remaining</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          {(() => {
-                            const lastMonth = new Date()
-                            lastMonth.setDate(lastMonth.getDate() - 30)
-                            const lastMonthStr = lastMonth.toISOString().slice(0, 10)
-                            const historyTxns = store.transactions
-                              .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
-                              .sort((a, b) => b.date.localeCompare(a.date))
-                            
-                            if (historyTxns.length === 0) {
-                              return <tr><td className="py-6 text-center text-slate-500 text-xs font-semibold" colSpan={4}>No logs in last 30 days</td></tr>
-                            }
+                      {/* Desktop table logs */}
+                      <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                              <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                              <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                              <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Paid Amount</th>
+                              <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Remaining</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {(() => {
+                              const lastMonth = new Date()
+                              lastMonth.setDate(lastMonth.getDate() - 30)
+                              const lastMonthStr = lastMonth.toISOString().slice(0, 10)
+                              const historyTxns = store.transactions
+                                .filter(t => t.type === 'settlement' && t.date >= lastMonthStr)
+                                .sort((a, b) => b.date.localeCompare(a.date))
+                              
+                              if (historyTxns.length === 0) {
+                                return <tr><td className="py-6 text-center text-slate-500 text-xs font-semibold" colSpan={4}>No logs in last 30 days</td></tr>
+                              }
 
-                            return historyTxns.map((t, i) => {
-                              const currentData = store.khatabook && store.khatabook[t.name] ? store.khatabook[t.name] : { amount: 0 }
-                              const remaining = currentData.amount || 0
-                              return (
-                                <tr key={i} className="hover:bg-slate-50 transition-all text-xs font-semibold">
-                                  <td className="py-3 px-3 text-slate-500">{t.date}</td>
-                                  <td className="py-3 px-3 text-slate-900">{t.name}</td>
-                                  <td className="py-3 px-3 text-green-600">{formatPKR(t.paid)}</td>
-                                  <td className="py-3 px-3">
-                                    {remaining === 0 ? (
-                                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-green-50 text-green-700 border border-green-200">Clear</span>
-                                    ) : (
-                                      <span className="text-slate-800">{formatPKR(remaining)}</span>
-                                    )}
-                                  </td>
-                                </tr>
-                              )
-                            })
-                          })()}
-                        </tbody>
-                      </table>
+                              return historyTxns.map((t, i) => {
+                                const remaining = txnRemainingBalances[t.id] ?? 0
+                                return (
+                                  <tr key={i} className="hover:bg-slate-50 transition-all text-xs font-semibold">
+                                    <td className="py-3 px-3 text-slate-500">{t.date}</td>
+                                    <td className="py-3 px-3 text-slate-900">{t.name}</td>
+                                    <td className="py-3 px-3 text-green-600">{formatPKR(t.amount || (t.qty && store.perKgRate ? t.qty * store.perKgRate : 0))}</td>
+                                    <td className="py-3 px-3">
+                                      {remaining === 0 ? (
+                                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-green-50 text-green-700 border border-green-200">Clear</span>
+                                      ) : (
+                                        <span className="text-slate-800">{formatPKR(remaining)}</span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                )
+                              })
+                            })()}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )
+              })()}
 
               {view === 'reports' && (
                 <div className="space-y-6">
@@ -714,14 +1037,28 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                         <div key={i} className="bg-white p-4 border border-slate-200 rounded-xl space-y-2.5">
                           <div className="flex justify-between items-center">
                             <span className="text-xs font-semibold text-slate-500">{s.date}</span>
-                            <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-bold">Cylinder Sale</span>
+                            <div className="flex items-center gap-2">
+                              <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-bold">Cylinder Sale</span>
+                              <button 
+                                className="p-1 text-slate-400 hover:text-red-600 transition-all rounded"
+                                onClick={async () => {
+                                  if (confirm('Are you sure you want to delete this sale and rollback stock?')) {
+                                    const res = await deleteSale(s.id, s.note, s.qty)
+                                    if (res.success) setToast({ message: res.message, type: 'success' })
+                                    else setToast({ message: res.message, type: 'error' })
+                                  }
+                                }}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-sm font-bold text-slate-800">{s.qty} Cylinder{s.qty > 1 ? 's' : ''}</span>
                             <span className="text-sm font-extrabold text-green-600">{formatPKR(s.amount)}</span>
                           </div>
                           <div className="flex justify-between text-[11px] font-semibold text-slate-500 border-t pt-2">
-                            <span>Rate: {formatPKR(s.ratePerKg)}/kg</span>
+                            <span>Rate: {formatPKR(s.rate_per_kg || (s.amount && s.qty ? s.amount / (s.qty * 45) : 0))}/kg</span>
                             {s.note && <span>{s.note}</span>}
                           </div>
                         </div>
@@ -741,6 +1078,7 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                             <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Revenue</th>
                             <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Unit Rate</th>
                             <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Remarks</th>
+                            <th className="py-2.5 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 text-xs font-semibold">
@@ -749,8 +1087,24 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                               <td className="py-3 px-3 text-slate-500">{s.date}</td>
                               <td className="py-3 px-3 text-slate-900">{s.qty}</td>
                               <td className="py-3 px-3 text-green-600">{formatPKR(s.amount)}</td>
-                              <td className="py-3 px-3 text-slate-600">{formatPKR(s.ratePerKg)}</td>
+                              <td className="py-3 px-3 text-slate-600">{formatPKR(s.rate_per_kg || (s.amount && s.qty ? s.amount / (s.qty * 45) : 0))}</td>
                               <td className="py-3 px-3 text-slate-500">{s.note}</td>
+                              <td className="py-3 px-3 text-right">
+                                <button 
+                                  className="p-1.5 hover:bg-red-50 text-slate-400 hover:text-red-600 transition-all"
+                                  style={{ borderRadius: '8px' }}
+                                  onClick={async () => {
+                                    if (confirm('Are you sure you want to delete this sale and rollback stock?')) {
+                                      const res = await deleteSale(s.id, s.note, s.qty)
+                                      if (res.success) setToast({ message: res.message, type: 'success' })
+                                      else setToast({ message: res.message, type: 'error' })
+                                    }
+                                  }}
+                                  title="Delete Sale"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </td>
                             </tr>
                           ))}
                           {store.transactions.filter(t => t.type === 'sale').length === 0 && (
