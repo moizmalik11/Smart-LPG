@@ -95,6 +95,7 @@ export default function App() {
   const handleLogout = async () => {
     setLoading(true)
     await supabase.auth.signOut()
+    localStorage.removeItem('activeDashboardView')
     setIsAuthenticated(false)
     setSession(null)
     setLoading(false)
