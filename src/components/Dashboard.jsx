@@ -3,10 +3,15 @@ import { useStore } from '../hooks/useStore'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
 import BottomNav from './BottomNav'
-import { DollarSign, Package, CheckCircle, X, Save, TrendingUp, Target, BarChart3, Edit, Edit2, Settings as SettingsIcon, FileText, Circle, ShoppingCart, RefreshCw, BookOpen, History, Trash2, Download } from 'lucide-react'
+const Spinner = () => (
+  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+  </svg>
+)
 
 export default function Dashboard({ session, renameShop, updateShopDetails, onLogout }) {
-  const { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale } = useStore(session.id)
+  const { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale, actionLoading } = useStore(session.id)
 
   const downloadCustomerPDF = (customerName) => {
     const txns = store.transactions
@@ -353,6 +358,12 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
 
   return (
     <div className="flex min-h-screen" style={{ background: '#f8fafc' }}>
+      {/* Premium Top Action Loading Bar */}
+      {(loading || actionLoading) && (
+        <div className="top-loading-bar">
+          <div className="top-loading-bar-inner" />
+        </div>
+      )}
       {/* Sidebar (Desktop navigation) */}
       <Sidebar
         session={session}
@@ -408,15 +419,19 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                     onClick={() => { setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                   ><X className="w-3.5 h-3.5" /></button>
                   <button
-                    className="px-3 py-1 text-xs font-semibold text-white transition-all hover:bg-green-700 flex items-center gap-1 shadow-sm"
+                    className="px-3 py-1 text-xs font-semibold text-white transition-all hover:bg-green-700 flex items-center gap-1 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ background: '#16a34a', borderRadius: '12px' }}
+                    disabled={actionLoading}
                     onClick={async () => {
                       const newRate = Number(perKgDraft || 0)
                       setPerKgRate(newRate)
                       await updatePerKgRate(newRate)
                       setPerKgEditing(false)
                     }}
-                  ><Save className="w-3.5 h-3.5" /> Save</button>
+                  >
+                    {actionLoading && <Spinner />}
+                    <Save className="w-3.5 h-3.5" /> Save
+                  </button>
                 </>
               )}
             </div>
@@ -484,7 +499,7 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
 
         {/* content window container optimized with bottom offset for mobileBottomNav */}
         <section className="flex-1 p-3 sm:p-4 lg:p-6 pb-24 lg:pb-6 overflow-auto space-y-6">
-          {loading ? (
+          {loading && store.transactions.length === 0 && store.perKgRate === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <svg className="animate-spin w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -526,15 +541,19 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                             onClick={() => { setPerKgEditing(false); setPerKgDraft(perKgRate); }}
                           ><X className="w-4 h-4" /> Cancel</button>
                           <button
-                            className="px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-green-700 flex items-center gap-1.5 shadow-md"
+                            className="px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-green-700 flex items-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                             style={{ background: '#16a34a', borderRadius: '12px' }}
+                            disabled={actionLoading}
                             onClick={async () => {
                               const newRate = Number(perKgDraft || 0)
                               setPerKgRate(newRate)
                               await updatePerKgRate(newRate)
                               setPerKgEditing(false)
                             }}
-                          ><Save className="w-4 h-4" /> Save</button>
+                          >
+                            {actionLoading && <Spinner />}
+                            <Save className="w-4 h-4" /> Save
+                          </button>
                         </>
                       )}
                     </div>
@@ -612,8 +631,9 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                           </div>
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <button
-                              className="px-4 py-3 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-all shadow-md text-sm flex items-center justify-center gap-1.5"
+                              className="px-4 py-3 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-all shadow-md text-sm flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                               style={{ borderRadius: '12px' }}
+                              disabled={actionLoading}
                               onClick={async () => {
                                 const result = await recordSale(type, 1, perKgRate, `Direct sale of 1x ${type}`)
                                 if (!result.success) {
@@ -623,7 +643,8 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                                 }
                               }}
                             >
-                              <ShoppingCart className="w-4 h-4" /> Sell -1
+                              {actionLoading ? <Spinner /> : <ShoppingCart className="w-4 h-4" />}
+                              Sell -1
                             </button>
                             <button
                               className="px-4 py-3 sm:py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-all shadow-md text-sm flex items-center justify-center gap-1.5"
@@ -666,8 +687,9 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                                   Cancel
                                 </button>
                                 <button
-                                  className="flex-1 sm:flex-none px-3.5 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold transition-all shadow-md text-xs flex items-center justify-center gap-1.5"
+                                  className="flex-1 sm:flex-none px-3.5 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold transition-all shadow-md text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                                   style={{ borderRadius: '12px' }}
+                                  disabled={actionLoading}
                                   onClick={async () => {
                                     const result = await manageEmpty(type, emptyQty)
                                     if (result.success) {
@@ -679,6 +701,7 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                                     }
                                   }}
                                 >
+                                  {actionLoading && <Spinner />}
                                   <CheckCircle className="w-3.5 h-3.5" /> Refill
                                 </button>
                               </div>
@@ -707,11 +730,14 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                   <div className="mb-6 flex flex-col sm:flex-row gap-3">
                     <input value={khataName} onChange={e => setKhataName(e.target.value)} placeholder="Customer Name" className="flex-1 p-2.5 bg-white border border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" style={{ borderRadius: '12px' }} />
                     <input value={khataKg} onChange={e => setKhataKg(e.target.value)} placeholder="Gas Qty (Kg)" type="number" className="flex-1 sm:w-32 p-2.5 bg-white border border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" style={{ borderRadius: '12px' }} />
-                    <button className="px-5 py-3 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md whitespace-nowrap" style={{ borderRadius: '12px' }} onClick={async () => {
+                    <button className="px-5 py-3 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md whitespace-nowrap flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '12px' }} disabled={actionLoading} onClick={async () => {
                       const res = await addKhataEntry(khataName, khataKg, perKgRate)
                       if (res && res.success) { setToast({ message: res.message, type: 'success' }); setKhataName(''); setKhataKg('') }
                       else setToast({ message: res.message || 'Error', type: 'error' })
-                    }}>Add Log Entry</button>
+                    }}>
+                      {actionLoading && <Spinner />}
+                      Add Log Entry
+                    </button>
                   </div>
 
                   <div className="space-y-3">
@@ -729,21 +755,27 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                           {addingTo === name ? (
                             <>
                               <input type="number" value={addKgValue} onChange={e => setAddKgValue(e.target.value)} placeholder="Weight (Kg)" className="p-2.5 bg-white border border-slate-300 w-full sm:w-28 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" style={{ borderRadius: '12px' }} />
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold whitespace-nowrap" style={{ borderRadius: '12px' }} onClick={async () => {
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '12px' }} disabled={actionLoading} onClick={async () => {
                                 const res = await addKhataEntry(name, addKgValue, perKgRate)
                                 if (res && res.success) { setToast({ message: res.message, type: 'success' }); setAddingTo(null); setAddKgValue('') }
                                 else setToast({ message: res.message || 'Error', type: 'error' })
-                              }}>+ Add Weight</button>
+                              }}>
+                                {actionLoading && <Spinner />}
+                                + Add Weight
+                              </button>
                               <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs" style={{ borderRadius: '12px' }} onClick={() => { setAddingTo(null); setAddKgValue('') }}>Cancel</button>
                             </>
                           ) : settlingName === name ? (
                             <>
                               <input type="number" value={settleAmount} onChange={e => setSettleAmount(e.target.value)} placeholder="PKR Amount" className="p-2.5 bg-white border border-slate-300 w-full sm:w-32 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" style={{ borderRadius: '12px' }} />
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" style={{ borderRadius: '12px' }} onClick={async () => {
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '12px' }} disabled={actionLoading} onClick={async () => {
                                 const res = await settleKhata(name, settleAmount)
                                 if (res && res.success) { setToast({ message: res.message, type: 'success' }); setSettlingName(null); setSettleAmount('') }
                                 else setToast({ message: res.message || 'Error', type: 'error' })
-                              }}><DollarSign className="w-3.5 h-3.5" /> Settle</button>
+                              }}>
+                                {actionLoading && <Spinner />}
+                                <DollarSign className="w-3.5 h-3.5" /> Settle
+                              </button>
                               <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs" style={{ borderRadius: '12px' }} onClick={() => { setSettlingName(null); setSettleAmount('') }}>Cancel</button>
                             </>
                           ) : (
@@ -1132,8 +1164,9 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                           </button>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <button
-                              className="px-3.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1"
+                             <button
+                              className="px-3.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={actionLoading}
                               onClick={async () => {
                                 if (!localSession || !localSession.name) {
                                   setToast({ message: 'Shop name is required', type: 'error' })
@@ -1155,6 +1188,7 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                                 }
                               }}
                             >
+                              {actionLoading && <Spinner />}
                               <Save className="w-3.5 h-3.5" /> Save
                             </button>
                             <button
@@ -1362,8 +1396,9 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                       >
                         Cancel
                       </button>
-                      <button
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                       <button
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                        disabled={actionLoading}
                         onClick={async () => {
                           if (inventoryModalData.filled + inventoryModalData.empty !== inventoryModalData.total) {
                             setToast({ message: 'Filled + Empty must equal total', type: 'error' })
@@ -1381,6 +1416,7 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                           }
                         }}
                       >
+                        {actionLoading && <Spinner />}
                         Save Stock
                       </button>
                     </div>
