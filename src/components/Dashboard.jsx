@@ -355,6 +355,11 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
   const [khataKg, setKhataKg] = useState('')
   const [khataRate, setKhataRate] = useState('')
   const [expandedCustomer, setExpandedCustomer] = useState(null)
+  const [pendingDeletes, setPendingDeletes] = useState({})
+  const [customEntryForm, setCustomEntryForm] = useState(null)
+  const [customDate, setCustomDate] = useState('')
+  const [customKg, setCustomKg] = useState('')
+  const [customRate, setCustomRate] = useState('')
   const [addingTo, setAddingTo] = useState(null)
   const [addKgValue, setAddKgValue] = useState('')
   const [addRateValue, setAddRateValue] = useState('')
@@ -394,6 +399,12 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
 
   return (
     <div className="flex min-h-screen" style={{ background: '#f8fafc' }}>
+      <style>{`
+        @keyframes shrink-width {
+          from { width: 100%; }
+          to { width: 0%; }
+        }
+      `}</style>
       {/* Premium Top Action Loading Bar */}
       {(loading || actionLoading) && (
         <div className="top-loading-bar">
@@ -499,6 +510,41 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
             </div>
           </div>
         )}
+
+        {/* Global Pending Deletes Popups */}
+        <div className="fixed bottom-4 right-4 z-[60] flex flex-col gap-2">
+          {Object.entries(pendingDeletes).map(([id, info]) => (
+            <div key={id} className="bg-slate-900 text-white p-4 rounded-xl shadow-2xl border border-slate-700 w-80 relative overflow-hidden animate-slide-up flex flex-col gap-3">
+              <div className="absolute top-0 left-0 h-1 bg-red-500" style={{ width: '100%', animation: 'shrink-width 10s linear forwards' }}></div>
+              <div className="text-sm font-bold">Delete log entry?</div>
+              <div className="text-xs text-slate-400">The entry will be permanently deleted in 10s.</div>
+              <div className="flex gap-2 mt-1">
+                <button 
+                  className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
+                  disabled={actionLoading}
+                  onClick={async () => {
+                    clearTimeout(info.timerId)
+                    const res = await deleteKhataTransaction(info.transaction)
+                    if(res.success) setToast({ message: 'Deleted instantly', type: 'success'})
+                    else setToast({ message: res.message, type: 'error'})
+                    setPendingDeletes(prev => { const n = {...prev}; delete n[id]; return n })
+                  }}
+                >
+                  Confirm Delete
+                </button>
+                <button 
+                  className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold transition-colors"
+                  onClick={() => {
+                    clearTimeout(info.timerId)
+                    setPendingDeletes(prev => { const n = {...prev}; delete n[id]; return n })
+                  }}
+                >
+                  Undo
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Edit Shop Modal */}
         {showEdit && (
@@ -838,46 +884,72 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                         </div>
                         {expandedCustomer === name && (
                            <div className="border-t border-slate-100 bg-slate-50 p-4 animate-fade-in-up">
-                              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Transaction Logs</h4>
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Transaction Logs</h4>
+                                <button className="text-[11px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-full transition-all" onClick={() => { setCustomEntryForm(name); setCustomDate(''); setCustomKg(''); setCustomRate('') }}>+ Add Custom Log</button>
+                              </div>
+                              {customEntryForm === name && (
+                                <div className="mb-4 bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-2 items-center">
+                                  <input type="date" value={customDate} onChange={e => setCustomDate(e.target.value)} className="w-full sm:flex-1 p-2 bg-slate-50 border border-slate-300 text-xs rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                                  <input type="number" value={customKg} onChange={e => setCustomKg(e.target.value)} placeholder="Qty (Kg)" className="w-full sm:flex-1 p-2 bg-slate-50 border border-slate-300 text-xs rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                                  <input type="number" value={customRate} onChange={e => setCustomRate(e.target.value)} placeholder={`Rate (Default: ${perKgRate})`} className="w-full sm:flex-1 p-2 bg-slate-50 border border-slate-300 text-xs rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                                  <div className="flex gap-2 w-full sm:w-auto">
+                                    <button className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm" disabled={actionLoading} onClick={async () => {
+                                      const finalRate = Number(customRate) > 0 ? Number(customRate) : perKgRate;
+                                      const res = await addKhataEntry(name, customKg, finalRate, customDate)
+                                      if (res && res.success) { setToast({ message: res.message, type: 'success' }); setCustomEntryForm(null) }
+                                      else setToast({ message: res.message || 'Error', type: 'error' })
+                                    }}>Add</button>
+                                    <button className="flex-1 sm:flex-none px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg transition-all" onClick={() => setCustomEntryForm(null)}>Cancel</button>
+                                  </div>
+                                </div>
+                              )}
                               <div className="space-y-2">
                                 {store.transactions
                                   .filter(t => (t.type === 'khata' || t.type === 'settlement') && t.name === name)
                                   .sort((a, b) => b.created_at.localeCompare(a.created_at))
-                                  .map(t => (
-                                    <div key={t.id} className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                                      <div>
-                                        <div className="text-xs font-bold text-slate-800 flex items-center gap-2">
-                                          <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${t.type === 'khata' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
-                                            {t.type === 'khata' ? 'Udhar' : 'Paid'}
-                                          </span>
-                                          {new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  .map(t => {
+                                    if (pendingDeletes[t.id]) {
+                                      return null;
+                                    }
+                                    return (
+                                      <div key={t.id} className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                                        <div>
+                                          <div className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${t.type === 'khata' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                                              {t.type === 'khata' ? 'Udhar' : 'Paid'}
+                                            </span>
+                                            {new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                          </div>
+                                          <div className="text-[11px] font-semibold text-slate-500 mt-1">
+                                            {t.type === 'khata' ? `Qty: ${Number(t.qty || 0).toFixed(2)}kg @ PKR ${t.rate_per_kg}` : `Payment settled`}
+                                          </div>
                                         </div>
-                                        <div className="text-[11px] font-semibold text-slate-500 mt-1">
-                                          {t.type === 'khata' ? `Qty: ${Number(t.qty || 0).toFixed(2)}kg @ PKR ${t.rate_per_kg}` : `Payment settled`}
+                                        <div className="flex items-center gap-4">
+                                          <div className={`font-bold text-sm ${t.type === 'khata' ? 'text-red-600' : 'text-emerald-600'}`}>
+                                            {t.type === 'khata' ? `+ PKR ${Number(t.amount || 0).toLocaleString()}` : `- PKR ${Number(t.amount || 0).toLocaleString()}`}
+                                          </div>
+                                          <button 
+                                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors"
+                                            title="Delete entry"
+                                            disabled={actionLoading}
+                                            onClick={(e) => {
+                                              e.stopPropagation()
+                                              const tid = setTimeout(async () => {
+                                                const res = await deleteKhataTransaction(t)
+                                                if (res.success) setToast({ message: res.message, type: 'success' })
+                                                else setToast({ message: res.message, type: 'error' })
+                                                setPendingDeletes(prev => { const n = { ...prev }; delete n[t.id]; return n })
+                                              }, 10000)
+                                              setPendingDeletes(prev => ({ ...prev, [t.id]: { timerId: tid, transaction: t } }))
+                                            }}
+                                          >
+                                            {actionLoading ? <Spinner /> : <Trash2 className="w-4 h-4" />}
+                                          </button>
                                         </div>
                                       </div>
-                                      <div className="flex items-center gap-4">
-                                        <div className={`font-bold text-sm ${t.type === 'khata' ? 'text-red-600' : 'text-emerald-600'}`}>
-                                          {t.type === 'khata' ? `+ PKR ${Number(t.amount || 0).toLocaleString()}` : `- PKR ${Number(t.amount || 0).toLocaleString()}`}
-                                        </div>
-                                        <button 
-                                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors"
-                                          title="Delete entry"
-                                          disabled={actionLoading}
-                                          onClick={async (e) => {
-                                            e.stopPropagation()
-                                            if (window.confirm('Are you sure you want to delete this log entry? This will adjust the customer balance automatically.')) {
-                                              const res = await deleteKhataTransaction(t)
-                                              if (res.success) setToast({ message: res.message, type: 'success' })
-                                              else setToast({ message: res.message, type: 'error' })
-                                            }
-                                          }}
-                                        >
-                                          {actionLoading ? <Spinner /> : <Trash2 className="w-4 h-4" />}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ))}
+                                    )
+                                  })}
                                 {store.transactions.filter(t => (t.type === 'khata' || t.type === 'settlement') && t.name === name).length === 0 && (
                                   <div className="text-xs text-slate-500 text-center py-4 bg-white rounded-xl border border-dashed border-slate-200">No logs found</div>
                                 )}

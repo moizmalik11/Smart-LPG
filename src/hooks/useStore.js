@@ -255,7 +255,7 @@ export function useStore(sessionId){
     }
   }
 
-  const addKhataEntry = async (name, kg, perKgRate) => {
+  const addKhataEntry = async (name, kg, perKgRate, customDate = null) => {
     setActionLoading(true)
     try {
       const q = Number(kg || 0)
@@ -291,7 +291,8 @@ export function useStore(sessionId){
 
       await supabase.from('transactions').insert({
         shop_id: sessionId,
-        date: todaysKey,
+        date: customDate ? customDate : todaysKey,
+        created_at: customDate ? new Date(customDate).toISOString() : new Date().toISOString(),
         type: 'khata',
         name: key,
         qty: q,
