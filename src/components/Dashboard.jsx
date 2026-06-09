@@ -21,6 +21,8 @@ import {
   TrendingUp,
   Trash2,
   Edit2,
+  ChevronDown,
+  ChevronUp,
   Settings as SettingsIcon
 } from 'lucide-react'
 const Spinner = () => (
@@ -38,7 +40,7 @@ const formatDateLocal = (d) => {
 }
 
 export default function Dashboard({ session, renameShop, updateShopDetails, onLogout }) {
-  const { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale, actionLoading } = useStore(session.id)
+  const { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale, deleteKhataTransaction, actionLoading } = useStore(session.id)
 
   const downloadCustomerPDF = (customerName) => {
     const txns = store.transactions
@@ -351,8 +353,11 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
   const [toast, setToast] = useState(null)
   const [khataName, setKhataName] = useState('')
   const [khataKg, setKhataKg] = useState('')
+  const [khataRate, setKhataRate] = useState('')
+  const [expandedCustomer, setExpandedCustomer] = useState(null)
   const [addingTo, setAddingTo] = useState(null)
   const [addKgValue, setAddKgValue] = useState('')
+  const [addRateValue, setAddRateValue] = useState('')
   const [settlingName, setSettlingName] = useState(null)
   const [settleAmount, setSettleAmount] = useState('')
   const [showHistory, setShowHistory] = useState(false)
@@ -761,9 +766,11 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                   <div className="mb-6 flex flex-col sm:flex-row gap-3">
                     <input value={khataName} onChange={e => setKhataName(e.target.value)} placeholder="Customer Name" className="flex-1 p-2.5 bg-white border border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" style={{ borderRadius: '12px' }} />
                     <input value={khataKg} onChange={e => setKhataKg(e.target.value)} placeholder="Gas Qty (Kg)" type="number" className="flex-1 sm:w-32 p-2.5 bg-white border border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" style={{ borderRadius: '12px' }} />
+                    <input value={khataRate} onChange={e => setKhataRate(e.target.value)} placeholder={`Rate (Default: ${perKgRate})`} type="number" className="flex-1 sm:w-40 p-2.5 bg-white border border-slate-300 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" style={{ borderRadius: '12px' }} />
                     <button className="px-5 py-3 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md whitespace-nowrap flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '12px' }} disabled={actionLoading} onClick={async () => {
-                      const res = await addKhataEntry(khataName, khataKg, perKgRate)
-                      if (res && res.success) { setToast({ message: res.message, type: 'success' }); setKhataName(''); setKhataKg('') }
+                      const finalRate = Number(khataRate) > 0 ? Number(khataRate) : perKgRate;
+                      const res = await addKhataEntry(khataName, khataKg, finalRate)
+                      if (res && res.success) { setToast({ message: res.message, type: 'success' }); setKhataName(''); setKhataKg(''); setKhataRate('') }
                       else setToast({ message: res.message || 'Error', type: 'error' })
                     }}>
                       {actionLoading && <Spinner />}
@@ -774,27 +781,32 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                   <div className="space-y-3">
                     {Object.entries(store.khatabook || {}).length === 0 && <div className="text-sm font-semibold text-slate-500 py-6 text-center">No khata entries recorded yet</div>}
                     {Object.entries(store.khatabook || {}).map(([name, data], idx) => (
-                      <div key={idx} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 border border-slate-200 rounded-xl hover:shadow-sm transition-all">
-                        <div className="flex-1">
-                          <div className="font-bold text-slate-900 text-base">{name}</div>
-                          <div className="flex flex-wrap gap-4 mt-1 text-xs font-semibold text-slate-500">
-                            <span>Total Weight: <span className="text-slate-800">{Number(data.kg || 0).toFixed(2)} kg</span></span>
-                            <span>Udhar: <span className="text-red-600">{formatPKR(data.amount || 0)}</span></span>
+                      <div key={idx} className="flex flex-col border border-slate-200 rounded-xl hover:shadow-sm transition-all bg-white overflow-hidden">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4">
+                          <div className="flex-1 cursor-pointer" onClick={() => setExpandedCustomer(expandedCustomer === name ? null : name)}>
+                            <div className="font-bold text-slate-900 text-base flex items-center gap-2">
+                              {name} {expandedCustomer === name ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                            </div>
+                            <div className="flex flex-wrap gap-4 mt-1 text-xs font-semibold text-slate-500">
+                              <span>Total Weight: <span className="text-slate-800">{Number(data.kg || 0).toFixed(2)} kg</span></span>
+                              <span>Udhar: <span className="text-red-600">{formatPKR(data.amount || 0)}</span></span>
+                            </div>
                           </div>
-                        </div>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                           {addingTo === name ? (
                             <>
                               <input type="number" value={addKgValue} onChange={e => setAddKgValue(e.target.value)} placeholder="Weight (Kg)" className="p-2.5 bg-white border border-slate-300 w-full sm:w-28 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" style={{ borderRadius: '12px' }} />
+                              <input type="number" value={addRateValue} onChange={e => setAddRateValue(e.target.value)} placeholder={`Rate (Default: ${perKgRate})`} className="p-2.5 bg-white border border-slate-300 w-full sm:w-32 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs" style={{ borderRadius: '12px' }} />
                               <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderRadius: '12px' }} disabled={actionLoading} onClick={async () => {
-                                const res = await addKhataEntry(name, addKgValue, perKgRate)
-                                if (res && res.success) { setToast({ message: res.message, type: 'success' }); setAddingTo(null); setAddKgValue('') }
+                                const finalRate = Number(addRateValue) > 0 ? Number(addRateValue) : perKgRate;
+                                const res = await addKhataEntry(name, addKgValue, finalRate)
+                                if (res && res.success) { setToast({ message: res.message, type: 'success' }); setAddingTo(null); setAddKgValue(''); setAddRateValue('') }
                                 else setToast({ message: res.message || 'Error', type: 'error' })
                               }}>
                                 {actionLoading && <Spinner />}
                                 + Add Weight
                               </button>
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs" style={{ borderRadius: '12px' }} onClick={() => { setAddingTo(null); setAddKgValue('') }}>Cancel</button>
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs" style={{ borderRadius: '12px' }} onClick={() => { setAddingTo(null); setAddKgValue(''); setAddRateValue('') }}>Cancel</button>
                             </>
                           ) : settlingName === name ? (
                             <>
@@ -818,11 +830,60 @@ export default function Dashboard({ session, renameShop, updateShopDetails, onLo
                               >
                                 <Download className="w-3.5 h-3.5" /> Slip
                               </button>
-                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold whitespace-nowrap" style={{ borderRadius: '12px' }} onClick={() => { setAddingTo(name); setAddKgValue('') }}>+ Add Kg</button>
+                              <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold whitespace-nowrap" style={{ borderRadius: '12px' }} onClick={() => { setAddingTo(name); setAddKgValue(''); setAddRateValue('') }}>+ Add Kg</button>
                               <button className="flex-1 py-2.5 sm:py-1.5 sm:flex-none px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold whitespace-nowrap flex items-center justify-center gap-1" style={{ borderRadius: '12px' }} onClick={() => { setSettlingName(name); setSettleAmount('') }}><DollarSign className="w-3.5 h-3.5" /> Settle Payment</button>
                             </>
                           )}
                         </div>
+                        </div>
+                        {expandedCustomer === name && (
+                           <div className="border-t border-slate-100 bg-slate-50 p-4 animate-fade-in-up">
+                              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Transaction Logs</h4>
+                              <div className="space-y-2">
+                                {store.transactions
+                                  .filter(t => (t.type === 'khata' || t.type === 'settlement') && t.name === name)
+                                  .sort((a, b) => b.created_at.localeCompare(a.created_at))
+                                  .map(t => (
+                                    <div key={t.id} className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                                      <div>
+                                        <div className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                                          <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${t.type === 'khata' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                                            {t.type === 'khata' ? 'Udhar' : 'Paid'}
+                                          </span>
+                                          {new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                        </div>
+                                        <div className="text-[11px] font-semibold text-slate-500 mt-1">
+                                          {t.type === 'khata' ? `Qty: ${Number(t.qty || 0).toFixed(2)}kg @ PKR ${t.rate_per_kg}` : `Payment settled`}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-4">
+                                        <div className={`font-bold text-sm ${t.type === 'khata' ? 'text-red-600' : 'text-emerald-600'}`}>
+                                          {t.type === 'khata' ? `+ PKR ${Number(t.amount || 0).toLocaleString()}` : `- PKR ${Number(t.amount || 0).toLocaleString()}`}
+                                        </div>
+                                        <button 
+                                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors"
+                                          title="Delete entry"
+                                          disabled={actionLoading}
+                                          onClick={async (e) => {
+                                            e.stopPropagation()
+                                            if (window.confirm('Are you sure you want to delete this log entry? This will adjust the customer balance automatically.')) {
+                                              const res = await deleteKhataTransaction(t)
+                                              if (res.success) setToast({ message: res.message, type: 'success' })
+                                              else setToast({ message: res.message, type: 'error' })
+                                            }
+                                          }}
+                                        >
+                                          {actionLoading ? <Spinner /> : <Trash2 className="w-4 h-4" />}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                {store.transactions.filter(t => (t.type === 'khata' || t.type === 'settlement') && t.name === name).length === 0 && (
+                                  <div className="text-xs text-slate-500 text-center py-4 bg-white rounded-xl border border-dashed border-slate-200">No logs found</div>
+                                )}
+                              </div>
+                           </div>
+                        )}
                       </div>
                     ))}
                   </div>
