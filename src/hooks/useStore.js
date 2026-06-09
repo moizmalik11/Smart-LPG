@@ -415,6 +415,69 @@ export function useStore(sessionId){
     }
   }
 
-  return { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale, actionLoading }
+  const deleteKhataTransaction = async (transaction) => {
+    setActionLoading(true)
+    try {
+      if (!transaction || !transaction.id) return { success: false, message: 'Invalid transaction' }
+      
+      const key = transaction.name
+      // 1. Delete transaction from transactions table
+      const { error: txError } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', transaction.id)
+        .eq('shop_id', sessionId)
+        
+      if (txError) return { success: false, message: txError.message }
+
+      // 2. Fetch current khata record
+      const { data: currentRecord } = await supabase
+        .from('khatabook')
+        .select('*')
+        .eq('shop_id', sessionId)
+        .eq('customer_name', key)
+        .maybeSingle()
+
+      if (currentRecord) {
+        let newAmount = Number(currentRecord.amount || 0)
+        let newKg = Number(currentRecord.kg || 0)
+
+        // If reversing a 'khata' (credit added)
+        if (transaction.type === 'khata') {
+          newAmount -= Number(transaction.amount || 0)
+          newKg -= Number(transaction.qty || 0)
+        } 
+        // If reversing a 'settlement' (payment)
+        else if (transaction.type === 'settlement') {
+          newAmount += Number(transaction.amount || 0)
+          newKg += Number(transaction.qty || 0)
+        }
+
+        newAmount = Math.max(0, newAmount)
+        newKg = Math.max(0, newKg)
+
+        if (newAmount === 0 && newKg === 0) {
+          await supabase
+            .from('khatabook')
+            .delete()
+            .eq('shop_id', sessionId)
+            .eq('customer_name', key)
+        } else {
+          await supabase
+            .from('khatabook')
+            .update({ kg: newKg, amount: newAmount })
+            .eq('shop_id', sessionId)
+            .eq('customer_name', key)
+        }
+      }
+
+      await fetchStoreData()
+      return { success: true, message: 'Transaction deleted and balance adjusted' }
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  return { store, loading, todaysTransactions, todaysSalesValue, weeklySales, totalFilled, totalEmpty, recordSale, manageEmpty, addKhataEntry, settleKhata, updateInventory, updatePerKgRate, deleteSale, deleteKhataTransaction, actionLoading }
 }
 
